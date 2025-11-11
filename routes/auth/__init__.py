@@ -4,7 +4,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 from . import (
     sign_in,
-    # sign_up,
+    sign_up,
     # sign_out,
     # refresh_token,
     # forgot_password,

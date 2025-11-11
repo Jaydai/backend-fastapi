@@ -1,15 +1,33 @@
 from domains.entities import Session
+from dtos import SignInDTO, SignUpDTO
 from core.supabase import supabase
-from typing import Dict, Any
 
 class AuthRepository:
     @staticmethod
-    def sign_in_with_password(email: str, password: str) -> Session:
+    def sign_in_with_password(sign_in_dto: SignInDTO) -> Session:
         sign_in_response = supabase.auth.sign_in_with_password({
-            "email": email,
-            "password": password,
+            "email": sign_in_dto.email,
+            "password": sign_in_dto.password,
         })
         return Session(
             access_token=sign_in_response.session.access_token,
             refresh_token=sign_in_response.session.refresh_token
+        )
+    
+    @staticmethod
+    def sign_up_with_email(sign_up_dto: SignUpDTO) -> Session:
+        # TODO: sign_up with email validation
+        sign_up_response = supabase.auth.sign_up({
+            "email": sign_up_dto.email,
+            "password": sign_up_dto.password,
+            "options": {
+                "data": {
+                    "first_name": sign_up_dto.first_name,
+                    "last_name": sign_up_dto.last_name
+                }
+            }
+        })
+        return Session(
+            access_token=sign_up_response.session.access_token,
+            refresh_token=sign_up_response.session.refresh_token
         )

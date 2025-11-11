@@ -1,6 +1,6 @@
-"""DTOs (Data Transfer Objects) module"""
-from .auth_dto import SignInDTO
+from .auth_dto import SignInDTO, SignUpDTO
 
 __all__ = [
     "SignInDTO",
+    "SignUpDTO",
 ]
