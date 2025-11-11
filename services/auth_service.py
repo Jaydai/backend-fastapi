@@ -1,4 +1,4 @@
-from dtos import SignInDTO, SignUpDTO, OAuthSignIn
+from dtos import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO
 from repositories import AuthRepository
 from domains.entities import Session
 
@@ -22,4 +22,8 @@ class AuthService:
     def sign_out(access_token: str | None) -> None:
         if access_token:
             AuthRepository.sign_out()
+
+    @staticmethod
+    def refresh_token(refresh_token_dto: RefreshTokenDTO) -> Session:
+        return AuthRepository.refresh_session(refresh_token_dto)
         

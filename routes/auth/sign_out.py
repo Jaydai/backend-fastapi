@@ -1,6 +1,7 @@
 from fastapi import Response, Request
 from . import router
 from services import AuthService
+from utils import clear_auth_cookies
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,14 +15,7 @@ async def sign_out(request: Request, response: Response):
 
         AuthService.sign_out(request.cookies.get("session_token"))
 
-        response.delete_cookie(
-            key="session_token",
-            path="/"
-        )
-        response.delete_cookie(
-            key="refresh_token",
-            path="/"
-        )
+        clear_auth_cookies(response)
 
     except Exception as e:
         logger.error(f"Sign out error: {str(e)}")

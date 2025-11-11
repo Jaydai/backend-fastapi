@@ -6,7 +6,7 @@ from . import (
     sign_in,
     sign_up,
     sign_out,
-    # refresh_token,
+    refresh,
     # forgot_password,
     # reset_password,
     # verify_email,

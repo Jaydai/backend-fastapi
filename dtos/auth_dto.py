@@ -16,3 +16,7 @@ class SignUpDTO(BaseModel):
 class OAuthSignIn(BaseModel):
     provider: str
     token: str
+
+
+class RefreshTokenDTO(BaseModel):
+    refresh_token: str
