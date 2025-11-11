@@ -1,5 +1,5 @@
 from domains.entities import Session
-from dtos import SignInDTO, SignUpDTO
+from dtos import SignInDTO, SignUpDTO, OAuthSignIn
 from core.supabase import supabase
 
 class AuthRepository:
@@ -14,6 +14,18 @@ class AuthRepository:
             refresh_token=sign_in_response.session.refresh_token
         )
     
+    @staticmethod
+    def oauth_sign_in(sign_in_dto: OAuthSignIn) -> Session:
+        sign_in_response = supabase.auth.sign_in_with_id_token({
+            "provider": sign_in_dto.provider,
+            "token": sign_in_dto.token
+        })
+        print(sign_in_response)
+        return Session(
+            access_token=sign_in_response.session.access_token,
+            refresh_token=sign_in_response.session.refresh_token
+        )
+
     @staticmethod
     def sign_up_with_email(sign_up_dto: SignUpDTO) -> Session:
         # TODO: sign_up with email validation
@@ -31,3 +43,7 @@ class AuthRepository:
             access_token=sign_up_response.session.access_token,
             refresh_token=sign_up_response.session.refresh_token
         )
+
+    @staticmethod
+    def sign_out() -> None:
+        supabase.auth.sign_out()

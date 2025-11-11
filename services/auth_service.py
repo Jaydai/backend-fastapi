@@ -1,4 +1,4 @@
-from dtos import SignInDTO, SignUpDTO
+from dtos import SignInDTO, SignUpDTO, OAuthSignIn
 from repositories import AuthRepository
 from domains.entities import Session
 
@@ -10,6 +10,16 @@ class AuthService:
         return AuthRepository.sign_in_with_password(sign_in_dto)
         
     @staticmethod
+    def oauth_sign_in(sign_in_dto: OAuthSignIn) -> Session:
+        return AuthRepository.oauth_sign_in(sign_in_dto)
+    
+    @staticmethod
     def sign_up_with_email(sign_up_dto: SignUpDTO) -> Session:
         return AuthRepository.sign_up_with_email(sign_up_dto)
+
+
+    @staticmethod
+    def sign_out(access_token: str | None) -> None:
+        if access_token:
+            AuthRepository.sign_out()
         

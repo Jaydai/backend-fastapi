@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
 
 
 class SignInDTO(BaseModel):
@@ -12,3 +11,8 @@ class SignUpDTO(BaseModel):
     password: str
     first_name: str
     last_name: str
+
+
+class OAuthSignIn(BaseModel):
+    provider: str
+    token: str
