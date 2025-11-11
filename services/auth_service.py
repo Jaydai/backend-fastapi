@@ -26,4 +26,7 @@ class AuthService:
     @staticmethod
     def refresh_token(refresh_token_dto: RefreshTokenDTO) -> Session:
         return AuthRepository.refresh_session(refresh_token_dto)
-        
+    
+    @staticmethod
+    def get_current_user_id() -> str | None:
+        return AuthRepository.get_current_user_id()

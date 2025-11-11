@@ -6,32 +6,32 @@ Following Dependency Inversion Principle
 """
 from typing import Callable, Optional
 from fastapi import Depends, HTTPException, status, Header
-from fastapi.security import HTTPBearer, HTTPAuthCookie
+from fastapi.security import HTTPBearer
 
 from core.supabase import supabase
-from services import PermissionService
+from services import PermissionService, AuthService
 from domains.enums import PermissionEnum
 
 
-security = HTTPBearer()
+# security = HTTPBearer()
 
-
-async def get_current_user_id(token: str = Depends(security)) -> str:
+# async def get_current_user_id(token: str = Depends(security)) -> str:
+async def get_current_user_id() -> str:
     """
     Extract user_id from JWT token
     This dependency should be used as a base for other permission checks
     """
     try:
         # Verify the token with Supabase
-        user = supabase.auth.get_user(token.credentials)
-        
-        if not user or not user.user:
+        user_id = AuthService.get_current_user_id()
+
+        if not user_id:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid authentication credentials",
             )
         
-        return user.user.id
+        return user_id
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
