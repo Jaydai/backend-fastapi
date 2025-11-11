@@ -1,0 +1,150 @@
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main  # Production branch
+      - staging  # Development branch
+  pull_request:
+    branches:
+      - main
+      - staging
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REPOSITORY: jaydai-backend
+  IMAGE_NAME: backend-fastapi
+  REGION: europe-west1  # Using your preferred region
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set environment based on branch
+        id: set-env
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+            echo "SERVICE_NAME=api-layers" >> $GITHUB_ENV
+            echo "CUSTOM_DOMAIN=api.layers.jayd.ai" >> $GITHUB_ENV
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PROD }}" >> $GITHUB_ENV
+            echo "SUPABASE_SECRET_KEY=${{ secrets.SUPABASE_SECRET_KEY_PROD }}" >> $GITHUB_ENV
+            echo "SUPABASE_PUBLISHABLE_KEY=${{ secrets.SUPABASE_PUBLISHABLE_KEY_PROD }}" >> $GITHUB_ENV
+            echo "FRONTEND_URL=${{ secrets.FRONTEND_URL_PROD }}" >> $GITHUB_ENV
+          fi
+          
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        
+      - name: Install gcloud beta components
+        run: |
+          gcloud components install beta --quiet
+        
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+          
+      - name: Build and push Docker image
+        run: |
+          IMAGE_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}-${{ env.ENVIRONMENT }}:${{ github.sha }}"
+          echo "Building image: $IMAGE_TAG"
+          
+          docker build -t $IMAGE_TAG -f Dockerfile.prod .
+          docker push $IMAGE_TAG
+          
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: ${{ env.IMAGE_TAG }}
+          flags: '--allow-unauthenticated --cpu=1 --memory=512Mi --min-instances=0 --max-instances=10'
+          env_vars: |
+            ENVIRONMENT=${{ env.ENVIRONMENT }}
+            SUPABASE_URL=${{ env.SUPABASE_URL }}
+            SUPABASE_SECRET_KEY=${{ env.SUPABASE_SECRET_KEY }}
+            SUPABASE_PUBLISHABLE_KEY=${{ env.SUPABASE_PUBLISHABLE_KEY }}
+            FRONTEND_URL=${{ env.FRONTEND_URL }}
+      - name: Check Domain Verification
+        if: env.CUSTOM_DOMAIN != ''
+        id: check-domain
+        run: |
+          echo "Checking if domain ${{ env.CUSTOM_DOMAIN }} is verified..."
+          
+          # Check if domain is verified by attempting to list verified domains
+          VERIFIED_DOMAINS=$(gcloud domains list-user-verified --format="value(domain)" 2>/dev/null || echo "")
+          
+          if echo "$VERIFIED_DOMAINS" | grep -q "^${{ env.CUSTOM_DOMAIN }}$" || echo "$VERIFIED_DOMAINS" | grep -q "^jayd.ai$"; then
+            echo "DOMAIN_VERIFIED=true" >> $GITHUB_ENV
+            echo "Domain is verified!"
+          else
+            echo "DOMAIN_VERIFIED=false" >> $GITHUB_ENV
+            echo "Domain is not verified."
+          fi
+
+      - name: Configure Custom Domain Mapping
+        if: env.CUSTOM_DOMAIN != '' && env.DOMAIN_VERIFIED == 'true'
+        run: |
+          echo "Configuring custom domain mapping for ${{ env.CUSTOM_DOMAIN }}"
+          
+          # Check if domain mapping already exists
+          if gcloud beta run domain-mappings describe ${{ env.CUSTOM_DOMAIN }} --region=${{ env.REGION }} --quiet 2>/dev/null; then
+            echo "Domain mapping already exists, updating..."
+            gcloud beta run domain-mappings update ${{ env.CUSTOM_DOMAIN }} \
+              --service=${{ env.SERVICE_NAME }} \
+              --region=${{ env.REGION }} \
+              --quiet
+          else
+            echo "Creating new domain mapping..."
+            gcloud beta run domain-mappings create \
+              --service=${{ env.SERVICE_NAME }} \
+              --domain=${{ env.CUSTOM_DOMAIN }} \
+              --region=${{ env.REGION }} \
+              --quiet
+          fi
+          
+          # Get the DNS record information
+          echo "Getting DNS configuration..."
+          gcloud beta run domain-mappings describe ${{ env.CUSTOM_DOMAIN }} \
+            --region=${{ env.REGION }} \
+            --format="value(status.resourceRecords[].name,status.resourceRecords[].rrdata)" > dns_records.txt
+          
+          echo "DNS Records to configure:"
+          cat dns_records.txt
+
+      - name: Domain Verification Instructions
+        if: env.CUSTOM_DOMAIN != '' && env.DOMAIN_VERIFIED == 'false'
+        run: |
+          echo "⚠️  Domain ${{ env.CUSTOM_DOMAIN }} is not verified!"
+          echo ""
+          echo "To verify your domain, please:"
+          echo "1. Go to Google Cloud Console → Cloud Run → Manage Custom Domains"
+          echo "2. Click 'Add Mapping' and enter: ${{ env.CUSTOM_DOMAIN }}"
+          echo "3. Follow the verification steps provided by Google"
+          echo "4. Add the required DNS records to your domain registrar"
+          echo ""
+          echo "Your service is deployed and accessible at: ${{ steps.deploy.outputs.url }}"
+          echo "Once domain is verified, re-run the deployment to configure custom domain mapping."
+            
+      - name: Show Output
+        run: |
+          echo "Cloud Run URL: ${{ steps.deploy.outputs.url }}"
+          if [[ "${{ env.DOMAIN_VERIFIED }}" == "true" && -n "${{ env.CUSTOM_DOMAIN }}" ]]; then
+            echo "Custom Domain URL: https://${{ env.CUSTOM_DOMAIN }}"
+          elif [[ -n "${{ env.CUSTOM_DOMAIN }}" ]]; then
+            echo "Custom Domain: ${{ env.CUSTOM_DOMAIN }} (verification required)"
+          fi
