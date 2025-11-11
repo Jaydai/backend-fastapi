@@ -4,6 +4,7 @@ from . import router
 from dtos import SignInDTO
 import logging
 from services import AuthService
+from domains.entities import Session
 
 logger = logging.getLogger(__name__)
 
@@ -11,8 +12,7 @@ logger = logging.getLogger(__name__)
 @router.post("/sign_in")
 async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
     try:
-        supabase_response = AuthService.sign_in_with_password(sign_in_dto)
-
+        session: Session = AuthService.sign_in_with_password(sign_in_dto)
 
         client_type = request.headers.get("X-Client-Type", "extension")  # Default to extension for backward compatibility
         logger.info(f"[AUTH] Sign in for client_type: {client_type}")
@@ -23,7 +23,7 @@ async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
 
         response.set_cookie(
             key="session_token",
-            value=supabase_response.session.access_token,
+            value=session.access_token,
             httponly=True,
             secure=True,  # HTTPS only
             samesite="lax",
@@ -31,10 +31,9 @@ async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
             path="/"
         )
 
-        # Set refresh token cookie
         response.set_cookie(
             key="refresh_token",
-            value=supabase_response.session.refresh_token,
+            value=session.refresh_token,
             httponly=True,
             secure=True,
             samesite="lax",
