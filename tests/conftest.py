@@ -1,15 +1,16 @@
 """
 Configuration pytest pour les tests backend-fastapi
 """
-import pytest
-from typing import Generator
-from fastapi.testclient import TestClient
-from core.supabase import supabase
-from main import app
-from supabase import create_client, Client
+
 import os
-import dotenv
 import uuid
+
+import dotenv
+import pytest
+from fastapi.testclient import TestClient
+
+from main import app
+from supabase import Client, create_client
 
 dotenv.load_dotenv()
 
@@ -101,7 +102,7 @@ def create_test_user(supabase_admin: Client):
             })
 
             if not sign_in_response.session or not sign_in_response.user:
-                print(f"Warning: Failed to sign in test user")
+                print("Warning: Failed to sign in test user")
                 return ("", "")
 
             created_user_id = sign_in_response.user.id

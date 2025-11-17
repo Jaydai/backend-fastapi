@@ -4,6 +4,7 @@ from datetime import datetime
 from domains.entities import Template, TemplateTitle, TemplateComment
 from services.locale_service import LocaleService
 
+
 class TemplateRepository:
     """Base repository for template database operations"""
 

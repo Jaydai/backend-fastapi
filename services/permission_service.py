@@ -1,7 +1,8 @@
 from supabase import Client
 from repositories import PermissionRepository
 from domains.entities import UserOrganizationRole
-from domains.enums import RoleEnum, PermissionEnum
+from domains.enums import PermissionEnum, RoleEnum
+from repositories import PermissionRepository
 
 
 class PermissionService:

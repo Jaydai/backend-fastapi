@@ -1,9 +1,12 @@
 """
 Supabase client initialization
 """
-from supabase import create_client, Client, ClientOptions
-import dotenv
+
 import os
+
+import dotenv
+
+from supabase import Client, ClientOptions, create_client
 
 # Load .env.local first (higher priority), then .env as fallback
 dotenv.load_dotenv(".env.local")

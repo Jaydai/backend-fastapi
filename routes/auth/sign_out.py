@@ -1,8 +1,11 @@
-from fastapi import Response, Request
-from . import router
+import logging
+
+from fastapi import Request, Response
+
 from services import AuthService
 from utils import clear_auth_cookies
-import logging
+
+from . import router
 
 logger = logging.getLogger(__name__)
 

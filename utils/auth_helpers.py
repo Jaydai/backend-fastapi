@@ -2,6 +2,7 @@ from fastapi import Response
 from domains.entities import Session
 from config.settings import settings, Environment
 
+from domains.entities import Session
 
 COOKIE_MAX_AGE = 7 * 24 * 60 * 60  # 7 days
 ACCESS_COOKIE_KEY = "access_token"

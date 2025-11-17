@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from ..enums import RoleEnum, PermissionEnum
+
+from ..enums import PermissionEnum, RoleEnum
 
 
 @dataclass
@@ -7,20 +8,20 @@ class UserOrganizationRole:
     user_id: str
     role: RoleEnum
     organization_id: str | None = None
-    
+
     def has_permission(self, permission: PermissionEnum) -> bool:
         return permission in ROLE_PERMISSIONS.get(self.role, [])
     
     def is_global(self) -> bool:
         return self.organization_id is None
-    
+
     def is_for_organization(self, organization_id: str) -> bool:
         return self.organization_id == organization_id
+
 
 ROLE_PERMISSIONS: dict[RoleEnum, list[PermissionEnum]] = {
     RoleEnum.ADMIN: [
         PermissionEnum.ADMIN_SETTINGS,
-
         PermissionEnum.COMMENT_CREATE,
         PermissionEnum.COMMENT_READ,
         PermissionEnum.COMMENT_UPDATE,

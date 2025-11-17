@@ -1,9 +1,9 @@
 from .auth_dto import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO, UserMeResponseDTO
 from .permission_dto import (
     CheckPermissionDTO,
-    UserRoleResponseDTO,
     PermissionResponseDTO,
     RolePermissionsResponseDTO,
+    UserRoleResponseDTO,
 )
 from .template_dto import (
     CreateTemplateDTO,

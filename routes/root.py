@@ -1,6 +1,11 @@
 import os
+
+from fastapi import APIRouter
+
 from config import settings
-from . import router
+
+router = APIRouter()
+
 
 @router.get("/")
 async def root():

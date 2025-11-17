@@ -1,6 +1,7 @@
+from fastapi import Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
-from fastapi import Request, status
+
 from services import AuthService
 from utils.auth_helpers import ACCESS_COOKIE_KEY
 from core.supabase import SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
@@ -29,7 +30,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/auth/reset_password",
         "/openapi.json",
     ]
-    
+
     async def dispatch(self, request: Request, call_next):
         # Allow CORS preflight requests to pass through without authentication
         if request.method == "OPTIONS":
@@ -98,22 +99,20 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         except Exception:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content={
-                    "detail": "Invalid authentication credentials. Token may be expired or malformed."
-                }
+                content={"detail": "Invalid authentication credentials. Token may be expired or malformed."},
             )
-        
+
         response = await call_next(request)
         return response
-    
+
     def _is_public_route(self, request: Request) -> bool:
         path = request.url.path
-        
+
         if path in self.PUBLIC_PATHS_WITHOUT_AUTH:
             return True
-        
+
         for public_path in self.PUBLIC_PATHS_WITHOUT_AUTH:
             if public_path != "/" and path.startswith(public_path):
                 return True
-        
+
         return False

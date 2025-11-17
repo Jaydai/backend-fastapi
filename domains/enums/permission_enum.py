@@ -3,7 +3,7 @@ from enum import Enum
 
 class PermissionEnum(str, Enum):
     ADMIN_SETTINGS = "admin:settings"
-    
+
     COMMENT_CREATE = "comment:create"
     COMMENT_READ = "comment:read"
     COMMENT_UPDATE = "comment:update"

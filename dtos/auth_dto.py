@@ -26,4 +26,4 @@ class UserMeResponseDTO(BaseModel):
     user_id: str
     name: str
     data_collection: bool
-    profile_picture_url: Optional[str]
+    profile_picture_url: str | None

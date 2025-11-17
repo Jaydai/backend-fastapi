@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from domains.enums import RoleEnum, PermissionEnum
+
+from domains.enums import PermissionEnum, RoleEnum
 
 
 class CheckPermissionDTO(BaseModel):
@@ -17,7 +18,7 @@ class UserRoleResponseDTO(BaseModel):
 class PermissionResponseDTO(BaseModel):
     permission: PermissionEnum
     description: str | None = None
-    
+
 
 class RolePermissionsResponseDTO(BaseModel):
     role: RoleEnum

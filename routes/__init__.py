@@ -1,5 +1,7 @@
 from fastapi import APIRouter
+
 from .auth import router as auth_router
+from .root import router as root_router
 from .templates import router as templates_router
 from .folders import router as folders_router
 from .blocks import router as blocks_router

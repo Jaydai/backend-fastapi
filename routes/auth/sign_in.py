@@ -1,11 +1,15 @@
 """Sign in endpoint"""
-from fastapi import HTTPException, Request, Response
-from . import router
-from dtos import SignInDTO
+
 import logging
-from services import AuthService
+
+from fastapi import HTTPException, Request, Response
+
 from domains.entities import Session
+from dtos import SignInDTO
+from services import AuthService
 from utils import set_auth_cookies
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +19,9 @@ async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
     try:
         session: Session = AuthService.sign_in_with_password(sign_in_dto)
 
-        client_type = request.headers.get("X-Client-Type", "extension")  # Default to extension for backward compatibility
+        client_type = request.headers.get(
+            "X-Client-Type", "extension"
+        )  # Default to extension for backward compatibility
         logger.info(f"[AUTH] Sign in for client_type: {client_type}")
 
         if client_type != "webapp" and client_type != "extension":

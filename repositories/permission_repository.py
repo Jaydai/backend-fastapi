@@ -16,13 +16,11 @@ class PermissionRepository:
 
             return [
                 UserOrganizationRole(
-                    user_id=row["user_id"],
-                    role=RoleEnum(row["role"]),
-                    organization_id=row.get("organization_id")
+                    user_id=row["user_id"], role=RoleEnum(row["role"]), organization_id=row.get("organization_id")
                 )
                 for row in response.data
             ]
-        except Exception as e:
+        except Exception:
             return []
 
     @staticmethod
@@ -37,13 +35,11 @@ class PermissionRepository:
 
             return [
                 UserOrganizationRole(
-                    user_id=row["user_id"],
-                    role=RoleEnum(row["role"]),
-                    organization_id=row.get("organization_id")
+                    user_id=row["user_id"], role=RoleEnum(row["role"]), organization_id=row.get("organization_id")
                 )
                 for row in response.data
             ]
-        except Exception as e:
+        except Exception:
             return []
 
     @staticmethod
@@ -60,11 +56,9 @@ class PermissionRepository:
 
             return [
                 UserOrganizationRole(
-                    user_id=row["user_id"],
-                    role=RoleEnum(row["role"]),
-                    organization_id=row.get("organization_id")
+                    user_id=row["user_id"], role=RoleEnum(row["role"]), organization_id=row.get("organization_id")
                 )
                 for row in response.data
             ]
-        except Exception as e:
+        except Exception:
             return []

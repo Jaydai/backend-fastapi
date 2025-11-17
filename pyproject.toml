@@ -1,0 +1,91 @@
+[tool.ruff]
+# Longueur de ligne maximale
+line-length = 120
+
+# Version Python cible
+target-version = "py311"
+
+# Dossiers à exclure du linting
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".pytest_cache",
+    "*.pyc",
+    "migrations",
+]
+
+[tool.ruff.lint]
+# Règles activées (E = erreurs, F = pyflakes, I = isort, N = naming)
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+
+# Règles ignorées (ajustez selon vos besoins)
+ignore = [
+    "E501",  # line too long (géré par formatter)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "B904",  # raise in except without from err/None - préférence projet
+]
+
+# Autoriser les imports non utilisés dans __init__.py
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.format]
+# Style de quotes
+quote-style = "double"
+
+# Style d'indentation
+indent-style = "space"
+
+# Trailing comma
+skip-magic-trailing-comma = false
+
+[tool.pytest.ini_options]
+# Configuration pytest
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+
+# Affichage
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+]
+
+# Markers personnalisés
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["services", "repositories", "routes", "middleware"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
