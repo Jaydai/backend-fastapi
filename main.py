@@ -5,6 +5,7 @@ Clean, modular, and maintainable structure
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from middleware.auth_middleware import AuthenticationMiddleware
 import os
 import logging
 
@@ -66,6 +67,7 @@ app.add_middleware(
     allow_headers=["*", "authorization", "content-type", "accept-language", "accept"],
     expose_headers=["*"]
 )
+app.add_middleware(AuthenticationMiddleware)
 
 # Include main API router
 app.include_router(api_router)

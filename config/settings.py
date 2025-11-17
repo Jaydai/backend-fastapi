@@ -3,7 +3,6 @@ Application settings and configuration
 Centralized configuration management for environment variables and constants
 """
 import os
-from typing import Optional
 from enum import Enum
 import dotenv
 

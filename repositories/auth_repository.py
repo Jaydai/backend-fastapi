@@ -1,4 +1,3 @@
-from typing import Optional
 from domains.entities import Session
 from dtos import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO
 from core.supabase import supabase
@@ -59,7 +58,7 @@ class AuthRepository:
         )
 
     @staticmethod
-    def get_current_user_id() -> Optional[str]:
+    def get_current_user_id() -> str | None:
         response = supabase.auth.get_user()
         if response.user:
             return response.user.id

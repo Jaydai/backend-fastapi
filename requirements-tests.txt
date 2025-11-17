@@ -1,0 +1,22 @@
+# Tests Requirements
+# Installer avec: pip install -r requirements-tests.txt
+
+# Testing framework
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+
+# HTTP client for testing
+httpx>=0.24.0
+
+# FastAPI testing
+fastapi[all]>=0.100.0
+
+# Supabase (déjà dans requirements.txt mais on le garde pour clarté)
+supabase>=1.0.0
+
+# Faker pour générer des données de test
+faker>=19.0.0
+
+# Pour les mocks si nécessaire
+pytest-mock>=3.11.0
