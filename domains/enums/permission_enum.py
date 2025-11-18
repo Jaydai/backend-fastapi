@@ -24,5 +24,8 @@ class PermissionEnum(str, Enum):
     USER_READ = "user:read"
     USER_UPDATE = "user:update"
     USER_DELETE = "user:delete"
-    
-    
+
+    ORGANIZATION_CREATE = "organization:create"
+    ORGANIZATION_READ = "organization:read"
+    ORGANIZATION_UPDATE = "organization:update"
+    ORGANIZATION_DELETE = "organization:delete"

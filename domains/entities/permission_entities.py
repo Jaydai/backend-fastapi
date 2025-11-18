@@ -37,6 +37,8 @@ ROLE_PERMISSIONS: dict[RoleEnum, list[PermissionEnum]] = {
         PermissionEnum.USER_READ,
         PermissionEnum.USER_UPDATE,
         PermissionEnum.USER_DELETE,
+        PermissionEnum.ORGANIZATION_READ,
+        PermissionEnum.ORGANIZATION_UPDATE,
     ],
     RoleEnum.WRITER: [
         PermissionEnum.COMMENT_CREATE,
@@ -51,6 +53,7 @@ ROLE_PERMISSIONS: dict[RoleEnum, list[PermissionEnum]] = {
         PermissionEnum.BLOCK_READ,
         PermissionEnum.BLOCK_UPDATE,
         PermissionEnum.BLOCK_DELETE,
+        PermissionEnum.ORGANIZATION_READ
     ],
     RoleEnum.VIEWER: [
         PermissionEnum.COMMENT_CREATE,
@@ -59,10 +62,12 @@ ROLE_PERMISSIONS: dict[RoleEnum, list[PermissionEnum]] = {
         PermissionEnum.COMMENT_DELETE,
         PermissionEnum.TEMPLATE_READ,
         PermissionEnum.BLOCK_READ,
+        PermissionEnum.ORGANIZATION_READ
     ],
     RoleEnum.GUEST: [
         PermissionEnum.COMMENT_READ,
         PermissionEnum.TEMPLATE_READ,
         PermissionEnum.BLOCK_READ,
+        PermissionEnum.ORGANIZATION_READ
     ],
 }

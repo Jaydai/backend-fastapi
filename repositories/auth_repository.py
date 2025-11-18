@@ -58,8 +58,8 @@ class AuthRepository:
         )
 
     @staticmethod
-    def get_current_user_id() -> str | None:
-        response = supabase.auth.get_user()
+    def get_current_user_id(jwt: str) -> str | None:
+        response = supabase.auth.get_user(jwt)
         if response.user:
             return response.user.id
         return None
