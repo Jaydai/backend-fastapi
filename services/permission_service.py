@@ -32,23 +32,18 @@ class PermissionService:
         return False
 
     @staticmethod
-    def user_has_permission(user_id: str, permission: PermissionEnum, organization_id: str | None) -> bool:
+    def user_has_permission_in_organization(user_id: str, permission: PermissionEnum, organization_id: str) -> bool:
         if PermissionService._is_global_resource(organization_id):
             return True
         
-        roles = PermissionRepository.get_user_organization_roles(user_id, organization_id)
+        roles: list[UserOrganizationRole] = PermissionRepository.get_user_organization_roles(user_id, organization_id)
         if not roles:
             return False
         
         global_roles = [r for r in roles if r.is_global()]
-        org_roles = [r for r in roles if r.is_for_organization(organization_id)] if organization_id else []
+        org_roles = [r for r in roles if r.is_for_organization(organization_id)]
         
         return PermissionService._check_organization_permission(org_roles, global_roles, permission)
-
-    @staticmethod
-    def user_has_permission_in_organization(user_id: str, permission: PermissionEnum, organization_id: str) -> bool:
-        return PermissionService.user_has_permission(user_id, permission, organization_id)
-    
 
     @staticmethod
     def user_is_global_admin(user_id: str) -> bool:
