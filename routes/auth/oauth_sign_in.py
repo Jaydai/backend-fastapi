@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Request, Response
 from pydantic import BaseModel
-from . import router, supabase
+from . import router
 from dtos import OAuthSignIn
 from services import AuthService
 from utils import set_auth_cookies
