@@ -34,12 +34,19 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         try:
-            # Try to get access_token from cookies (browser requests)
-            access_token = request.cookies.get(ACCESS_COOKIE_KEY)
+            # Try to get access_token from multiple sources:
+            # 1. Authorization header (for extension and API clients)
+            access_token = None
+            auth_header = request.headers.get("authorization") or request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                access_token = auth_header[7:]  # Remove "Bearer " prefix
 
-            # If not in cookies, try to parse from Cookie header (server-to-server requests)
+            # 2. Cookies (for webapp browser requests)
             if not access_token:
-                # Try both lowercase and capitalized versions
+                access_token = request.cookies.get(ACCESS_COOKIE_KEY)
+
+            # 3. Cookie header (for server-to-server requests)
+            if not access_token:
                 cookie_header = request.headers.get("cookie") or request.headers.get("Cookie", "")
                 if cookie_header:
                     # Parse Cookie header: "access_token=xxx; refresh_token=yyy"
