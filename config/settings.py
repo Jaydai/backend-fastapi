@@ -60,12 +60,10 @@ class DevSettings(BaseSettings):
 
 class ProdSettings(BaseSettings):
     """Production environment settings"""
-    
+
     DEBUG: bool = False
-    
+
     ALLOWED_ORIGINS: list = [
-        "http://localhost:3000", # TODO: remove
-        "https://app.staging.jayd.ai/", # TODO: remove
         "https://app.jayd.ai",
         "chrome-extension://enfcjmbdbldomiobfndablekgdkmcipd",
         "https://chatgpt.com",

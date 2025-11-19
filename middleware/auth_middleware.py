@@ -5,6 +5,9 @@ from services import AuthService
 from utils.auth_helpers import ACCESS_COOKIE_KEY
 from core.supabase import SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
 from supabase import create_client, ClientOptions
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AuthenticationMiddleware(BaseHTTPMiddleware):
@@ -12,15 +15,42 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/",
         "/docs", # TODO: désactiver en prod
         "/redoc",
-        "/auth", # TODO: Rajouter de la ségrégation
+        "/auth/sign_in",
+        "/auth/sign_up",
+        "/auth/oauth_sign_in",
+        "/auth/refresh",
+        "/auth/verify",
+        "/auth/resend_verification",
+        "/auth/reset_password",
+        "/openapi.json",
     ]
     
     async def dispatch(self, request: Request, call_next):
+        # Allow CORS preflight requests to pass through without authentication
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         if self._is_public_route(request):
             return await call_next(request)
-        
+
         try:
+            # Try to get access_token from cookies (browser requests)
             access_token = request.cookies.get(ACCESS_COOKIE_KEY)
+
+            # If not in cookies, try to parse from Cookie header (server-to-server requests)
+            if not access_token:
+                # Try both lowercase and capitalized versions
+                cookie_header = request.headers.get("cookie") or request.headers.get("Cookie", "")
+                if cookie_header:
+                    # Parse Cookie header: "access_token=xxx; refresh_token=yyy"
+                    cookies_dict = {}
+                    for cookie_pair in cookie_header.split(";"):
+                        cookie_pair = cookie_pair.strip()
+                        if "=" in cookie_pair:
+                            key, value = cookie_pair.split("=", 1)
+                            cookies_dict[key.strip()] = value.strip()
+                    access_token = cookies_dict.get(ACCESS_COOKIE_KEY)
+
             if not access_token:
                 return JSONResponse(
                     status_code=status.HTTP_401_UNAUTHORIZED,

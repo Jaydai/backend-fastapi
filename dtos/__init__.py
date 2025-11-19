@@ -1,4 +1,4 @@
-from .auth_dto import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO
+from .auth_dto import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO, UserMeResponseDTO
 from .permission_dto import (
     CheckPermissionDTO,
     UserRoleResponseDTO,
@@ -19,6 +19,7 @@ __all__ = [
     "SignUpDTO",
     "OAuthSignIn",
     "RefreshTokenDTO",
+    "UserMeResponseDTO",
     "CheckPermissionDTO",
     "UserRoleResponseDTO",
     "PermissionResponseDTO",

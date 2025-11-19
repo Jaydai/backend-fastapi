@@ -20,11 +20,45 @@ async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
 
         if client_type != "webapp" and client_type != "extension":
             logger.error(f"[AUTH] Unknown client_type: {client_type}")
-            return HTTPException(status_code=400, detail="Unknown client type")
+            raise HTTPException(status_code=400, detail="Unknown client type")
 
+        # Set auth cookies
         set_auth_cookies(response, session)
-        
 
+        # Get Supabase auth user (for email, created_at, etc.)
+        from core.supabase import supabase
+        auth_response = supabase.auth.get_user(session.access_token)
+        auth_user = auth_response.user
+
+        if not auth_user:
+            raise HTTPException(status_code=500, detail="Failed to get user information")
+
+        # Get user metadata (for name, profile_picture, etc.)
+        try:
+            metadata = AuthService.get_user_metadata(auth_user.id)
+        except Exception as e:
+            logger.warning(f"Could not get user metadata: {e}")
+            # Create default metadata if it doesn't exist
+            metadata = None
+
+        # Return complete user info
+        return {
+            "success": True,
+            "session": {
+                "access_token": session.access_token,
+                "refresh_token": session.refresh_token
+            },
+            "user": {
+                "id": auth_user.id,
+                "email": auth_user.email,
+                "full_name": metadata.name if metadata else auth_user.user_metadata.get("full_name"),
+                "avatar_url": metadata.profile_picture_url if metadata else auth_user.user_metadata.get("avatar_url"),
+                "created_at": auth_user.created_at
+            }
+        }
+
+    except HTTPException:
+        raise
     except Exception as e:
         error_message = str(e)
         logger.error(f"Sign in error: {error_message}")

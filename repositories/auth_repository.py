@@ -1,4 +1,4 @@
-from domains.entities import Session
+from domains.entities import Session, User
 from dtos import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO
 from core.supabase import supabase
 
@@ -63,3 +63,22 @@ class AuthRepository:
         if response.user:
             return response.user.id
         return None
+
+
+ 
+    @staticmethod
+    def get_user_metadata(user_id: str) -> User:
+        """Get user metadata from users_metadata table"""
+        response = (
+            supabase.table("users_metadata")
+            .select("user_id, name, data_collection, profile_picture_url")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
+
+
+        if response.data:
+            return User(**response.data)
+        return User()
+

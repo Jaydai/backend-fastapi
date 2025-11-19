@@ -1,6 +1,6 @@
 from dtos import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO
 from repositories import AuthRepository
-from domains.entities import Session
+from domains.entities import Session, User
 
 
 class AuthService:
@@ -30,3 +30,8 @@ class AuthService:
     @staticmethod
     def get_current_user_id(access_token: str) -> str | None:
         return AuthRepository.get_current_user_id(access_token)
+    
+    @staticmethod
+    def get_user_metadata(user_id: str) -> User:
+        return AuthRepository.get_user_metadata(user_id)
+    
