@@ -1,7 +1,7 @@
 from domains.entities import OrganizationInvitation
 from dtos import InvitationResponseDTO
 from repositories import InvitationRepository
-from services import UserService
+from .user_service import UserService
 from supabase import Client
 import logging
 
