@@ -49,9 +49,9 @@ class AuthRepository:
 
     @staticmethod
     def refresh_session(refresh_token_dto: RefreshTokenDTO) -> Session:
-        refresh_response = supabase.auth.refresh_session({
-            "refresh_token": refresh_token_dto.refresh_token
-        })
+        refresh_response = supabase.auth.refresh_session(
+            refresh_token_dto.refresh_token
+        )
         return Session(
             access_token=refresh_response.session.access_token,
             refresh_token=refresh_response.session.refresh_token

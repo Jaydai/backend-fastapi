@@ -5,13 +5,61 @@ from .permission_dto import (
     PermissionResponseDTO,
     RolePermissionsResponseDTO,
 )
-from .template_dto import TemplateTitleResponseDTO
+from .template_dto import (
+    CreateTemplateDTO,
+    UpdateTemplateDTO,
+    CreateVersionDTO,
+    TemplateVersionResponseDTO,
+    TemplateListItemDTO,
+    TemplateResponseDTO,
+    TemplateCommentAuthorDTO,
+    TemplateCommentDTO,
+    UsageResponseDTO,
+    TemplateTitleResponseDTO,
+)
+from .user_dto import UserProfileResponseDTO, UpdateUserProfileDTO, UpdateDataCollectionDTO
 from .organization_dto import (
     OrganizationResponseDTO,
     OrganizationMemberResponseDTO,
     OrganizationDetailResponseDTO,
     UpdateMemberRoleDTO,
     InvitationResponseDTO,
+    UpdateInvitationStatusDTO,
+)
+from .message_dto import (
+    SaveMessageDTO,
+    MessageResponseDTO,
+    SaveChatDTO,
+    ChatResponseDTO,
+    MessageBatchResultDTO,
+    ChatBatchResultDTO,
+    CombinedBatchDTO,
+    CombinedBatchResponseDTO,
+)
+from .onboarding_dto import (
+    OnboardingStatusResponseDTO,
+    UpdateOnboardingDTO,
+)
+from .notification_dto import (
+    NotificationResponseDTO,
+    NotificationMetadataDTO,
+    NotificationStatsResponseDTO,
+    UpdateNotificationDTO,
+    MarkAllReadResponseDTO,
+)
+from .folder_dto import (
+    CreateFolderDTO,
+    UpdateFolderDTO,
+    FolderResponseDTO,
+    FolderWithItemsDTO,
+    UpdatePinnedFoldersDTO,
+)
+from .block_dto import (
+    BlockType,
+    CreateBlockDTO,
+    UpdateBlockDTO,
+    BlockResponseDTO,
+    UpdatePinnedBlocksDTO,
 )
 
 __all__ = [
@@ -23,10 +71,48 @@ __all__ = [
     "UserRoleResponseDTO",
     "PermissionResponseDTO",
     "RolePermissionsResponseDTO",
+    "CreateTemplateDTO",
+    "UpdateTemplateDTO",
+    "CreateVersionDTO",
+    "TemplateVersionResponseDTO",
+    "TemplateListItemDTO",
+    "TemplateResponseDTO",
+    "TemplateCommentAuthorDTO",
+    "TemplateCommentDTO",
+    "UsageResponseDTO",
     "TemplateTitleResponseDTO",
+    "UserProfileResponseDTO",
+    "UpdateUserProfileDTO",
+    "UpdateDataCollectionDTO",
     "OrganizationResponseDTO",
     "OrganizationMemberResponseDTO",
     "OrganizationDetailResponseDTO",
     "UpdateMemberRoleDTO",
     "InvitationResponseDTO",
+    "UpdateInvitationStatusDTO",
+    "SaveMessageDTO",
+    "MessageResponseDTO",
+    "SaveChatDTO",
+    "ChatResponseDTO",
+    "MessageBatchResultDTO",
+    "ChatBatchResultDTO",
+    "CombinedBatchDTO",
+    "CombinedBatchResponseDTO",
+    "OnboardingStatusResponseDTO",
+    "UpdateOnboardingDTO",
+    "NotificationResponseDTO",
+    "NotificationMetadataDTO",
+    "NotificationStatsResponseDTO",
+    "UpdateNotificationDTO",
+    "MarkAllReadResponseDTO",
+    "CreateFolderDTO",
+    "UpdateFolderDTO",
+    "FolderResponseDTO",
+    "FolderWithItemsDTO",
+    "UpdatePinnedFoldersDTO",
+    "BlockType",
+    "CreateBlockDTO",
+    "UpdateBlockDTO",
+    "BlockResponseDTO",
+    "UpdatePinnedBlocksDTO",
 ]

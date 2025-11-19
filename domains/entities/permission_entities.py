@@ -9,7 +9,7 @@ class UserOrganizationRole:
     organization_id: str | None = None
     
     def has_permission(self, permission: PermissionEnum) -> bool:
-        return permission in ROLE_PERMISSIONS.get(self.role.name, [])
+        return permission in ROLE_PERMISSIONS.get(self.role, [])
     
     def is_global(self) -> bool:
         return self.organization_id is None

@@ -39,7 +39,6 @@ class UpdateMemberRoleDTO(BaseModel):
     @field_validator('role')
     @classmethod
     def validate_role(cls, v: str) -> str:
-        """Validate that the role is a valid RoleEnum value"""
         valid_roles = [role.value for role in RoleEnum]
         if v not in valid_roles:
             raise ValueError(f"Invalid role. Must be one of: {', '.join(valid_roles)}")
@@ -54,3 +53,15 @@ class InvitationResponseDTO(BaseModel):
     role: str
     organization_name: str | None = None
     created_at: str | None = None
+
+
+class UpdateInvitationStatusDTO(BaseModel):
+    status: str
+
+    @field_validator('status')
+    @classmethod
+    def validate_status(cls, v: str) -> str:
+        valid_statuses = ["accepted", "declined"]
+        if v not in valid_statuses:
+            raise ValueError(f"Invalid status. Must be one of: {', '.join(valid_statuses)}")
+        return v

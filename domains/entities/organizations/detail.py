@@ -4,7 +4,6 @@ from .member import OrganizationMember
 
 @dataclass
 class OrganizationDetail:
-    """Represents detailed information about an organization including all members"""
     id: str
     name: str
     description: dict | None = None

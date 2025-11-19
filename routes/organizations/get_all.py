@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 async def get_all(
     request: Request
 ) -> list[OrganizationResponseDTO]:
-    """Get organizations that the user has access to (RLS-based)."""
     try:
         user_id = request.state.user_id  # Injected by middleware
         logger.info(f"User {user_id} fetching organizations")

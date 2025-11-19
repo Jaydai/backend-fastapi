@@ -48,8 +48,7 @@ class OrganizationRepository:
 
     @staticmethod
     def get_organization_members(client: Client, organization_id: str) -> list[OrganizationMember]:
-        # TODO: remove try catch and handle errors in service layer
-        # Get user_organization_roles for this organization
+        # First, get all user_organization_roles for this organization
         response = client.table("user_organization_roles") \
             .select("user_id, role") \
             .eq("organization_id", organization_id) \
@@ -58,35 +57,32 @@ class OrganizationRepository:
         if not response.data:
             return []
 
-        # Get user details from auth.users for each member
         members = []
         for role_data in response.data:
-            try:
-                # Fetch user details from auth.users
-                user_response = client.auth.admin.get_user_by_id(role_data["user_id"])
+            user_id = role_data["user_id"]
 
-                if user_response and user_response.user:
-                    user = user_response.user
-                    user_metadata = user.user_metadata or {}
+            # Fetch user metadata separately
+            user_metadata_response = client.table("users_metadata") \
+                .select("email, name") \
+                .eq("user_id", user_id) \
+                .execute()
 
-                    members.append(OrganizationMember(
-                        user_id=role_data["user_id"],
-                        email=user.email or "",
-                        role=role_data["role"],
-                        first_name=user_metadata.get("first_name"),
-                        last_name=user_metadata.get("last_name")
-                    ))
-            except Exception as e:
-                # Log error but continue with other members
-                # In production, use proper logging
-                print(f"Error fetching user {role_data['user_id']}: {e}")
-                continue
+            user_metadata = {}
+            if user_metadata_response.data and len(user_metadata_response.data) > 0:
+                user_metadata = user_metadata_response.data[0]
+
+            members.append(OrganizationMember(
+                user_id=user_id,
+                email=user_metadata.get("email") or "",
+                role=role_data["role"],
+                first_name=user_metadata.get("name"),
+                last_name=None
+            ))
 
         return members
 
     @staticmethod
     def update_member_role(client: Client, organization_id: str, user_id: str, new_role: str) -> OrganizationMember | None:
-        # TODO: remove try catch and handle errors in service layer
         response = client.table("user_organization_roles") \
             .update({"role": new_role}) \
             .eq("organization_id", organization_id) \
@@ -96,25 +92,21 @@ class OrganizationRepository:
         if not response.data or len(response.data) == 0:
             return None
 
-        try:
-            user_response = client.auth.admin.get_user_by_id(user_id)
+        user_metadata_response = client.table("users_metadata") \
+            .select("email, name") \
+            .eq("user_id", user_id) \
+            .single() \
+            .execute()
 
-            if user_response and user_response.user:
-                user = user_response.user
-                user_metadata = user.user_metadata or {}
+        user_metadata = user_metadata_response.data if user_metadata_response.data else {}
 
-                return OrganizationMember(
-                    user_id=user_id,
-                    email=user.email or "",
-                    role=new_role,
-                    first_name=user_metadata.get("first_name"),
-                    last_name=user_metadata.get("last_name")
-                )
-        except Exception as e:
-            print(f"Error fetching user details after role update: {e}")
-            return None
-
-        return None
+        return OrganizationMember(
+            user_id=user_id,
+            email=user_metadata.get("email") or "",
+            role=new_role,
+            first_name=user_metadata.get("name"),
+            last_name=None
+        )
 
     @staticmethod
     def remove_member(client: Client, organization_id: str, user_id: str) -> bool:
