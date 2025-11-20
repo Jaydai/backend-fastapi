@@ -7,7 +7,6 @@ from . import (
     sign_up,
     sign_out,
     refresh,
-    me,
     # forgot_password,
     # reset_password,
     # verify_email,

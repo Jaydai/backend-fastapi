@@ -1,12 +1,11 @@
 """Me endpoint - get current authenticated user"""
 from fastapi import HTTPException, Response, Request
 import logging
+
 from . import router
 from services import AuthService
-from dtos import UserMeResponseDTO
 
 logger = logging.getLogger(__name__)
-
 
 
 @router.get("/me")
@@ -31,5 +30,9 @@ async def get_me(request: Request, response: Response):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"[AUTH] Unexpected error in /me endpoint: {str(e)}", exc_info=True)
+        logger.error(
+            f"[USERS] Unexpected error in /users/me endpoint: {str(e)}",
+            exc_info=True,
+        )
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
