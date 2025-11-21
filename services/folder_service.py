@@ -157,17 +157,21 @@ class FolderService:
     def get_folder_items(
         client: Client,
         folder_id: str,
-        locale: str = "en"
+        locale: str = "en",
+        limit: int | None = None,
+        offset: int = 0
     ) -> FolderWithItemsDTO:
         # Check if folder exists
         folder = FolderRepository.get_folder_by_id(client, folder_id)
         if not folder:
             raise ValueError(f"Folder not found: {folder_id}")
 
-        items = FolderRepository.get_folder_items(client, folder_id)
+        items = FolderRepository.get_folder_items(client, folder_id, limit, offset)
 
         return FolderMapper.folder_with_items_to_dto(
             items["folders"],
             items["templates"],
-            locale
+            locale,
+            items.get("total_count", 0),
+            items.get("has_more", False)
         )

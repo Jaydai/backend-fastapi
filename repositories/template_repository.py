@@ -33,7 +33,10 @@ class TemplateRepository:
         limit: int = 100,
         offset: int = 0
     ) -> list[Template]:
-        query = client.table("prompt_templates").select("id, title, description, folder_id, organization_id, user_id, workspace_type, created_at, updated_at, tags, usage_count, current_version_id, is_free")
+        # Note: We exclude content field for better performance (content can be heavy)
+        query = client.table("prompt_templates").select(
+            "id, title, description, folder_id, organization_id, user_id, workspace_type, created_at, updated_at, tags, usage_count, current_version_id, is_free"
+        )
 
         if workspace_type == "all" or (not workspace_type and not organization_id):
             user_metadata = TemplateRepository._get_user_metadata(client, user_id)
@@ -74,17 +77,21 @@ class TemplateRepository:
 
         templates_data = response.data or []
 
-        if published is True:
+        # Apply published filter if needed (optimized approach)
+        # Instead of N+1, we do one additional query for all templates at once
+        if published is True and templates_data:
             template_ids = [t["id"] for t in templates_data]
-            if template_ids:
-                versions_query = client.table("prompt_templates_versions")\
-                    .select("template_id")\
-                    .in_("template_id", template_ids)\
-                    .eq("is_published", True)\
-                    .execute()
 
-                published_template_ids = set(v["template_id"] for v in (versions_query.data or []))
-                templates_data = [t for t in templates_data if t["id"] in published_template_ids]
+            # Single query to get all published template IDs
+            versions_response = client.table("prompt_templates_versions")\
+                .select("template_id")\
+                .in_("template_id", template_ids)\
+                .eq("is_published", True)\
+                .execute()
+
+            published_template_ids = set(v["template_id"] for v in (versions_response.data or []))
+            # Filter to only published templates
+            templates_data = [t for t in templates_data if t["id"] in published_template_ids]
 
         templates = []
         for data in templates_data:
@@ -94,7 +101,7 @@ class TemplateRepository:
                 description=data.get("description"),
                 folder_id=data.get("folder_id"),
                 organization_id=data.get("organization_id"),
-                    user_id=data["user_id"],
+                user_id=data["user_id"],
                 workspace_type=data["workspace_type"],
                 created_at=data["created_at"],
                 updated_at=data.get("updated_at"),
@@ -103,7 +110,7 @@ class TemplateRepository:
                 last_used_at=data.get("last_used_at"),
                 current_version_id=data.get("current_version_id"),
                 is_free=data.get("is_free", True),
-                is_published=data.get("is_published", False)
+                is_published=published if published is True else data.get("is_published", False)
             ))
 
         return templates

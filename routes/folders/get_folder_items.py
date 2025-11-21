@@ -9,16 +9,18 @@ logger = logging.getLogger(__name__)
 @router.get("/{folder_id}/items", response_model=FolderWithItemsDTO, status_code=status.HTTP_200_OK)
 async def get_folder_items(
     request: Request,
-    folder_id: str
+    folder_id: str,
+    limit: int | None = None,
+    offset: int = 0
 ) -> FolderWithItemsDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
         locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
 
-        logger.info(f"User {user_id} getting items for folder {folder_id}")
+        logger.info(f"User {user_id} getting items for folder {folder_id} (limit={limit}, offset={offset})")
 
-        items = FolderService.get_folder_items(client, folder_id, locale)
+        items = FolderService.get_folder_items(client, folder_id, locale, limit, offset)
 
         return items
     except ValueError as e:

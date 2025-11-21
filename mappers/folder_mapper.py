@@ -36,7 +36,9 @@ class FolderMapper:
     def folder_with_items_to_dto(
         folders: list[Folder],
         templates: list[Template],
-        locale: str = "en"
+        locale: str = "en",
+        total_count: int = 0,
+        has_more: bool = False
     ) -> FolderWithItemsDTO:
         from mappers.template_mapper import TemplateMapper
 
@@ -45,5 +47,7 @@ class FolderMapper:
 
         return FolderWithItemsDTO(
             folders=folder_dtos,
-            templates=template_dtos
+            templates=template_dtos,
+            total_count=total_count,
+            has_more=has_more
         )

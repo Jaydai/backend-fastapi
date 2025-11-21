@@ -302,12 +302,23 @@ class FolderRepository:
         return {"folders": folders, "templates": templates}
 
     @staticmethod
-    def get_folder_items(client: Client, folder_id: str) -> dict:
-        folders_response = client.table("prompt_folders")\
-            .select("*")\
+    def get_folder_items(
+        client: Client,
+        folder_id: str,
+        limit: int | None = None,
+        offset: int = 0
+    ) -> dict:
+        # Build folders query
+        folders_query = client.table("prompt_folders")\
+            .select("*", count="exact")\
             .eq("parent_folder_id", folder_id)\
-            .order("created_at", desc=True)\
-            .execute()
+            .order("created_at", desc=True)
+
+        # Apply pagination if limit is specified
+        if limit is not None:
+            folders_query = folders_query.range(offset, offset + limit - 1)
+
+        folders_response = folders_query.execute()
 
         folders = []
         for data in folders_response.data or []:
@@ -323,11 +334,17 @@ class FolderRepository:
                 updated_at=data.get("updated_at")
             ))
 
-        templates_response = client.table("prompt_templates")\
-            .select("*")\
+        # Build templates query
+        templates_query = client.table("prompt_templates")\
+            .select("*", count="exact")\
             .eq("folder_id", folder_id)\
-            .order("created_at", desc=True)\
-            .execute()
+            .order("created_at", desc=True)
+
+        # Apply pagination if limit is specified
+        if limit is not None:
+            templates_query = templates_query.range(offset, offset + limit - 1)
+
+        templates_response = templates_query.execute()
 
         templates = []
         for data in templates_response.data or []:
@@ -350,4 +367,18 @@ class FolderRepository:
                 is_published=data.get("is_published", False)
             ))
 
-        return {"folders": folders, "templates": templates}
+        # Calculate total count and has_more
+        folders_count = folders_response.count or 0
+        templates_count = templates_response.count or 0
+        total_count = folders_count + templates_count
+
+        has_more = False
+        if limit is not None:
+            has_more = (offset + limit) < total_count
+
+        return {
+            "folders": folders,
+            "templates": templates,
+            "total_count": total_count,
+            "has_more": has_more
+        }

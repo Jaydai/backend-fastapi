@@ -8,6 +8,7 @@ from . import (
     get_pinned_folders,      # Must be before get_folder to avoid path conflicts
     update_pinned_folders,   # Must be before update_folder to avoid path conflicts
     pin_folder,              # Must be before get_folder to avoid path conflicts
+    get_root_folders,        # Must be before get_folder to avoid path conflicts
     get_root_items,          # Must be before get_folder to avoid path conflicts
     get_folder_items,        # Must be before get_folder to avoid path conflicts
     get_folder,              # /{folder_id} must come after specific paths

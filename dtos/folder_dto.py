@@ -25,6 +25,8 @@ class FolderResponseDTO(BaseModel):
 class FolderWithItemsDTO(BaseModel):
     folders: list[FolderResponseDTO]
     templates: list
+    total_count: int = 0
+    has_more: bool = False
 
 class UpdatePinnedFoldersDTO(BaseModel):
     folder_ids: list[str]
