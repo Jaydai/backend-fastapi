@@ -159,7 +159,7 @@ class AuditRepository:
 
             trend_response = client.table("enriched_chats") \
                 .select("theme") \
-                .in_("user_ids", user_ids) \
+                .in_("user_id", user_ids) \
                 .gte("created_at", trend_start.isoformat()) \
                 .lt("created_at", trend_end.isoformat()) \
                 .not_.is_("theme", "null") \

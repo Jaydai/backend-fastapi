@@ -7,5 +7,13 @@ router = APIRouter()
 
 # Import route handlers to register them
 from . import organization_audit
+from . import quality
+from . import risk
+from . import usage
+from . import themes
+from . import intents
+from . import top_users
+from . import top_prompts
+from . import risky_prompts
 
 __all__ = ["router"]

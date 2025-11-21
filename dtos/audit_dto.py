@@ -24,6 +24,7 @@ class QualityStatsDTO(BaseModel):
     distribution: dict[str, int]  # excellent, good, medium, poor
     total_rated: int
     trend_change: Optional[float] = None
+    trend_7days: Optional[float] = None  # 7-day trend percentage change
 
 
 class RiskStatsDTO(BaseModel):
@@ -39,6 +40,7 @@ class RiskStatsDTO(BaseModel):
     sensitive_data_count: int
     average_risk_score: float
     risk_distribution: dict[str, int]
+    trend_7days: Optional[float] = None  # 7-day trend percentage change in average risk
 
 
 class UsageStatsDTO(BaseModel):
@@ -51,6 +53,8 @@ class UsageStatsDTO(BaseModel):
     work_percentage: float
     average_prompts_per_user: float
     average_quality_score: float
+    daily_average: float  # Average prompts per day over the period
+    trend_7days: Optional[float] = None  # 7-day trend percentage change in daily prompts
 
 
 class ThemeStatsDTO(BaseModel):
@@ -62,7 +66,7 @@ class ThemeStatsDTO(BaseModel):
 
 class IntentStatsDTO(BaseModel):
     """Intent distribution response"""
-    top_intents: list[dict]  # [{"intent": str, "count": int, "avg_quality": float}]
+    top_intents: list[dict]  # [{"intent": str, "count": int, "percentage": float, "avg_quality": float}]
     total_categorized: int
 
 
@@ -112,4 +116,70 @@ class OrganizationAuditResponseDTO(BaseModel):
     top_users: list[TopUserDTO]
     top_prompts: list[TopPromptDTO]
     riskiest_prompts: list[RiskyPromptDTO]
+    generated_at: datetime
+
+
+# Individual endpoint response DTOs with context
+
+class QualityStatsWithContextDTO(BaseModel):
+    """Quality statistics with context"""
+    organization_id: str
+    date_range: dict[str, str]
+    data: QualityStatsDTO
+    generated_at: datetime
+
+
+class RiskStatsWithContextDTO(BaseModel):
+    """Risk statistics with context"""
+    organization_id: str
+    date_range: dict[str, str]
+    data: RiskStatsDTO
+    generated_at: datetime
+
+
+class UsageStatsWithContextDTO(BaseModel):
+    """Usage statistics with context"""
+    organization_id: str
+    date_range: dict[str, str]
+    data: UsageStatsDTO
+    generated_at: datetime
+
+
+class ThemeStatsWithContextDTO(BaseModel):
+    """Theme statistics with context"""
+    organization_id: str
+    date_range: dict[str, str]
+    data: ThemeStatsDTO
+    generated_at: datetime
+
+
+class IntentStatsWithContextDTO(BaseModel):
+    """Intent statistics with context"""
+    organization_id: str
+    date_range: dict[str, str]
+    data: IntentStatsDTO
+    generated_at: datetime
+
+
+class TopUsersWithContextDTO(BaseModel):
+    """Top users with context"""
+    organization_id: str
+    date_range: dict[str, str]
+    data: list[TopUserDTO]
+    generated_at: datetime
+
+
+class TopPromptsWithContextDTO(BaseModel):
+    """Top prompts with context"""
+    organization_id: str
+    date_range: dict[str, str]
+    data: list[TopPromptDTO]
+    generated_at: datetime
+
+
+class RiskyPromptsWithContextDTO(BaseModel):
+    """Risky prompts with context"""
+    organization_id: str
+    date_range: dict[str, str]
+    data: list[RiskyPromptDTO]
     generated_at: datetime
