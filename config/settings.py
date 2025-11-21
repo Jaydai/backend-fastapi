@@ -33,12 +33,18 @@ class BaseSettings:
 
 class LocalSettings(BaseSettings):
     """Local development settings"""
-    
+
     ALLOWED_ORIGINS: list = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:5173",
+        "https://chatgpt.com",
+        "https://claude.ai",
+        "https://chat.mistral.ai",
+        "https://copilot.microsoft.com",
+        "https://gemini.google.com",
+        "https://www.perplexity.ai",
     ]
 
 
@@ -60,12 +66,10 @@ class DevSettings(BaseSettings):
 
 class ProdSettings(BaseSettings):
     """Production environment settings"""
-    
+
     DEBUG: bool = False
-    
+
     ALLOWED_ORIGINS: list = [
-        "http://localhost:3000", # TODO: remove
-        "https://app.staging.jayd.ai/", # TODO: remove
         "https://app.jayd.ai",
         "chrome-extension://enfcjmbdbldomiobfndablekgdkmcipd",
         "https://chatgpt.com",

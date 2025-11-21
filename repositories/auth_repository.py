@@ -1,6 +1,7 @@
-from domains.entities import Session
+from domains.entities import Session, User
 from dtos import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO
 from core.supabase import supabase
+from supabase import Client
 
 class AuthRepository:
     @staticmethod
@@ -63,3 +64,40 @@ class AuthRepository:
         if response.user:
             return response.user.id
         return None
+
+
+ 
+    @staticmethod
+    def get_user_metadata(client: Client, user_id: str) -> User:
+        """Get user metadata from users_metadata table"""
+        response = (
+            client.table("users_metadata")
+            .select("user_id, name, data_collection, profile_picture_url")
+            .eq("user_id", user_id)
+            .execute()
+        )
+
+        # If user metadata doesn't exist, create it
+        if not response.data or len(response.data) == 0:
+            # Create default user metadata
+            new_user_data = {
+                "user_id": user_id,
+                "name": None,
+                "data_collection": True,  # Default to True
+                "profile_picture_url": None
+            }
+
+            insert_response = (
+                client.table("users_metadata")
+                .insert(new_user_data)
+                .execute()
+            )
+
+            if insert_response.data and len(insert_response.data) > 0:
+                return User(**insert_response.data[0])
+
+            # If insert failed, return default User
+            return User(user_id=user_id, name=None, data_collection=True, profile_picture_url=None)
+
+        return User(**response.data[0])
+

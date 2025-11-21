@@ -1,4 +1,4 @@
-from .auth_entities import Session
+from .auth_entities import Session, User
 from .permission_entities import ROLE_PERMISSIONS, UserOrganizationRole
 from .template_entities import Template, TemplateVersion, TemplateWithVersions, TemplateComment, TemplateCommentAuthor, TemplateTitle
 from .user_entities import UserProfile
@@ -14,6 +14,7 @@ from .block_entities import Block
 
 __all__ = [
     "Session",
+    "User",
     "ROLE_PERMISSIONS",
     "UserOrganizationRole",
     "Template",

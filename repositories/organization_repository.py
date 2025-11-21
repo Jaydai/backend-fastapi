@@ -26,7 +26,6 @@ class OrganizationRepository:
                 role_data = row["user_organization_roles"][0]
                 if role_data:
                     user_org_role = UserOrganizationRole(
-                        id=role_data["id"],
                         user_id=role_data["user_id"],
                         role=role_data["role"],
                         organization_id=role_data.get("organization_id")

@@ -14,6 +14,5 @@ from . import (
 # Not implemented yet (501)
 from . import (
     forgot_password,
-    reset_password,
-    me,
+    reset_password
 )
