@@ -3,45 +3,46 @@ import logging
 
 from . import router
 from services import InvitationService
-from dtos import InvitationResponseDTO
+from dtos import InvitationResponseDTO, UpdateInvitationStatusDTO
 
 logger = logging.getLogger(__name__)
 
 
-@router.post(
-    "/{invitation_id}/decline",
+@router.patch(
+    "/{invitation_id}/status",
     response_model=InvitationResponseDTO,
     status_code=status.HTTP_200_OK
 )
-async def decline_invitation(
+async def update_invitation_status(
     request: Request,
-    invitation_id: str
+    invitation_id: str,
+    update_data: UpdateInvitationStatusDTO
 ) -> InvitationResponseDTO:
     try:
         user_id = request.state.user_id
-        logger.info(f"User {user_id} declining invitation {invitation_id}")
+        logger.info(f"User {user_id} updating invitation {invitation_id} to status {update_data.status}")
 
-        invitation = InvitationService.decline_invitation(
+        invitation = InvitationService.update_invitation_status(
             request.state.supabase_client,
             invitation_id,
-            user_id
+            user_id,
+            update_data.status
         )
 
         logger.info(
-            f"User {user_id} successfully declined invitation {invitation_id} "
-            f"for organization {invitation.organization_name}"
+            f"User {user_id} successfully updated invitation {invitation_id} "
+            f"to status {update_data.status} for organization {invitation.organization_name}"
         )
 
         return invitation
 
     except ValueError as e:
-        logger.warning(f"Failed to decline invitation: {e}")
+        logger.warning(f"Failed to update invitation: {e}")
         error_message = str(e)
 
-        # Map specific errors to appropriate status codes
         if "not found" in error_message.lower():
             status_code = status.HTTP_404_NOT_FOUND
-        elif "not for you" in error_message.lower():
+        elif "not for you" in error_message.lower() or "already a member" in error_message.lower():
             status_code = status.HTTP_400_BAD_REQUEST
         else:
             status_code = status.HTTP_400_BAD_REQUEST
@@ -51,8 +52,8 @@ async def decline_invitation(
             detail=error_message
         )
     except Exception as e:
-        logger.error(f"Error declining invitation: {e}")
+        logger.error(f"Error updating invitation: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to decline invitation: {str(e)}"
+            detail=f"Failed to update invitation: {str(e)}"
         )

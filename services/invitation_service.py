@@ -1,7 +1,7 @@
 from domains.entities import OrganizationInvitation
 from dtos import InvitationResponseDTO
 from repositories import InvitationRepository
-from services import UserService
+from .user_service import UserService
 from supabase import Client
 import logging
 
@@ -10,51 +10,52 @@ logger = logging.getLogger(__name__)
 
 class InvitationService:
     @staticmethod
-    def accept_invitation(client: Client, invitation_id: str, user_id: str) -> InvitationResponseDTO:
-        logger.info(f"User {user_id} accepting invitation {invitation_id}")
-
-        invitation: OrganizationInvitation = InvitationRepository.get_invitation_by_id(client, invitation_id)
-
-        if not invitation:
-            raise ValueError("Invitation not found")
-
+    def get_pending_invitations(client: Client, user_id: str) -> list[InvitationResponseDTO]:
         user_email = UserService.get_email_by_id(client, user_id)
-        if invitation.invited_email != user_email:
-            raise ValueError("This invitation is not for you")
+        invitations = InvitationRepository.get_pending_invitations(client, user_email)
 
-        if not invitation.can_be_accepted():
-            raise ValueError("This invitation cannot be accepted")
-        
-        UserService.create_user_organization_role(
-            client,
-            user_id,
-            invitation.organization_id,
-            invitation.role
-        )
-        accepted_invitation = InvitationRepository.accept_invitation(
-            client,
-            invitation
-        )
-        if not accepted_invitation:
-            raise ValueError(
-                "Failed to accept invitation. It may have already been processed or is no longer valid."
+        return [
+            InvitationResponseDTO(
+                id=inv.id,
+                invited_email=inv.invited_email,
+                inviter_name=inv.inviter_name,
+                status=inv.status,
+                role=inv.role,
+                organization_name=inv.organization_name,
+                created_at=inv.created_at
             )
+            for inv in invitations
+        ]
 
-        logger.info(f"User {user_id} successfully accepted invitation {invitation_id}")
+    @staticmethod
+    def get_invitation_by_id(client: Client, invitation_id: str) -> InvitationResponseDTO | None:
+        invitation = InvitationRepository.get_invitation_by_id(client, invitation_id)
+        if not invitation:
+            return None
 
         return InvitationResponseDTO(
-            id=accepted_invitation.id,
-            invited_email=accepted_invitation.invited_email,
-            inviter_name=accepted_invitation.inviter_name,
-            status=accepted_invitation.status,
-            role=accepted_invitation.role,
-            organization_name=accepted_invitation.organization_name,
-            created_at=accepted_invitation.created_at
+            id=invitation.id,
+            invited_email=invitation.invited_email,
+            inviter_name=invitation.inviter_name,
+            status=invitation.status,
+            role=invitation.role,
+            organization_name=invitation.organization_name,
+            created_at=invitation.created_at
         )
 
     @staticmethod
-    def decline_invitation(client: Client, invitation_id: str, user_id: str) -> InvitationResponseDTO:
-        logger.info(f"User {user_id} declining invitation {invitation_id}")
+    def cancel_invitation(client: Client, invitation_id: str, user_id: str) -> bool:
+        invitation = InvitationRepository.get_invitation_by_id(client, invitation_id)
+        if not invitation:
+            return False
+
+        # Update status to cancelled
+        result = InvitationRepository.update_invitation_status(client, invitation, "cancelled")
+        return result is not None
+
+    @staticmethod
+    def update_invitation_status(client: Client, invitation_id: str, user_id: str, new_status: str) -> InvitationResponseDTO:
+        logger.info(f"User {user_id} updating invitation {invitation_id} to status {new_status}")
 
         invitation = InvitationRepository.get_invitation_by_id(client, invitation_id)
         if not invitation:
@@ -64,27 +65,39 @@ class InvitationService:
         if invitation.invited_email != user_email:
             raise ValueError("This invitation is not for you")
 
-        if not invitation.can_be_declined():
-            raise ValueError("This invitation cannot be declined")
-        
-        declined_invitation = InvitationRepository.decline_invitation(
+        if new_status == "accepted":
+            if not invitation.can_be_accepted():
+                raise ValueError("This invitation cannot be accepted")
+
+            UserService.create_user_organization_role(
+                client,
+                user_id,
+                invitation.organization_id,
+                invitation.role
+            )
+        elif new_status == "declined":
+            if not invitation.can_be_declined():
+                raise ValueError("This invitation cannot be declined")
+
+        updated_invitation = InvitationRepository.update_invitation_status(
             client,
-            invitation
+            invitation,
+            new_status
         )
 
-        if not declined_invitation:
+        if not updated_invitation:
             raise ValueError(
-                "Failed to decline invitation. It may have already been processed or is no longer valid."
+                f"Failed to update invitation. It may have already been processed or is no longer valid."
             )
 
-        logger.info(f"User {user_id} successfully declined invitation {invitation_id}")
+        logger.info(f"User {user_id} successfully updated invitation {invitation_id} to {new_status}")
 
         return InvitationResponseDTO(
-            id=declined_invitation.id,
-            invited_email=declined_invitation.invited_email,
-            inviter_name=declined_invitation.inviter_name,
-            status=declined_invitation.status,
-            role=declined_invitation.role,
-            organization_name=declined_invitation.organization_name,
-            created_at=declined_invitation.created_at
+            id=updated_invitation.id,
+            invited_email=updated_invitation.invited_email,
+            inviter_name=updated_invitation.inviter_name,
+            status=updated_invitation.status,
+            role=updated_invitation.role,
+            organization_name=updated_invitation.organization_name,
+            created_at=updated_invitation.created_at
         )

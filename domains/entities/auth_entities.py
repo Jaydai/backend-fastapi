@@ -3,7 +3,6 @@ from typing import Optional
 
 @dataclass
 class Session:
-    """Can be based on Supabase session object"""
     access_token: str
     refresh_token: str
 
