@@ -17,7 +17,7 @@ async def get_folders(
 
     try:
         client = request.state.supabase_client
-        locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
+        locale = request.state.locale
 
         logger.info(f"Fetching folder titles with parent_folder_ids={parent_folder_ids}, org={organization_id}")
 
