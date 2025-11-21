@@ -1,6 +1,7 @@
 from dtos import SignInDTO, SignUpDTO, OAuthSignIn, RefreshTokenDTO
 from repositories import AuthRepository
 from domains.entities import Session, User
+from supabase import Client
 
 
 class AuthService:
@@ -32,6 +33,6 @@ class AuthService:
         return AuthRepository.get_current_user_id(access_token)
     
     @staticmethod
-    def get_user_metadata(user_id: str) -> User:
-        return AuthRepository.get_user_metadata(user_id)
+    def get_user_metadata(client: Client, user_id: str) -> User:
+        return AuthRepository.get_user_metadata(client, user_id)
     

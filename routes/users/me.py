@@ -24,7 +24,9 @@ async def get_me(request: Request, response: Response):
             logger.error("User not found")
             raise HTTPException(status_code=401, detail="No authenticated user")
 
-        user = AuthService.get_user_metadata(user_id)
+        # Get authenticated Supabase client from middleware
+        client = request.state.supabase_client
+        user = AuthService.get_user_metadata(client, user_id)
         return user
 
     except HTTPException:

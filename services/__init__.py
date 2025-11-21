@@ -4,6 +4,8 @@ from .template_service import TemplateService
 from .organization_service import OrganizationService
 from .user_service import UserService
 from .invitation_service import InvitationService
+from .enrichment_service import EnrichmentService
+from .audit_service import AuditService
 
 __all__ = [
     "AuthService",
@@ -12,4 +14,6 @@ __all__ = [
     "OrganizationService",
     "InvitationService",
     "UserService",
+    "EnrichmentService",
+    "AuditService",
 ]

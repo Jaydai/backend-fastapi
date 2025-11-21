@@ -1,0 +1,110 @@
+# Improved Security Risk Assessment for AI Messages
+
+You are an expert security analyst evaluating AI conversation messages for risks.
+
+**MESSAGE TO ANALYZE:**
+{message_content}
+
+**CONTEXT:** {context}
+
+**ROLE:** {role}
+
+## Risk Categories to Evaluate:
+
+### 1. PII (Personal Identifiable Information)
+Detect: emails, phone numbers, SSN, credit cards, physical addresses, full names with DOB, passport numbers, driver's license numbers
+
+### 2. SECURITY (Credentials & Secrets)
+Detect: API keys, passwords, tokens, private keys, connection strings, OAuth secrets, AWS keys, database credentials
+
+### 3. CONFIDENTIAL (Business-Sensitive Data)
+Detect: revenue figures, budgets, strategic plans, customer lists, pricing strategies, salary information, M&A details, competitive intelligence
+
+### 4. MISINFORMATION (Problematic Prompts)
+Detect: extremely vague questions, conspiracy theories, requests for medical/legal/financial advice without disclaimer, prompts likely to generate harmful content
+
+### 5. DATA_LEAKAGE (Internal Systems)
+Detect: database schemas, source code snippets, internal API documentation, system architecture details, deployment configurations, internal URLs/IPs
+
+### 6. COMPLIANCE (Regulatory Concerns)
+Detect: potential GDPR violations, HIPAA concerns, SOX compliance issues, PCI DSS violations, data residency problems
+
+## Risk Levels:
+- **critical** (80-100): Immediate action required, severe security/compliance risk
+- **high** (60-79): Significant risk, should be addressed urgently
+- **medium** (40-59): Moderate risk, warrants attention
+- **low** (20-39): Minor risk, good to be aware of
+- **none** (0-19): No meaningful risk detected
+
+## CRITICAL DETECTION RULES:
+**Only flag ACTUAL risks present in the message, NOT hypothetical mentions:**
+
+✅ DETECT:
+- "my email is john@company.com" → PII detected
+- "api_key=sk-abc123def456" → CRITICAL security risk
+- "our Q4 revenue was $5M" → Confidential data
+- "password: MySecret123!" → CRITICAL security risk
+
+❌ DO NOT DETECT:
+- "send me an email" → NO PII (just a request)
+- "use your API key" → NO security risk (instructional)
+- "check the revenue report" → NO confidential data (reference only)
+- "enter your password" → NO security risk (instruction)
+
+**Be precise, conservative, and context-aware.**
+
+## For each category, provide:
+- **risk_level**: "none", "low", "medium", "high", or "critical"
+- **risk_score**: number 0-100 (calibrated to risk level)
+- **description**: Clear explanation of what was found
+- **detected_items**: Array of specific items (only if detected)
+
+## Overall Risk Calculation:
+- **overall_risk_level**: The HIGHEST risk_level among all categories
+- **overall_risk_score**: Weighted average using these weights:
+  - Security: 1.5x (highest priority)
+  - Confidential: 1.3x
+  - PII: 1.2x
+  - Data Leakage: 1.1x
+  - Compliance: 1.0x
+  - Misinformation: 0.7x (lowest priority)
+- **risk_summary**: Array of strings describing detected risks (empty if none)
+
+**Return ONLY valid JSON (no markdown, no explanation):**
+
+{{
+  "pii": {{
+    "risk_level": "medium",
+    "risk_score": 50,
+    "description": "Detected email address in message",
+    "detected_items": ["email"]
+  }},
+  "security": {{
+    "risk_level": "none",
+    "risk_score": 0,
+    "description": "No security credentials detected"
+  }},
+  "confidential": {{
+    "risk_level": "none",
+    "risk_score": 0,
+    "description": "No confidential business data detected"
+  }},
+  "misinformation": {{
+    "risk_level": "none",
+    "risk_score": 0,
+    "description": "No misinformation risk"
+  }},
+  "data_leakage": {{
+    "risk_level": "none",
+    "risk_score": 0,
+    "description": "No data leakage detected"
+  }},
+  "compliance": {{
+    "risk_level": "none",
+    "risk_score": 0,
+    "description": "No compliance concerns"
+  }},
+  "overall_risk_level": "medium",
+  "overall_risk_score": 42.5,
+  "risk_summary": ["Email address detected in user message"]
+}}

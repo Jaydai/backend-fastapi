@@ -33,9 +33,12 @@ async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
         if not auth_user:
             raise HTTPException(status_code=500, detail="Failed to get user information")
 
+        # Get authenticated client from request state (set by middleware after cookies)
+        client = request.state.supabase_client
+
         # Get user metadata (for name, profile_picture, etc.)
         try:
-            metadata = AuthService.get_user_metadata(auth_user.id)
+            metadata = AuthService.get_user_metadata(client, auth_user.id)
         except Exception as e:
             logger.warning(f"Could not get user metadata: {e}")
             # Create default metadata if it doesn't exist
