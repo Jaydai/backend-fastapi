@@ -218,6 +218,7 @@ class AuditService:
 
         usage_data = await AuditRepository.get_usage_stats_async(client, user_ids, start_dt, end_dt)
         usage_stats = aggregate_usage_stats(usage_data)
+        print(f"🔥🔥🔥🔥🔥🔥usage_stats: {usage_stats}")
 
         return UsageStatsWithContextDTO(
             organization_id=organization_id,

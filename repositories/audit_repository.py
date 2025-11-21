@@ -278,8 +278,8 @@ class AuditRepository:
 
                 if message_ids:
                     messages_response = client.table("messages") \
-                        .select("provider_id, content") \
-                        .in_("provider_id", message_ids) \
+                        .select("message_provider_id, content") \
+                        .in_("message_provider_id", message_ids) \
                         .execute()
 
                     return {
@@ -325,8 +325,8 @@ class AuditRepository:
                 message_ids = [risk["message_provider_id"] for risk in risks_response.data]
 
                 messages_response = client.table("messages") \
-                    .select("provider_id, content") \
-                    .in_("provider_id", message_ids) \
+                    .select("message_provider_id, content") \
+                    .in_("message_provider_id", message_ids) \
                     .execute()
 
                 return {

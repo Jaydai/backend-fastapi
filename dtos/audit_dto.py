@@ -53,7 +53,7 @@ class UsageStatsDTO(BaseModel):
     work_percentage: float
     average_prompts_per_user: float
     average_quality_score: float
-    daily_average: float  # Average prompts per day over the period
+    daily_average: Optional[float] = None  # Average prompts per day over the period
     trend_7days: Optional[float] = None  # 7-day trend percentage change in daily prompts
 
 

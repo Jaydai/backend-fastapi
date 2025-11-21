@@ -230,7 +230,7 @@ def aggregate_top_prompts(top_prompts_data: dict) -> list[TopPrompt]:
     messages = top_prompts_data.get("messages", [])
 
     # Build message content map
-    message_map = {msg.get("provider_id"): msg.get("content", "") for msg in messages}
+    message_map = {msg.get("message_provider_id"): msg.get("content", "") for msg in messages}
 
     top_prompts = []
     for chat in chats[:10]:

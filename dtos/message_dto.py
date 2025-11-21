@@ -12,7 +12,7 @@ class SaveMessageDTO(BaseModel):
 
 
 class MessageResponseDTO(BaseModel):
-    id: str
+    id: int
     user_id: str
     message_provider_id: str
     content: str
@@ -30,7 +30,7 @@ class SaveChatDTO(BaseModel):
 
 
 class ChatResponseDTO(BaseModel):
-    id: str
+    id: int
     user_id: str
     chat_provider_id: str
     title: str
