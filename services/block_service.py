@@ -18,7 +18,6 @@ class BlockService:
         block_type: str | None = None,
         workspace_type: str | None = None,
         organization_id: str | None = None,
-        company_id: str | None = None,
         published: bool | None = None,
         search_query: str | None = None
     ) -> list[BlockResponseDTO]:
@@ -28,7 +27,6 @@ class BlockService:
             block_type,
             workspace_type,
             organization_id,
-            company_id,
             published,
             search_query
         )
@@ -57,8 +55,6 @@ class BlockService:
         workspace_type = "user"
         if data.organization_id:
             workspace_type = "organization"
-        elif data.company_id:
-            workspace_type = "company"
 
         title_dict = BlockMapper.ensure_localized_dict(data.title, locale)
         description_dict = BlockMapper.ensure_localized_dict(data.description, locale) if data.description else None
@@ -73,7 +69,6 @@ class BlockService:
             content_dict,
             data.published,
             data.organization_id,
-            data.company_id,
             workspace_type
         )
 

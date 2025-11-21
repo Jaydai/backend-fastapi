@@ -9,7 +9,6 @@ class Block:
     content: dict[str, str]
     published: bool
     user_id: str
-    company_id: str | None
     organization_id: str | None
     workspace_type: str
     created_at: str

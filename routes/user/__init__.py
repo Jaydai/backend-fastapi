@@ -14,6 +14,7 @@ from . import (
     get_profile,
     update_profile,
     update_data_collection,
+    me,
 )
 
 # Not implemented yet (501)

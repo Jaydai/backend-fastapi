@@ -26,15 +26,15 @@ async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
         set_auth_cookies(response, session)
 
         # Get Supabase auth user (for email, created_at, etc.)
-        from core.supabase import supabase
+        from core.supabase import supabase, create_authenticated_client
         auth_response = supabase.auth.get_user(session.access_token)
         auth_user = auth_response.user
 
         if not auth_user:
             raise HTTPException(status_code=500, detail="Failed to get user information")
 
-        # Get authenticated client from request state (set by middleware after cookies)
-        client = request.state.supabase_client
+        # Create authenticated client for this user (needed for RLS policies)
+        client = create_authenticated_client(session.access_token)
 
         # Get user metadata (for name, profile_picture, etc.)
         try:

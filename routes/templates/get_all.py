@@ -11,9 +11,8 @@ logger = logging.getLogger(__name__)
 @router.get("", response_model=list[TemplateListItemDTO], status_code=status.HTTP_200_OK)
 async def get_all_templates(
     request: Request,
-    workspace_type: str | None = Query(None, description="Workspace: user, company, organization"),
+    workspace_type: str | None = Query(None, description="Workspace: user, organization"),
     organization_id: str | None = None,
-    company_id: str | None = None,
     folder_id: int | None = None,
     tags: str | None = Query(None, description="Comma-separated tags"),
     published: bool | None = None,
@@ -35,7 +34,6 @@ async def get_all_templates(
             locale,
             workspace_type,
             organization_id,
-            company_id,
             folder_id,
             tag_list,
             published,

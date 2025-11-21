@@ -1,5 +1,9 @@
 from dataclasses import dataclass
+from typing import Literal
 from .member import OrganizationMember
+
+
+OrganizationType = Literal["company", "standard"]
 
 
 @dataclass
@@ -7,6 +11,7 @@ class OrganizationDetail:
     id: str
     name: str
     description: dict | None = None
+    type: OrganizationType = "standard"
     image_url: str | None = None
     banner_url: str | None = None
     website_url: str | None = None

@@ -1,11 +1,16 @@
 from pydantic import BaseModel, field_validator
+from typing import Literal
 from domains.enums import RoleEnum
+
+
+OrganizationType = Literal["company", "standard"]
 
 
 class OrganizationResponseDTO(BaseModel):
     id: str
     name: str
     role: str | None = None
+    type: OrganizationType = "standard"
     image_url: str | None = None
     banner_url: str | None = None
     created_at: str | None = None
@@ -24,6 +29,7 @@ class OrganizationDetailResponseDTO(BaseModel):
     id: str
     name: str
     description: dict | None = None  # JSONB field
+    type: OrganizationType = "standard"
     image_url: str | None = None
     banner_url: str | None = None
     website_url: str | None = None

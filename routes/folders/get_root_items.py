@@ -9,9 +9,8 @@ logger = logging.getLogger(__name__)
 @router.get("/root/items", response_model=FolderWithItemsDTO, status_code=status.HTTP_200_OK)
 async def get_root_items(
     request: Request,
-    workspace_type: str | None = Query(None, description="Workspace: user, company, organization, all"),
-    organization_id: str | None = None,
-    company_id: str | None = None
+    workspace_type: str | None = Query(None, description="Workspace: user, organization, all"),
+    organization_id: str | None = None
 ) -> FolderWithItemsDTO:
     try:
         user_id = request.state.user_id
@@ -25,8 +24,7 @@ async def get_root_items(
             user_id,
             locale,
             workspace_type,
-            organization_id,
-            company_id
+            organization_id
         )
 
         return items

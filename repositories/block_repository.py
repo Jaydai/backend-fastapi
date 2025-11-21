@@ -11,7 +11,7 @@ class BlockRepository:
             .execute()
 
         if not response.data:
-            return {"company_id": None, "organization_ids": [], "roles": {}}
+            return {"organization_ids": [], "roles": {}}
 
         return response.data
 
@@ -22,19 +22,14 @@ class BlockRepository:
         block_type: str | None = None,
         workspace_type: str | None = None,
         organization_id: str | None = None,
-        company_id: str | None = None,
         published: bool | None = None,
         search_query: str | None = None
     ) -> list[Block]:
         query = client.table("prompt_blocks").select("*")
 
-        if workspace_type == "all" or (not workspace_type and not organization_id and not company_id):
+        if workspace_type == "all" or (not workspace_type and not organization_id):
             user_metadata = BlockRepository._get_user_metadata(client, user_id)
             conditions = [f"user_id.eq.{user_id}"]
-
-            company = user_metadata.get("company_id")
-            if company:
-                conditions.append(f"company_id.eq.{company}")
 
             roles = user_metadata.get("roles") or {}
             org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
@@ -44,15 +39,7 @@ class BlockRepository:
 
             query = query.or_(",".join(conditions))
         elif workspace_type == "user":
-            query = query.eq("user_id", user_id).is_("organization_id", "null").is_("company_id", "null")
-        elif workspace_type == "company":
-            target_company_id = company_id
-            if not target_company_id:
-                user_metadata = BlockRepository._get_user_metadata(client, user_id)
-                target_company_id = user_metadata.get("company_id")
-            if not target_company_id:
-                return []
-            query = query.eq("company_id", target_company_id)
+            query = query.eq("user_id", user_id).is_("organization_id", "null")
         elif workspace_type == "organization":
             user_metadata = BlockRepository._get_user_metadata(client, user_id)
             roles = user_metadata.get("roles") or {}
@@ -90,7 +77,6 @@ class BlockRepository:
                 content=data.get("content", {}),
                 published=data.get("published", False),
                 user_id=data["user_id"],
-                company_id=data.get("company_id"),
                 organization_id=data.get("organization_id"),
                 workspace_type=data.get("workspace_type", "user"),
                 created_at=data["created_at"],
@@ -119,7 +105,6 @@ class BlockRepository:
             content=data.get("content", {}),
             published=data.get("published", False),
             user_id=data["user_id"],
-            company_id=data.get("company_id"),
             organization_id=data.get("organization_id"),
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
@@ -137,7 +122,6 @@ class BlockRepository:
         content: dict[str, str],
         published: bool,
         organization_id: str | None,
-        company_id: str | None,
         workspace_type: str
     ) -> Block:
         block_data = {
@@ -148,7 +132,6 @@ class BlockRepository:
             "content": content,
             "published": published,
             "organization_id": organization_id,
-            "company_id": company_id,
             "workspace_type": workspace_type
         }
 
@@ -163,7 +146,6 @@ class BlockRepository:
             content=data.get("content", {}),
             published=data.get("published", False),
             user_id=data["user_id"],
-            company_id=data.get("company_id"),
             organization_id=data.get("organization_id"),
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
@@ -210,7 +192,6 @@ class BlockRepository:
             content=data.get("content", {}),
             published=data.get("published", False),
             user_id=data["user_id"],
-            company_id=data.get("company_id"),
             organization_id=data.get("organization_id"),
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],

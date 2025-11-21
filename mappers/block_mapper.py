@@ -28,7 +28,6 @@ class BlockMapper:
             content=BlockMapper.localize_string(block.content, locale),
             published=block.published,
             user_id=block.user_id,
-            company_id=block.company_id,
             organization_id=block.organization_id,
             workspace_type=block.workspace_type,
             created_at=block.created_at,

@@ -12,7 +12,6 @@ async def get_blocks(
     block_type: str | None = Query(None, alias="type"),
     workspace_type: str | None = Query(None),
     organization_id: str | None = None,
-    company_id: str | None = None,
     published: bool | None = None,
     q: str | None = None
 ) -> list[BlockResponseDTO]:
@@ -30,7 +29,6 @@ async def get_blocks(
             block_type,
             workspace_type,
             organization_id,
-            company_id,
             published,
             q
         )

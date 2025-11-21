@@ -19,7 +19,6 @@ class CreateBlockDTO(BaseModel):
     content: str
     published: bool = True
     organization_id: str | None = None
-    company_id: str | None = None
 
 class UpdateBlockDTO(BaseModel):
     type: BlockType | None = None
@@ -36,7 +35,6 @@ class BlockResponseDTO(BaseModel):
     content: str
     published: bool
     user_id: str
-    company_id: str | None = None
     organization_id: str | None = None
     workspace_type: str
     created_at: str

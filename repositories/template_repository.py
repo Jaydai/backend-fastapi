@@ -17,7 +17,7 @@ class TemplateRepository:
             .execute()
 
         if not response.data:
-            return {"company_id": None, "organization_ids": [], "roles": {}}
+            return {"organization_ids": [], "roles": {}}
 
         return response.data
 
@@ -27,22 +27,17 @@ class TemplateRepository:
         user_id: str,
         workspace_type: str | None = None,
         organization_id: str | None = None,
-        company_id: str | None = None,
         folder_id: int | None = None,
         tags: list[str] | None = None,
         published: bool | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[Template]:
-        query = client.table("prompt_templates").select("id, title, description, folder_id, organization_id, company_id, user_id, workspace_type, created_at, updated_at, tags, usage_count, current_version_id, is_free")
+        query = client.table("prompt_templates").select("id, title, description, folder_id, organization_id, user_id, workspace_type, created_at, updated_at, tags, usage_count, current_version_id, is_free")
 
-        if workspace_type == "all" or (not workspace_type and not organization_id and not company_id):
+        if workspace_type == "all" or (not workspace_type and not organization_id):
             user_metadata = TemplateRepository._get_user_metadata(client, user_id)
             conditions = [f"user_id.eq.{user_id}"]
-
-            company = user_metadata.get("company_id")
-            if company:
-                conditions.append(f"company_id.eq.{company}")
 
             roles = user_metadata.get("roles") or {}
             org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
@@ -52,17 +47,7 @@ class TemplateRepository:
 
             query = query.or_(",".join(conditions))
         elif workspace_type == "user":
-            query = query.eq("user_id", user_id).is_("organization_id", "null").is_("company_id", "null")
-        elif workspace_type == "company":
-            target_company_id = company_id
-            if not target_company_id:
-                user_metadata = TemplateRepository._get_user_metadata(client, user_id)
-                target_company_id = user_metadata["company_id"]
-
-            if not target_company_id:
-                return []
-
-            query = query.eq("company_id", target_company_id)
+            query = query.eq("user_id", user_id).is_("organization_id", "null")
         elif workspace_type == "organization":
             user_metadata = TemplateRepository._get_user_metadata(client, user_id)
             roles = user_metadata.get("roles") or {}
@@ -109,8 +94,7 @@ class TemplateRepository:
                 description=data.get("description"),
                 folder_id=data.get("folder_id"),
                 organization_id=data.get("organization_id"),
-                company_id=data.get("company_id"),
-                user_id=data["user_id"],
+                    user_id=data["user_id"],
                 workspace_type=data["workspace_type"],
                 created_at=data["created_at"],
                 updated_at=data.get("updated_at"),
@@ -140,7 +124,6 @@ class TemplateRepository:
             description=data.get("description"),
             folder_id=data.get("folder_id"),
             organization_id=data.get("organization_id"),
-            company_id=data.get("company_id"),
             user_id=data["user_id"],
             workspace_type=data["workspace_type"],
             created_at=data["created_at"],
@@ -161,7 +144,6 @@ class TemplateRepository:
         description: dict[str, str] | None,
         folder_id: str | None,  # UUID
         organization_id: str | None,
-        company_id: str | None,
         tags: list[str] | None,
         workspace_type: str
     ) -> Template:
@@ -171,7 +153,6 @@ class TemplateRepository:
             "description": description,
             "folder_id": folder_id,
             "organization_id": organization_id,
-            "company_id": company_id,
             "tags": tags,
             "workspace_type": workspace_type,
             "usage_count": 0,
@@ -187,7 +168,6 @@ class TemplateRepository:
             description=data.get("description"),
             folder_id=data.get("folder_id"),
             organization_id=data.get("organization_id"),
-            company_id=data.get("company_id"),
             user_id=data["user_id"],
             workspace_type=data["workspace_type"],
             created_at=data["created_at"],
@@ -231,7 +211,6 @@ class TemplateRepository:
             description=data.get("description"),
             folder_id=data.get("folder_id"),
             organization_id=data.get("organization_id"),
-            company_id=data.get("company_id"),
             user_id=data["user_id"],
             workspace_type=data["workspace_type"],
             created_at=data["created_at"],
@@ -474,8 +453,7 @@ class TemplateRepository:
                 description=data.get("description"),
                 folder_id=data.get("folder_id"),
                 organization_id=data.get("organization_id"),
-                company_id=data.get("company_id"),
-                user_id=data["user_id"],
+                    user_id=data["user_id"],
                 workspace_type=data["workspace_type"],
                 created_at=data["created_at"],
                 updated_at=data.get("updated_at"),

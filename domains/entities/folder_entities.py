@@ -7,7 +7,6 @@ class Folder:
     description: dict[str, str] | None
     user_id: str | None
     organization_id: str | None
-    company_id: str | None
     parent_folder_id: str | None
     workspace_type: str
     created_at: str

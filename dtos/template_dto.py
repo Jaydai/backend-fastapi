@@ -6,7 +6,6 @@ class CreateTemplateDTO(BaseModel):
     content: str
     folder_id: str | None = None  # UUID
     organization_id: str | None = None
-    company_id: str | None = None
     tags: list[str] | None = None
     category: str | None = None
     is_public: bool | None = None
@@ -55,7 +54,6 @@ class TemplateListItemDTO(BaseModel):
     description: str | None = None
     folder_id: str | None = None  # UUID
     organization_id: str | None = None
-    company_id: str | None = None
     user_id: str | None = None  # Can be None for public/shared templates
     workspace_type: str
     created_at: str
@@ -88,7 +86,6 @@ class TemplateResponseDTO(BaseModel):
     content: str
     folder_id: str | None = None  # UUID
     organization_id: str | None = None
-    company_id: str | None = None
     user_id: str | None = None  # Can be None for public/shared templates
     workspace_type: str
     created_at: str

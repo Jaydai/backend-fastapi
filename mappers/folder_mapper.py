@@ -26,7 +26,6 @@ class FolderMapper:
             description=FolderMapper.localize_string(folder.description, locale) if folder.description else None,
             user_id=folder.user_id,
             organization_id=folder.organization_id,
-            company_id=folder.company_id,
             parent_folder_id=folder.parent_folder_id,
             workspace_type=folder.workspace_type,
             created_at=folder.created_at,

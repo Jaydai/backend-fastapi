@@ -5,7 +5,6 @@ class CreateFolderDTO(BaseModel):
     description: str | None = None
     parent_folder_id: str | None = None
     organization_id: str | None = None
-    company_id: str | None = None
 
 class UpdateFolderDTO(BaseModel):
     title: str | None = None
@@ -18,7 +17,6 @@ class FolderResponseDTO(BaseModel):
     description: str | None = None
     user_id: str | None = None
     organization_id: str | None = None
-    company_id: str | None = None
     parent_folder_id: str | None = None
     workspace_type: str
     created_at: str

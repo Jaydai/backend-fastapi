@@ -30,7 +30,6 @@ class TemplateService:
         locale: str = "en",
         workspace_type: str | None = None,
         organization_id: str | None = None,
-        company_id: str | None = None,
         folder_id: int | None = None,
         tags: list[str] | None = None,
         published: bool | None = None,
@@ -42,7 +41,6 @@ class TemplateService:
             user_id,
             workspace_type,
             organization_id,
-            company_id,
             folder_id,
             tags,
             published,
@@ -78,8 +76,6 @@ class TemplateService:
         workspace_type = "user"
         if data.organization_id:
             workspace_type = "organization"
-        elif data.company_id:
-            workspace_type = "company"
 
         title_dict = TemplateMapper.ensure_localized_dict(data.title, locale)
         description_dict = TemplateMapper.ensure_localized_dict(data.description, locale) if data.description else None
@@ -92,7 +88,6 @@ class TemplateService:
             description_dict,
             data.folder_id,
             data.organization_id,
-            data.company_id,
             data.tags,
             workspace_type
         )

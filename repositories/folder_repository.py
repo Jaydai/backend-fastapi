@@ -11,7 +11,7 @@ class FolderRepository:
             .execute()
 
         if not response.data:
-            return {"company_id": None, "organization_ids": [], "roles": {}}
+            return {"organization_ids": [], "roles": {}}
 
         return response.data
 
@@ -21,18 +21,13 @@ class FolderRepository:
         user_id: str,
         workspace_type: str | None = None,
         organization_id: str | None = None,
-        company_id: str | None = None,
         parent_folder_id: str | None = None
     ) -> list[Folder]:
         query = client.table("prompt_folders").select("*")
 
-        if workspace_type == "all" or (not workspace_type and not organization_id and not company_id):
+        if workspace_type == "all" or (not workspace_type and not organization_id):
             user_metadata = FolderRepository._get_user_metadata(client, user_id)
             conditions = [f"user_id.eq.{user_id}"]
-
-            company = user_metadata.get("company_id")
-            if company:
-                conditions.append(f"company_id.eq.{company}")
 
             roles = user_metadata.get("roles") or {}
             org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
@@ -42,17 +37,7 @@ class FolderRepository:
 
             query = query.or_(",".join(conditions))
         elif workspace_type == "user":
-            query = query.eq("user_id", user_id).is_("organization_id", "null").is_("company_id", "null")
-        elif workspace_type == "company":
-            target_company_id = company_id
-            if not target_company_id:
-                user_metadata = FolderRepository._get_user_metadata(client, user_id)
-                target_company_id = user_metadata.get("company_id")
-
-            if not target_company_id:
-                return []
-
-            query = query.eq("company_id", target_company_id)
+            query = query.eq("user_id", user_id).is_("organization_id", "null")
         elif workspace_type == "organization":
             user_metadata = FolderRepository._get_user_metadata(client, user_id)
             roles = user_metadata.get("roles") or {}
@@ -85,7 +70,6 @@ class FolderRepository:
                 description=data.get("description"),
                 user_id=data.get("user_id"),
                 organization_id=data.get("organization_id"),
-                company_id=data.get("company_id"),
                 parent_folder_id=data.get("parent_folder_id"),
                 workspace_type=data["workspace_type"],
                 created_at=data["created_at"],
@@ -111,7 +95,6 @@ class FolderRepository:
             description=data.get("description"),
             user_id=data.get("user_id"),
             organization_id=data.get("organization_id"),
-            company_id=data.get("company_id"),
             parent_folder_id=data.get("parent_folder_id"),
             workspace_type=data["workspace_type"],
             created_at=data["created_at"],
@@ -126,7 +109,6 @@ class FolderRepository:
         description: dict[str, str] | None,
         parent_folder_id: str | None,
         organization_id: str | None,
-        company_id: str | None,
         workspace_type: str
     ) -> Folder:
         folder_data = {
@@ -135,7 +117,6 @@ class FolderRepository:
             "description": description,
             "parent_folder_id": parent_folder_id,
             "organization_id": organization_id,
-            "company_id": company_id,
             "workspace_type": workspace_type
         }
 
@@ -148,7 +129,6 @@ class FolderRepository:
             description=data.get("description"),
             user_id=data.get("user_id"),
             organization_id=data.get("organization_id"),
-            company_id=data.get("company_id"),
             parent_folder_id=data.get("parent_folder_id"),
             workspace_type=data["workspace_type"],
             created_at=data["created_at"],
@@ -186,7 +166,6 @@ class FolderRepository:
             description=data.get("description"),
             user_id=data.get("user_id"),
             organization_id=data.get("organization_id"),
-            company_id=data.get("company_id"),
             parent_folder_id=data.get("parent_folder_id"),
             workspace_type=data["workspace_type"],
             created_at=data["created_at"],
@@ -254,26 +233,21 @@ class FolderRepository:
         client: Client,
         user_id: str,
         workspace_type: str | None = None,
-        organization_id: str | None = None,
-        company_id: str | None = None
+        organization_id: str | None = None
     ) -> dict:
         from repositories.template_repository import TemplateRepository
 
         folders = FolderRepository.get_folders(
-            client, user_id, workspace_type, organization_id, company_id, "root"
+            client, user_id, workspace_type, organization_id, "root"
         )
 
         templates_query = client.table("prompt_templates")\
             .select("*")\
             .is_("folder_id", "null")
 
-        if workspace_type == "all" or (not workspace_type and not organization_id and not company_id):
+        if workspace_type == "all" or (not workspace_type and not organization_id):
             user_metadata = FolderRepository._get_user_metadata(client, user_id)
             conditions = [f"user_id.eq.{user_id}"]
-
-            company = user_metadata.get("company_id")
-            if company:
-                conditions.append(f"company_id.eq.{company}")
 
             roles = user_metadata.get("roles") or {}
             org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
@@ -284,17 +258,7 @@ class FolderRepository:
             templates_query = templates_query.or_(",".join(conditions))
         elif workspace_type == "user":
             templates_query = templates_query.eq("user_id", user_id)\
-                .is_("organization_id", "null")\
-                .is_("company_id", "null")
-        elif workspace_type == "company":
-            target_company_id = company_id
-            if not target_company_id:
-                user_metadata = FolderRepository._get_user_metadata(client, user_id)
-                target_company_id = user_metadata.get("company_id")
-            if target_company_id:
-                templates_query = templates_query.eq("company_id", target_company_id)
-            else:
-                templates_query = templates_query.eq("id", "impossible-id")
+                .is_("organization_id", "null")
         elif workspace_type == "organization":
             user_metadata = FolderRepository._get_user_metadata(client, user_id)
             roles = user_metadata.get("roles") or {}
@@ -323,7 +287,6 @@ class FolderRepository:
                 description=data.get("description"),
                 folder_id=data.get("folder_id"),
                 organization_id=data.get("organization_id"),
-                company_id=data.get("company_id"),
                 user_id=data["user_id"],
                 workspace_type=data["workspace_type"],
                 created_at=data["created_at"],
@@ -354,7 +317,6 @@ class FolderRepository:
                 description=data.get("description"),
                 user_id=data.get("user_id"),
                 organization_id=data.get("organization_id"),
-                company_id=data.get("company_id"),
                 parent_folder_id=data.get("parent_folder_id"),
                 workspace_type=data["workspace_type"],
                 created_at=data["created_at"],
@@ -376,7 +338,6 @@ class FolderRepository:
                 description=data.get("description"),
                 folder_id=data.get("folder_id"),
                 organization_id=data.get("organization_id"),
-                company_id=data.get("company_id"),
                 user_id=data["user_id"],
                 workspace_type=data["workspace_type"],
                 created_at=data["created_at"],

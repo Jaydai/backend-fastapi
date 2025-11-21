@@ -9,9 +9,8 @@ logger = logging.getLogger(__name__)
 @router.get("", response_model=list[FolderResponseDTO], status_code=status.HTTP_200_OK)
 async def get_folders(
     request: Request,
-    workspace_type: str | None = Query(None, description="Workspace: user, company, organization, all"),
+    workspace_type: str | None = Query(None, description="Workspace: user, organization, all"),
     organization_id: str | None = None,
-    company_id: str | None = None,
     parent_folder_id: str | None = None
 ) -> list[FolderResponseDTO]:
     try:
@@ -19,7 +18,7 @@ async def get_folders(
         client = request.state.supabase_client
         locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
 
-        logger.info(f"User {user_id} getting folders with filters: workspace={workspace_type}, org={organization_id}, company={company_id}, parent={parent_folder_id}")
+        logger.info(f"User {user_id} getting folders with filters: workspace={workspace_type}, org={organization_id}, parent={parent_folder_id}")
 
         folders = FolderService.get_folders(
             client,
@@ -27,7 +26,6 @@ async def get_folders(
             locale,
             workspace_type,
             organization_id,
-            company_id,
             parent_folder_id
         )
 

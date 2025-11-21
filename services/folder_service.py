@@ -17,7 +17,6 @@ class FolderService:
         locale: str = "en",
         workspace_type: str | None = None,
         organization_id: str | None = None,
-        company_id: str | None = None,
         parent_folder_id: str | None = None
     ) -> list[FolderResponseDTO]:
         folders = FolderRepository.get_folders(
@@ -25,7 +24,6 @@ class FolderService:
             user_id,
             workspace_type,
             organization_id,
-            company_id,
             parent_folder_id
         )
 
@@ -53,8 +51,6 @@ class FolderService:
         workspace_type = "user"
         if data.organization_id:
             workspace_type = "organization"
-        elif data.company_id:
-            workspace_type = "company"
 
         title_dict = FolderMapper.ensure_localized_dict(data.title, locale)
         description_dict = FolderMapper.ensure_localized_dict(data.description, locale) if data.description else None
@@ -66,7 +62,6 @@ class FolderService:
             description_dict,
             data.parent_folder_id,
             data.organization_id,
-            data.company_id,
             workspace_type
         )
 
@@ -143,15 +138,13 @@ class FolderService:
         user_id: str,
         locale: str = "en",
         workspace_type: str | None = None,
-        organization_id: str | None = None,
-        company_id: str | None = None
+        organization_id: str | None = None
     ) -> FolderWithItemsDTO:
         items = FolderRepository.get_root_items(
             client,
             user_id,
             workspace_type,
-            organization_id,
-            company_id
+            organization_id
         )
 
         return FolderMapper.folder_with_items_to_dto(

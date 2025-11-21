@@ -17,6 +17,7 @@ class OrganizationRepository:
 
         if not response.data:
             return []
+        print(f"😎😎😎 response.data: {response.data}")
         
         organizations = []
         for row in response.data:
@@ -37,6 +38,7 @@ class OrganizationRepository:
                 id=row["id"],
                 name=row["name"],
                 user_organization_role=user_org_role,
+                type=row.get("type", "standard"),  # Default to standard if not set
                 image_url=row.get("image_url"),
                 banner_url=row.get("banner_url"),
                 created_at=row.get("created_at"),
@@ -147,6 +149,7 @@ class OrganizationRepository:
             id=org_data["id"],
             name=org_data["name"],
             description=org_data.get("description"),
+            type=org_data.get("type", "standard"),  # Default to standard if not set
             image_url=org_data.get("image_url"),
             banner_url=org_data.get("banner_url"),
             website_url=org_data.get("website_url"),
