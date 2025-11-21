@@ -13,13 +13,15 @@ from repositories import TemplateRepository, TemplateVersionRepository, Permissi
 
 from mappers.template_mapper import TemplateMapper
 from services.templates import get_templates_titles, create_template, update_template
+from services.locale_service import LocaleService
 
 class TemplateService:
     @staticmethod
     def get_templates_titles(
         client: Client,
-        locale: str = "en",
-        user_id: str | None = None,
+        user_id: str,
+        locale: str = LocaleService.DEFAULT_LOCALE,
+        workspace_type: str | None = None,
         organization_id: str | None = None,
         folder_id: str | None = None,
         published: bool | None = None,
@@ -31,6 +33,7 @@ class TemplateService:
             client=client,
             locale=locale,
             user_id=user_id,
+            workspace_type=workspace_type,
             organization_id=organization_id,
             folder_id=folder_id,
             published=published,
@@ -42,7 +45,7 @@ class TemplateService:
     def get_template_by_id(
         client: Client,
         template_id: str,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO | None:
         template = TemplateRepository.get_template_by_id(client, template_id)
         if not template:
@@ -59,7 +62,7 @@ class TemplateService:
         client: Client,
         user_id: str,
         data: CreateTemplateDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO:
         return create_template(client, user_id, data, locale)
 
@@ -69,7 +72,7 @@ class TemplateService:
         client: Client,
         template_id: str,
         data: UpdateTemplateDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO | None:
         return update_template(client, template_id, data, locale)
 
@@ -87,7 +90,7 @@ class TemplateService:
     def get_versions(
         client: Client,
         template_id: str,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> list[TemplateVersionResponseDTO]:
         versions = TemplateRepository.get_versions(client, template_id)
         return [TemplateMapper.version_entity_to_dto(v, locale) for v in versions]
@@ -98,7 +101,7 @@ class TemplateService:
         template_id: str,
         user_id: str,
         data: CreateVersionDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateVersionResponseDTO:
         if data.copy_from_version_id:
             source_version = TemplateRepository.get_version_by_id(client, data.copy_from_version_id)
@@ -143,7 +146,7 @@ class TemplateService:
         client: Client,
         user_id: str,
         query: str,
-        locale: str = "en",
+        locale: str = LocaleService.DEFAULT_LOCALE,
         tags: list[str] | None = None,
         include_public: bool = True,
         limit: int = 50,

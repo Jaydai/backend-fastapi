@@ -1,5 +1,6 @@
 from fastapi import Request
 from dataclasses import asdict, is_dataclass
+from services.locale_service import LocaleService
 
 
 def extract_locale_from_request(request: Request) -> str:
@@ -46,7 +47,7 @@ def ensure_localized_field(value: str | dict[str, str], locale: str) -> dict[str
         return {}
 
 
-def get_localized_value(field: str | dict[str, str], locale: str = "en", fallback: str = None) -> str:
+def get_localized_value(field: str | dict[str, str], locale: str = LocaleService.DEFAULT_LOCALE, fallback: str = None) -> str:
     """
     Get localized value from a field.
 

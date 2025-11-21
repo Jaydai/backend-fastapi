@@ -9,13 +9,14 @@ from dtos import (
 )
 from repositories.block_repository import BlockRepository
 from mappers.block_mapper import BlockMapper
+from services.locale_service import LocaleService
 
 class BlockService:
     @staticmethod
     def get_blocks(
         client: Client,
         user_id: str,
-        locale: str = "en",
+        locale: str = LocaleService.DEFAULT_LOCALE,
         block_type: str | None = None,
         workspace_type: str | None = None,
         organization_id: str | None = None,
@@ -63,7 +64,7 @@ class BlockService:
     def get_block_by_id(
         client: Client,
         block_id: str,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> BlockResponseDTO | None:
         block = BlockRepository.get_block_by_id(client, block_id)
         if not block:
@@ -76,7 +77,7 @@ class BlockService:
         client: Client,
         user_id: str,
         data: CreateBlockDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> BlockResponseDTO:
         workspace_type = "user"
         if data.organization_id:
@@ -105,7 +106,7 @@ class BlockService:
         client: Client,
         block_id: str,
         data: UpdateBlockDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> BlockResponseDTO | None:
         block_type = data.type.value if data.type else None
         title_dict = BlockMapper.ensure_localized_dict(data.title, locale) if data.title else None
@@ -139,7 +140,7 @@ class BlockService:
     def get_pinned_blocks(
         client: Client,
         user_id: str,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> list[BlockResponseDTO]:
         pinned_ids = BlockRepository.get_pinned_block_ids(client, user_id)
 
