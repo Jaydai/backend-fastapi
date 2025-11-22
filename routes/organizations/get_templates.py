@@ -22,7 +22,7 @@ async def get_organization_templates(
     locale: str = Query("en", description="Locale for localization")
 ) -> list[TemplateTitleResponseDTO]:
     try:
-        templates = TemplateService.get_templates_titles(
+        templates = TemplateService.get_titles(
             request.state.supabase_client,
             locale,
             organization_id=organization_id,

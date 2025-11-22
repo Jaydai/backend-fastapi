@@ -39,7 +39,7 @@ async def get_all_templates(
             else:
                 folder_id_list = [fid.strip() for fid in folder_ids.split(",") if fid.strip()]
 
-        templates = TemplateService.get_templates_titles(
+        templates = TemplateService.get_titles(
             client,
             locale,
             organization_id,

@@ -20,7 +20,7 @@ async def get_template_by_id(
 
         logger.info(f"User {user_id} fetching template {template_id}")
 
-        template = TemplateService.get_template_by_id(client, template_id, locale)
+        template = TemplateService.get_by_id(client, template_id, locale)
 
         if not template:
             raise HTTPException(

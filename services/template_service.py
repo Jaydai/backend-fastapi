@@ -14,51 +14,31 @@ from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
 from utils import localize_object
 from domains.entities import TemplateVersion
+from services.templates import get_titles, get_by_id, create_template, update_template
 
 class TemplateService:
-    @staticmethod
-    def get_all_templates_title() -> list[TemplateTitleResponseDTO]:
-        templates = TemplateRepository.get_all_templates_title()
-        return [
-            TemplateTitleResponseDTO(**localize_object(template, "fr", ["title"]))
-            for template in templates
-        ]
 
     @staticmethod
-    def get_templates_titles(
+    def get_titles(
         client: Client,
         locale: str = "en",
+        user_id: str | None = None,
         organization_id: str | None = None,
         folder_ids: list[str] | None = None,
         published: bool | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[TemplateTitleResponseDTO]:
-        from services.templates import TemplateTitleService
-        return TemplateTitleService.get_titles(
-            client,
-            locale=locale,
-            organization_id=organization_id,
-            folder_ids=folder_ids,
-            published=published,
-            limit=limit,
-            offset=offset
-        )
+        return get_titles(client, locale, organization_id, folder_ids, published, user_id, workspace_type, limit, offset)
 
     @staticmethod
-    def get_template_by_id(
+    def get_by_id(
         client: Client,
         template_id: str,
         locale: str = "en"
     ) -> TemplateResponseDTO | None:
-        template = TemplateRepository.get_template_by_id(client, template_id)
-        if not template:
-            return None
+        return get_by_id(client, template_id, locale)
 
-        versions = TemplateRepository.get_versions(client, template_id)
-        comments = TemplateRepository.get_comments(client, template_id, locale)
-
-        return TemplateMapper.entity_to_response_dto(template, versions, comments, locale)
 
     @staticmethod
     def create_template(
@@ -67,45 +47,8 @@ class TemplateService:
         data: CreateTemplateDTO,
         locale: str = "en"
     ) -> TemplateResponseDTO:
-        # TODO: remove workspace_type ?
-        workspace_type = "user"
-        if data.organization_id:
-            workspace_type = "organization"
+        return create_template(client, user_id, data, locale)
 
-        title_dict = TemplateMapper.ensure_localized_dict(data.title, locale)
-        description_dict = TemplateMapper.ensure_localized_dict(data.description, locale) if data.description else None
-        content_dict = TemplateMapper.ensure_localized_dict(data.content, locale)
-
-        template = TemplateRepository.create_template(
-            client,
-            user_id,
-            title_dict,
-            description_dict,
-            data.folder_id,
-            data.organization_id,
-            data.tags,
-            workspace_type
-        )
-
-        try:
-            version = TemplateRepository.create_version(
-                client,
-                template.id,
-                user_id,
-                content_dict,
-                version_number="1.0",
-                change_notes=None,
-                status="draft" if workspace_type != "user" else "published",
-                optimized_for=data.optimized_for
-            )
-
-            TemplateRepository.update_template(client, template.id, current_version_id=version.id)
-
-        except Exception as e:
-            TemplateRepository.delete_template(client, template.id)
-            raise Exception(f"Failed to create template version: {str(e)}")
-
-        return TemplateService.get_template_by_id(client, template.id, locale)
 
     @staticmethod
     def update_template(
@@ -114,70 +57,8 @@ class TemplateService:
         data: UpdateTemplateDTO,
         locale: str = "en"
     ) -> TemplateResponseDTO | None:
-        template = TemplateRepository.get_template_by_id(client, template_id)
-        if not template:
-            return None
+        return update_template(client, template_id, data, locale)
 
-        title_dict = TemplateMapper.ensure_localized_dict(data.title, locale) if data.title else None
-        description_dict = TemplateMapper.ensure_localized_dict(data.description, locale) if data.description else None
-
-        content_updated = data.content is not None
-        status_updated = data.status is not None
-
-        if content_updated or status_updated:
-            if data.version_id:
-                version_update_data = {}
-                if content_updated:
-                    version_update_data["content"] = TemplateMapper.ensure_localized_dict(data.content, locale)
-                if status_updated:
-                    version_update_data["status"] = data.status
-
-                version = TemplateRepository.update_version(
-                    client,
-                    data.version_id,
-                    template_id,
-                    content=version_update_data.get("content"),
-                    status=version_update_data.get("status")
-                )
-
-                if not version:
-                    return None
-            else:
-                if content_updated:
-                    content_dict = TemplateMapper.ensure_localized_dict(data.content, locale)
-                    version = TemplateRepository.create_version(
-                        client,
-                        template_id,
-                        template.user_id,
-                        content_dict,
-                        change_notes=None,
-                        status=data.status or "draft"
-                    )
-                    TemplateRepository.update_template(
-                        client,
-                        template_id,
-                        title=title_dict,
-                        description=description_dict,
-                        folder_id=data.folder_id,
-                        tags=data.tags,
-                        current_version_id=version.id
-                    )
-
-        if not content_updated and not status_updated:
-            TemplateRepository.update_template(
-                client,
-                template_id,
-                title=title_dict,
-                description=description_dict,
-                folder_id=data.folder_id,
-                tags=data.tags,
-                current_version_id=data.current_version_id
-            )
-
-        if data.is_pinned is not None:
-            TemplateRepository.update_pinned_status(client, template.user_id, template_id, data.is_pinned)
-
-        return TemplateService.get_template_by_id(client, template_id, locale)
 
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:
@@ -250,27 +131,3 @@ class TemplateService:
         )
 
         return [TemplateMapper.entity_to_list_item_dto(t, locale) for t in templates]
-
-    @staticmethod
-    def get_organization_template_titles(
-        client: Client,
-        organization_id: str,
-        locale: str = "en"
-    ) -> list[OrganizationTemplateTitleDTO]:
-        """
-        Get template titles for a specific organization (localized).
-        """
-        from repositories.template_repository import TemplateRepository
-
-        templates_data = TemplateRepository.get_organization_template_titles(client, organization_id)
-
-        result = []
-        for template_data in templates_data:
-            # Localize the title
-            localized = localize_object(template_data, locale, ["title"])
-            result.append(OrganizationTemplateTitleDTO(
-                id=localized["id"],
-                title=localized["title"]
-            ))
-
-        return result
