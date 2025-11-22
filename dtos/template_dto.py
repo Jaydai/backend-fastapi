@@ -106,3 +106,8 @@ class UsageResponseDTO(BaseModel):
 class TemplateTitleResponseDTO(BaseModel):
     id: str
     title: str
+
+class OrganizationTemplateTitleDTO(BaseModel):
+    """Template title for organization context (with localization support)"""
+    id: str
+    title: str  # Localized title

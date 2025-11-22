@@ -10,6 +10,8 @@ from . import (
     update_member_role,
     remove_member,
     get_invitations,
+    get_templates,
+    get_folders,
 )
 
 # Not implemented yet (501)

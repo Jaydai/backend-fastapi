@@ -4,10 +4,11 @@ from dtos import (
     UpdateTemplateDTO,
     CreateVersionDTO,
     TemplateVersionResponseDTO,
-    TemplateListItemDTO,
+    TemplateTitleResponseDTO,
     TemplateResponseDTO,
     UsageResponseDTO,
     TemplateTitleResponseDTO,
+    OrganizationTemplateTitleDTO,
 )
 from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
@@ -24,31 +25,25 @@ class TemplateService:
         ]
 
     @staticmethod
-    def get_templates(
+    def get_templates_titles(
         client: Client,
-        user_id: str,
         locale: str = "en",
-        workspace_type: str | None = None,
         organization_id: str | None = None,
-        folder_id: int | None = None,
-        tags: list[str] | None = None,
+        folder_ids: list[str] | None = None,
         published: bool | None = None,
         limit: int = 100,
         offset: int = 0
-    ) -> list[TemplateListItemDTO]:
-        templates = TemplateRepository.get_templates(
+    ) -> list[TemplateTitleResponseDTO]:
+        templates = TemplateRepository.get_templates_titles(
             client,
-            user_id,
-            workspace_type,
             organization_id,
-            folder_id,
-            tags,
+            folder_ids,
             published,
             limit,
             offset
         )
 
-        return [TemplateMapper.entity_to_list_item_dto(t, locale) for t in templates]
+        return [TemplateTitleResponseDTO(**localize_object(template, locale, ["title"])) for template in templates]
 
     @staticmethod
     def get_template_by_id(
@@ -243,7 +238,7 @@ class TemplateService:
         include_public: bool = True,
         limit: int = 50,
         offset: int = 0
-    ) -> list[TemplateListItemDTO]:
+    ) -> list[TemplateTitleResponseDTO]:
         templates = TemplateRepository.search_templates(
             client,
             user_id,
@@ -255,3 +250,27 @@ class TemplateService:
         )
 
         return [TemplateMapper.entity_to_list_item_dto(t, locale) for t in templates]
+
+    @staticmethod
+    def get_organization_template_titles(
+        client: Client,
+        organization_id: str,
+        locale: str = "en"
+    ) -> list[OrganizationTemplateTitleDTO]:
+        """
+        Get template titles for a specific organization (localized).
+        """
+        from repositories.template_repository import TemplateRepository
+
+        templates_data = TemplateRepository.get_organization_template_titles(client, organization_id)
+
+        result = []
+        for template_data in templates_data:
+            # Localize the title
+            localized = localize_object(template_data, locale, ["title"])
+            result.append(OrganizationTemplateTitleDTO(
+                id=localized["id"],
+                title=localized["title"]
+            ))
+
+        return result

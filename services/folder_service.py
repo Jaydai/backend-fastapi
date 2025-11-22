@@ -4,7 +4,8 @@ from dtos import (
     UpdateFolderDTO,
     FolderResponseDTO,
     FolderWithItemsDTO,
-    UpdatePinnedFoldersDTO
+    UpdatePinnedFoldersDTO,
+    OrganizationFolderTitleDTO
 )
 from repositories.folder_repository import FolderRepository
 from mappers.folder_mapper import FolderMapper
@@ -175,3 +176,27 @@ class FolderService:
             items.get("total_count", 0),
             items.get("has_more", False)
         )
+
+    @staticmethod
+    def get_organization_folder_titles(
+        client: Client,
+        organization_id: str,
+        locale: str = "en"
+    ) -> list[OrganizationFolderTitleDTO]:
+        """
+        Get folder titles for a specific organization (localized).
+        """
+        from utils import localize_object
+
+        folders_data = FolderRepository.get_organization_folder_titles(client, organization_id)
+
+        result = []
+        for folder_data in folders_data:
+            # Localize the title
+            localized = localize_object(folder_data, locale, ["title"])
+            result.append(OrganizationFolderTitleDTO(
+                id=localized["id"],
+                title=localized["title"]
+            ))
+
+        return result

@@ -38,7 +38,17 @@ class TemplateRepository:
             "id, title, description, folder_id, organization_id, user_id, workspace_type, created_at, updated_at, tags, usage_count, current_version_id, is_free"
         )
 
-        if workspace_type == "all" or (not workspace_type and not organization_id):
+        # If organization_id is specified, filter by organization (regardless of workspace_type)
+        if organization_id:
+            user_metadata = TemplateRepository._get_user_metadata(client, user_id)
+            roles = user_metadata.get("roles") or {}
+            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
+
+            # Check user has access to this organization
+            if organization_id not in org_roles:
+                return []
+            query = query.eq("organization_id", organization_id)
+        elif workspace_type == "all":
             user_metadata = TemplateRepository._get_user_metadata(client, user_id)
             conditions = [f"user_id.eq.{user_id}"]
 
@@ -56,14 +66,21 @@ class TemplateRepository:
             roles = user_metadata.get("roles") or {}
             org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
 
-            if organization_id:
-                if organization_id not in org_roles:
-                    return []
-                query = query.eq("organization_id", organization_id)
-            else:
-                if not org_roles:
-                    return []
-                query = query.in_("organization_id", list(org_roles.keys()))
+            if not org_roles:
+                return []
+            query = query.in_("organization_id", list(org_roles.keys()))
+        else:
+            # Default: return user templates and all organization templates
+            user_metadata = TemplateRepository._get_user_metadata(client, user_id)
+            conditions = [f"user_id.eq.{user_id}"]
+
+            roles = user_metadata.get("roles") or {}
+            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
+            if org_roles:
+                for org_id in org_roles.keys():
+                    conditions.append(f"organization_id.eq.{org_id}")
+
+            query = query.or_(",".join(conditions))
 
         if folder_id is not None:
             query = query.eq("folder_id", folder_id)
@@ -556,3 +573,53 @@ class TemplateRepository:
             comments.append(parent_comment)
 
         return comments
+
+    @staticmethod
+    def get_organization_template_titles(
+        client: Client,
+        organization_id: str
+    ) -> list[dict]:
+        """
+        Get template titles (id, title) for a specific organization.
+        Returns raw dict data with title field intact for localization.
+        """
+        response = client.table("prompt_templates")\
+            .select("id, title")\
+            .eq("organization_id", organization_id)\
+            .order("created_at", desc=True)\
+            .execute()
+
+        return response.data or []
+
+
+
+    @staticmethod
+    def get_templates_titles(
+        client: Client,
+        organization_id: str | None = None,
+        folder_ids: list[str] | None = None,
+        published: bool | None = None,
+        limit: int = 100,
+        offset: int = 0
+    ) -> list[TemplateTitle]:
+        # Note: We exclude content field for better performance (content can be heavy)
+        query = client.table("prompt_templates").select(
+            "id, title"
+        )
+        if organization_id:
+            query = query.eq("organization_id", organization_id)
+        if folder_ids is not None:
+            if len(folder_ids) == 0:
+                query = query.is_("folder_id", "null")
+            else:
+                query = query.in_("folder_id", folder_ids)
+        if published:
+            query = query.eq("is_published", published)
+
+        query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
+        response = query.execute()
+        templates_data = response.data or []
+
+        templates = [TemplateTitle(**item) for item in templates_data]
+
+        return templates

@@ -25,7 +25,17 @@ class FolderRepository:
     ) -> list[Folder]:
         query = client.table("prompt_folders").select("*")
 
-        if workspace_type == "all" or (not workspace_type and not organization_id):
+        # If organization_id is specified, filter by organization (regardless of workspace_type)
+        if organization_id:
+            user_metadata = FolderRepository._get_user_metadata(client, user_id)
+            roles = user_metadata.get("roles") or {}
+            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
+
+            # Check user has access to this organization
+            if organization_id not in org_roles:
+                return []
+            query = query.eq("organization_id", organization_id)
+        elif workspace_type == "all":
             user_metadata = FolderRepository._get_user_metadata(client, user_id)
             conditions = [f"user_id.eq.{user_id}"]
 
@@ -43,14 +53,21 @@ class FolderRepository:
             roles = user_metadata.get("roles") or {}
             org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
 
-            if organization_id:
-                if organization_id not in org_roles:
-                    return []
-                query = query.eq("organization_id", organization_id)
-            else:
-                if not org_roles:
-                    return []
-                query = query.in_("organization_id", list(org_roles.keys()))
+            if not org_roles:
+                return []
+            query = query.in_("organization_id", list(org_roles.keys()))
+        else:
+            # Default: return user folders and all organization folders
+            user_metadata = FolderRepository._get_user_metadata(client, user_id)
+            conditions = [f"user_id.eq.{user_id}"]
+
+            roles = user_metadata.get("roles") or {}
+            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
+            if org_roles:
+                for org_id in org_roles.keys():
+                    conditions.append(f"organization_id.eq.{org_id}")
+
+            query = query.or_(",".join(conditions))
 
         if parent_folder_id is not None:
             if parent_folder_id == "root":
@@ -382,3 +399,20 @@ class FolderRepository:
             "total_count": total_count,
             "has_more": has_more
         }
+
+    @staticmethod
+    def get_organization_folder_titles(
+        client: Client,
+        organization_id: str
+    ) -> list[dict]:
+        """
+        Get folder titles (id, title) for a specific organization.
+        Returns raw dict data with title field intact for localization.
+        """
+        response = client.table("prompt_folders")\
+            .select("id, title")\
+            .eq("organization_id", organization_id)\
+            .order("created_at", desc=True)\
+            .execute()
+
+        return response.data or []

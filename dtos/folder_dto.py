@@ -30,3 +30,8 @@ class FolderWithItemsDTO(BaseModel):
 
 class UpdatePinnedFoldersDTO(BaseModel):
     folder_ids: list[str]
+
+class OrganizationFolderTitleDTO(BaseModel):
+    """Folder title for organization context (with localization support)"""
+    id: str
+    title: str  # Localized title

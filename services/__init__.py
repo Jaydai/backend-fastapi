@@ -1,6 +1,7 @@
 from .auth_service import AuthService
 from .permission_service import PermissionService
 from .template_service import TemplateService
+from .folder_service import FolderService
 from .organization_service import OrganizationService
 from .user_service import UserService
 from .message_service import MessageService, ChatService
@@ -17,6 +18,7 @@ __all__ = [
     "AuthService",
     "PermissionService",
     "TemplateService",
+    "FolderService",
     "OrganizationService",
     "InvitationService",
     "UserService",
