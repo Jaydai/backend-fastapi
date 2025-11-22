@@ -4,6 +4,7 @@ from dtos import (
     UpdateBlockDTO,
     BlockResponseDTO,
     UpdatePinnedBlocksDTO,
+    BlockTitleResponseDTO,
     BlockType
 )
 from repositories.block_repository import BlockRepository
@@ -32,6 +33,31 @@ class BlockService:
         )
 
         return [BlockMapper.entity_to_response_dto(b, locale) for b in blocks]
+
+    @staticmethod
+    def get_blocks_titles(
+        client: Client,
+        locale: str = "en",
+        organization_id: str | None = None,
+        types: list[str] | None = None,
+        published: bool | None = None,
+        limit: int = 100,
+        offset: int = 0
+    ) -> list[BlockTitleResponseDTO]:
+        """
+        Get block titles (id, title) with optional filtering.
+        Returns minimal data for list endpoints.
+        """
+        from services.blocks import BlockTitleService
+        return BlockTitleService.get_titles(
+            client,
+            locale=locale,
+            organization_id=organization_id,
+            types=types,
+            published=published,
+            limit=limit,
+            offset=offset
+        )
 
     @staticmethod
     def get_block_by_id(

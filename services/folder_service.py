@@ -5,6 +5,7 @@ from dtos import (
     FolderResponseDTO,
     FolderWithItemsDTO,
     UpdatePinnedFoldersDTO,
+    FolderTitleResponseDTO,
     OrganizationFolderTitleDTO
 )
 from repositories.folder_repository import FolderRepository
@@ -29,6 +30,29 @@ class FolderService:
         )
 
         return [FolderMapper.entity_to_response_dto(f, locale) for f in folders]
+
+    @staticmethod
+    def get_folders_titles(
+        client: Client,
+        locale: str = "en",
+        organization_id: str | None = None,
+        parent_folder_ids: list[str] | None = None,
+        limit: int = 100,
+        offset: int = 0
+    ) -> list[FolderTitleResponseDTO]:
+        """
+        Get folder titles (id, title) with optional filtering.
+        Returns minimal data for list endpoints.
+        """
+        from services.folders import FolderTitleService
+        return FolderTitleService.get_titles(
+            client,
+            locale=locale,
+            organization_id=organization_id,
+            parent_folder_ids=parent_folder_ids,
+            limit=limit,
+            offset=offset
+        )
 
     @staticmethod
     def get_folder_by_id(

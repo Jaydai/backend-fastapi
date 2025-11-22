@@ -54,6 +54,7 @@ from .folder_dto import (
     FolderResponseDTO,
     FolderWithItemsDTO,
     UpdatePinnedFoldersDTO,
+    FolderTitleResponseDTO,
     OrganizationFolderTitleDTO,
 )
 from .block_dto import (
@@ -62,6 +63,7 @@ from .block_dto import (
     UpdateBlockDTO,
     BlockResponseDTO,
     UpdatePinnedBlocksDTO,
+    BlockTitleResponseDTO,
 )
 
 __all__ = [
@@ -114,10 +116,12 @@ __all__ = [
     "FolderResponseDTO",
     "FolderWithItemsDTO",
     "UpdatePinnedFoldersDTO",
+    "FolderTitleResponseDTO",
     "OrganizationFolderTitleDTO",
     "BlockType",
     "CreateBlockDTO",
     "UpdateBlockDTO",
     "BlockResponseDTO",
     "UpdatePinnedBlocksDTO",
+    "BlockTitleResponseDTO",
 ]

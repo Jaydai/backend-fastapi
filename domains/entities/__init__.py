@@ -9,8 +9,8 @@ from .organizations import (
     OrganizationDetail,
     OrganizationInvitation,
 )
-from .folder_entities import Folder, FolderWithItems
-from .block_entities import Block
+from .folder_entities import Folder, FolderWithItems, FolderTitle
+from .block_entities import Block, BlockTitle
 
 __all__ = [
     "Session",
@@ -32,5 +32,7 @@ __all__ = [
     "OrganizationInvitation",
     "Folder",
     "FolderWithItems",
+    "FolderTitle",
     "Block",
+    "BlockTitle",
 ]

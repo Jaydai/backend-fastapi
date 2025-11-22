@@ -34,16 +34,16 @@ class TemplateService:
         limit: int = 100,
         offset: int = 0
     ) -> list[TemplateTitleResponseDTO]:
-        templates = TemplateRepository.get_templates_titles(
+        from services.templates import TemplateTitleService
+        return TemplateTitleService.get_titles(
             client,
-            organization_id,
-            folder_ids,
-            published,
-            limit,
-            offset
+            locale=locale,
+            organization_id=organization_id,
+            folder_ids=folder_ids,
+            published=published,
+            limit=limit,
+            offset=offset
         )
-
-        return [TemplateTitleResponseDTO(**localize_object(template, locale, ["title"])) for template in templates]
 
     @staticmethod
     def get_template_by_id(

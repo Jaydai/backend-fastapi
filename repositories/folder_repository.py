@@ -1,5 +1,5 @@
 from supabase import Client
-from domains.entities import Folder
+from domains.entities import Folder, FolderTitle
 
 class FolderRepository:
     @staticmethod
@@ -93,6 +93,47 @@ class FolderRepository:
                 updated_at=data.get("updated_at")
             ))
 
+        return folders
+
+    @staticmethod
+    def get_folders_titles(
+        client: Client,
+        organization_id: str | None = None,
+        parent_folder_ids: list[str] | None = None,
+        limit: int = 100,
+        offset: int = 0
+    ) -> list[FolderTitle]:
+        """
+        Get folder titles (id, title) with optional filtering.
+
+        Args:
+            client: Supabase client
+            organization_id: Filter by organization ID
+            parent_folder_ids: Filter by parent folder IDs (empty list = root only, None = all)
+            limit: Max number of results
+            offset: Pagination offset
+
+        Returns:
+            List of FolderTitle entities
+        """
+        query = client.table("prompt_folders").select("id, title")
+
+        if organization_id:
+            query = query.eq("organization_id", organization_id)
+
+        if parent_folder_ids is not None:
+            if len(parent_folder_ids) == 0:
+                # Empty list means root folders only (parent_folder_id is null)
+                query = query.is_("parent_folder_id", "null")
+            else:
+                # Filter by specific parent folder IDs
+                query = query.in_("parent_folder_id", parent_folder_ids)
+
+        query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
+        response = query.execute()
+        folders_data = response.data or []
+
+        folders = [FolderTitle(**item) for item in folders_data]
         return folders
 
     @staticmethod

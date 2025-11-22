@@ -14,3 +14,8 @@ class Block:
     created_at: str
     updated_at: str | None
     usage_count: int
+
+@dataclass
+class BlockTitle:
+    id: str
+    title: dict[str, str]

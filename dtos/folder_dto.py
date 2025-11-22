@@ -31,6 +31,11 @@ class FolderWithItemsDTO(BaseModel):
 class UpdatePinnedFoldersDTO(BaseModel):
     folder_ids: list[str]
 
+class FolderTitleResponseDTO(BaseModel):
+    """Folder title response (minimal data for list endpoints)"""
+    id: str
+    title: str  # Localized title
+
 class OrganizationFolderTitleDTO(BaseModel):
     """Folder title for organization context (with localization support)"""
     id: str
