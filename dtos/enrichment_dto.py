@@ -24,6 +24,7 @@ class ChatEnrichmentBatchItemDTO(BaseModel):
     chat_provider_id: Optional[str] = None
     message_provider_id: Optional[str] = None
     chat_id: Optional[int] = None
+    user_id: Optional[str] = Field(None, description="User ID for unauthenticated batch processing")
 
 
 class ChatEnrichmentBatchRequestDTO(BaseModel):
@@ -38,6 +39,7 @@ class EnrichMessageRequestDTO(BaseModel):
     message_provider_id: Optional[str] = Field(None, description="External message ID")
     message_id: Optional[int] = Field(None, description="Internal message ID")
     context: Optional[dict] = Field(None, description="Additional context")
+    user_id: Optional[str] = Field(None, description="User ID for unauthenticated batch processing")
 
 
 class EnrichMessageBatchRequestDTO(BaseModel):
@@ -99,7 +101,7 @@ class RiskIssueDTO(BaseModel):
     category: str
     severity: str
     description: str
-    details: Optional[dict] = None
+    details: Optional[dict | str] = None
 
 
 class EnrichMessageResponseDTO(BaseModel):

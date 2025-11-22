@@ -13,9 +13,12 @@ async def enrich_message_batch(request: Request, dto: EnrichMessageBatchRequestD
     """
     Enrich multiple messages with risk assessment (1-100 messages)
     Returns list of results with success/error indicators
+
+    This endpoint can be called without authentication for batch processing scripts.
     """
     try:
-        user_id = request.state.user_id
+        # Allow unauthenticated access for scripts - user_id will be None
+        user_id = getattr(request.state, 'user_id', None)
         results = EnrichmentService.enrich_message_batch(
             request.state.supabase_client,
             user_id,
