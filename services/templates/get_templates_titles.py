@@ -14,26 +14,27 @@ def get_templates_titles(
     limit: int = 100,
     offset: int = 0
 ) -> list[TemplateTitleResponseDTO]:
-    """
-    Get template titles with localization.
+    # Business logic: Determine which filters to apply based on priority
+    filter_user_id = None
+    filter_org_id = None
+    filter_folder_id = folder_id
 
-    Args:
-        client: Supabase client
-        locale: Locale for localization
-        user_id: Filter by user ID
-        organization_id: Filter by organization ID
-        folder_id: Filter by folder ID (overrides user/org)
-        limit: Max results
-        offset: Pagination offset
+    if folder_id is not None:
+        # Priority 1: Filter by folder only
+        pass
+    elif organization_id:
+        # Priority 2: Filter by organization only
+        filter_org_id = organization_id
+    elif user_id:
+        # Priority 3: Filter by user only
+        filter_user_id = user_id
+    # Priority 4: No filters (RLS handles access)
 
-    Returns:
-        List of localized template title DTOs
-    """
     templates = repo_get_templates_titles(
         client,
-        user_id=user_id,
-        organization_id=organization_id,
-        folder_id=folder_id,
+        user_id=filter_user_id,
+        organization_id=filter_org_id,
+        folder_id=filter_folder_id,
         limit=limit,
         offset=offset
     )

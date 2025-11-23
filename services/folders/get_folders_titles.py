@@ -14,26 +14,28 @@ def get_folders_titles(
     limit: int = 100,
     offset: int = 0
 ) -> list[FolderTitleResponseDTO]:
-    """
-    Get folder titles with localization.
 
-    Args:
-        client: Supabase client
-        locale: Locale for localization
-        user_id: Filter by user ID
-        organization_id: Filter by organization ID
-        parent_folder_id: Filter by parent folder ID (overrides user/org)
-        limit: Max results
-        offset: Pagination offset
+    # Business logic: Determine which filters to apply based on priority
+    filter_user_id = None
+    filter_org_id = None
+    filter_parent_id = parent_folder_id
 
-    Returns:
-        List of localized folder title DTOs
-    """
+    if parent_folder_id is not None:
+        # Priority 1: Filter by parent folder only
+        pass
+    elif organization_id:
+        # Priority 2: Filter by organization only
+        filter_org_id = organization_id
+    elif user_id:
+        # Priority 3: Filter by user only
+        filter_user_id = user_id
+    # Priority 4: No filters (RLS handles access)
+
     folders = repo_get_folders_titles(
         client,
-        user_id=user_id,
-        organization_id=organization_id,
-        parent_folder_id=parent_folder_id,
+        user_id=filter_user_id,
+        organization_id=filter_org_id,
+        parent_folder_id=filter_parent_id,
         limit=limit,
         offset=offset
     )

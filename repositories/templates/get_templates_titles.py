@@ -1,4 +1,4 @@
-"""Get template titles - simplified version"""
+"""Get template titles repository"""
 from supabase import Client
 from domains.entities import TemplateTitle
 
@@ -12,29 +12,22 @@ def get_templates_titles(
     offset: int = 0
 ) -> list[TemplateTitle]:
     """
-    Get template titles (id, title) with simple filtering.
-
-    Logic:
-    - If folder_id provided: Get templates in that folder
-    - Else if organization_id provided: Get templates for that organization
-    - Else if user_id provided: Get templates for that user
-    - Else: Get all templates (RLS will filter based on access)
+    Repository function to fetch template titles from database.
+    Applies filters as provided by the service layer.
     """
     query = client.table("prompt_templates").select("id, title")
 
-    # Priority 1: Filter by folder if specified
-    if folder_id is not None:
-        if folder_id == "root" or folder_id == "":
-            query = query.is_("folder_id", "null")
-        else:
-            query = query.eq("folder_id", folder_id)
-    # Priority 2: Filter by organization
-    elif organization_id:
-        query = query.eq("organization_id", organization_id)
-    # Priority 3: Filter by user
-    elif user_id:
+    # Apply filters as provided
+    if user_id:
         query = query.eq("user_id", user_id)
-    # Priority 4: Get all (RLS will filter)
+
+    if organization_id:
+        query = query.eq("organization_id", organization_id)
+
+    if folder_id is not None:
+        query = query.eq("folder_id", folder_id)
+    else:
+        query = query.is_("folder_id", "null")
 
     query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
     response = query.execute()
