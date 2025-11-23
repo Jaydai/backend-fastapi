@@ -16,6 +16,8 @@ async def enrich_message_batch(request: Request, dto: EnrichMessageBatchRequestD
 
     This endpoint can be called without authentication for batch processing scripts.
     """
+    print("❤️❤️❤️❤️")
+    print("request.state", request.state)
     try:
         # Allow unauthenticated access for scripts - user_id will be None
         user_id = getattr(request.state, 'user_id', None)

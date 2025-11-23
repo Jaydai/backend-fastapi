@@ -26,7 +26,7 @@ class UpdateTemplateDTO(BaseModel):
 
 class CreateVersionDTO(BaseModel):
     content: str | None = None
-    version_number: str | None = None
+    name: str | None = None
     change_notes: str | None = None
     status: str | None = None
     copy_from_version_id: int | None = None
@@ -35,7 +35,7 @@ class CreateVersionDTO(BaseModel):
 class TemplateVersionResponseDTO(BaseModel):
     id: int
     template_id: str  # UUID foreign key to template
-    version_number: str
+    name: str
     content: str
     change_notes: str | None = None
     author_id: str

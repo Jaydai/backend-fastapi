@@ -97,10 +97,10 @@ class TemplateMapper:
         return TemplateVersionResponseDTO(
             id=version.id,
             template_id=version.template_id,
-            version_number=version.version_number,
+            name=version.name,
             content=TemplateMapper.localize_string(version.content, locale),
             change_notes=TemplateMapper.localize_string(version.change_notes, locale) if version.change_notes else None,
-            author_id=version.author_id,
+        author_id=version.author_id,
             created_at=version.created_at,
             updated_at=version.updated_at,
             status=version.status,

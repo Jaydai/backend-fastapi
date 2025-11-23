@@ -36,7 +36,7 @@ def create_template(
                 template.id,
                 user_id,
                 content_dict,
-                version_number="1.0",
+                name="1.0",
                 change_notes=None,
                 status="draft" if workspace_type != "user" else "published",
                 optimized_for=data.optimized_for

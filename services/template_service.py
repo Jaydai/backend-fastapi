@@ -29,7 +29,7 @@ class TemplateService:
         limit: int = 100,
         offset: int = 0
     ) -> list[TemplateTitleResponseDTO]:
-        return get_titles(client, locale, organization_id, folder_ids, published, user_id, workspace_type, limit, offset)
+        return get_titles(client, locale, organization_id, folder_ids, published, user_id, limit, offset)
 
     @staticmethod
     def get_by_id(
@@ -101,7 +101,7 @@ class TemplateService:
             template_id,
             user_id,
             content_dict,
-            version_number=data.version_number,
+            name=data.name,
             change_notes=change_notes_dict,
             status=data.status or "draft",
             optimized_for=data.optimized_for

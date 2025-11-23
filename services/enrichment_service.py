@@ -134,6 +134,9 @@ class EnrichmentService:
                 })
             except Exception as e:
                 logger.error(f"Failed to enrich message {request.message_provider_id}: {e}")
+                logger.error(f"Exception type: {type(e).__name__}, Exception args: {e.args}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
                 results.append({
                     "success": False,
                     "data": None,

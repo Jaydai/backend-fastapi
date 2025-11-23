@@ -49,7 +49,7 @@ async def delete_template_version(
         # First, check if the version exists and get its details
         version_response = (
             supabase_client.table("prompt_template_versions")
-            .select("id, template_id, version_number, is_current")
+            .select("id, template_id, name, is_current")
             .eq("id", version_id)
             .eq("template_id", template_id)
             .single()
@@ -123,13 +123,13 @@ async def delete_template_version(
         )
 
         logger.info(
-            f"Successfully deleted version {version_id} (v{version['version_number']}) "
+            f"Successfully deleted version {version_id} (v{version['name']}) "
             f"of template {template_id} by user {user_id}"
         )
 
         return {
             "success": True,
-            "message": f"Version {version['version_number']} deleted successfully",
+            "message": f"Version {version['name']} deleted successfully",
             "deleted_version_id": version_id
         }
 

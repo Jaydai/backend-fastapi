@@ -2,13 +2,6 @@
 
 You are an expert security analyst evaluating AI conversation messages for risks with high precision.
 
-**MESSAGE TO ANALYZE:**
-{message_content}
-
-**CONTEXT:** {context}
-
-**ROLE:** {role}
-
 ## Your Task:
 1. Identify ACTUAL sensitive data present (not references or instructions)
 2. Assess risk level and confidence for each category

@@ -60,6 +60,23 @@ class OverrideQualityRequestDTO(BaseModel):
 
 # Response DTOs
 
+# NEW: Advanced enrichment DTOs (defined first to avoid circular dependencies)
+
+class DomainExpertiseDTO(BaseModel):
+    """Domain expertise detection"""
+    theme_area: str = Field(..., description="Primary domain (coding, marketing, etc.)")
+    sub_specialties: list[str] = Field(default_factory=list, description="Detected specialties")
+    tech_stack: list[str] = Field(default_factory=list, description="Technologies/tools mentioned")
+    experience_level: str = Field(..., description="beginner, intermediate, advanced, expert")
+
+
+class ProductivityIndicatorsDTO(BaseModel):
+    """Organizational productivity insights"""
+    estimated_complexity: str = Field(..., description="simple, moderate, complex, very_complex")
+    collaboration_signals: list[str] = Field(default_factory=list, description="Teamwork indicators")
+    reusability_score: int = Field(..., ge=0, le=100, description="How templateable is this prompt")
+
+
 class QualityMetricsDTO(BaseModel):
     """Quality metrics response"""
     quality_score: int = Field(..., ge=0, le=100)
@@ -67,6 +84,7 @@ class QualityMetricsDTO(BaseModel):
     context_score: int = Field(..., ge=0, le=5)
     specificity_score: int = Field(..., ge=0, le=5)
     actionability_score: int = Field(..., ge=0, le=5)
+    complexity_score: Optional[int] = Field(None, ge=1, le=5, description="Task complexity (1-5)")
 
 
 class FeedbackDTO(BaseModel):
@@ -75,6 +93,7 @@ class FeedbackDTO(BaseModel):
     strengths: list[str]
     improvements: list[str]
     improved_prompt_example: Optional[str] = None
+    personalized_tip: Optional[str] = Field(None, description="Tailored advice based on skill level")
 
 
 class ChatEnrichmentResponseDTO(BaseModel):
@@ -82,8 +101,11 @@ class ChatEnrichmentResponseDTO(BaseModel):
     is_work_related: bool
     theme: str
     intent: str
+    skill_level: Optional[str] = Field(None, description="beginner, intermediate, advanced, expert")
+    domain_expertise: Optional[DomainExpertiseDTO] = None
     quality: Optional[QualityMetricsDTO] = None
     feedback: Optional[FeedbackDTO] = None
+    productivity_indicators: Optional[ProductivityIndicatorsDTO] = None
     raw: dict
     processing_time_ms: Optional[int] = None
 
@@ -94,6 +116,8 @@ class RiskCategoryDetailDTO(BaseModel):
     score: float = Field(..., ge=0.0, le=100.0)
     detected: bool
     details: Optional[str] = None
+    confidence: Optional[float] = Field(None, ge=0.0, le=100.0, description="Detection confidence (0-100)")
+    suggested_redaction: Optional[str] = Field(None, description="How to safely redact this content")
 
 
 class RiskIssueDTO(BaseModel):
@@ -108,6 +132,8 @@ class EnrichMessageResponseDTO(BaseModel):
     """Response model for message enrichment"""
     overall_risk_level: str
     overall_risk_score: float = Field(..., ge=0.0, le=100.0)
+    overall_confidence: Optional[float] = Field(None, ge=0.0, le=100.0, description="Average confidence across detected risks")
+    suggested_action: Optional[str] = Field(None, description="Recommended action: block, warn, review, or allow")
     risk_categories: dict[str, RiskCategoryDetailDTO]
     risk_summary: list[str]
     detected_issues: list[RiskIssueDTO]

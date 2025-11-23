@@ -22,7 +22,7 @@ class Template:
 class TemplateVersion:
     id: int
     template_id: str  # UUID foreign key to template
-    version_number: str
+    name: str
     content: dict[str, str]
     description: dict[str, str] | None
     change_notes: dict[str, str] | None
