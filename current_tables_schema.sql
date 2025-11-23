@@ -105,6 +105,77 @@ CREATE TYPE "public"."role_type" AS ENUM (
 ALTER TYPE "public"."role_type" OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."auto_generate_version_slug"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+  base_slug TEXT;
+  version_num INTEGER;
+BEGIN
+  -- Only generate if slug is not provided
+  IF NEW.slug IS NULL OR NEW.slug = '' THEN
+    -- Get the version number for this template
+    SELECT COUNT(*) + 1 INTO version_num
+    FROM prompt_templates_versions
+    WHERE template_id = NEW.template_id;
+
+    -- Generate base slug
+    base_slug := generate_version_slug(NEW.name, version_num);
+
+    -- Ensure uniqueness
+    NEW.slug := ensure_unique_version_slug(NEW.template_id, base_slug);
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."auto_generate_version_slug"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."check_team_hierarchy"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+    current_parent_id BIGINT;
+    depth INTEGER := 0;
+    max_depth INTEGER := 10; -- Prevent infinite loops
+BEGIN
+    -- Only check if parent_team_id is being set
+    IF NEW.parent_team_id IS NULL THEN
+        RETURN NEW;
+    END IF;
+
+    current_parent_id := NEW.parent_team_id;
+
+    -- Traverse up the hierarchy to check for cycles
+    WHILE current_parent_id IS NOT NULL AND depth < max_depth LOOP
+        -- Check if we've reached the current team (cycle detected)
+        IF current_parent_id = NEW.id THEN
+            RAISE EXCEPTION 'Circular team hierarchy detected';
+        END IF;
+
+        -- Move up the hierarchy
+        SELECT parent_team_id INTO current_parent_id
+        FROM public.teams
+        WHERE id = current_parent_id;
+
+        depth := depth + 1;
+    END LOOP;
+
+    IF depth >= max_depth THEN
+        RAISE EXCEPTION 'Team hierarchy too deep (max 10 levels)';
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."check_team_hierarchy"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."cleanup_test_data"("p_org_ids" "uuid"[]) RETURNS "void"
     LANGUAGE "sql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -255,6 +326,73 @@ $$;
 
 
 ALTER FUNCTION "public"."ensure_single_current_version"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."ensure_unique_version_slug"("template_id" "uuid", "base_slug" "text") RETURNS "text"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+  unique_slug TEXT;
+  counter INTEGER := 2;
+BEGIN
+  unique_slug := base_slug;
+
+  -- Check if the slug already exists for this template
+  WHILE EXISTS (
+    SELECT 1 FROM prompt_templates_versions
+    WHERE prompt_templates_versions.template_id = ensure_unique_version_slug.template_id
+    AND slug = unique_slug
+  ) LOOP
+    unique_slug := base_slug || '-' || counter;
+    counter := counter + 1;
+  END LOOP;
+
+  RETURN unique_slug;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."ensure_unique_version_slug"("template_id" "uuid", "base_slug" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."generate_version_slug"("version_name" "text", "version_number" integer DEFAULT NULL::integer) RETURNS "text"
+    LANGUAGE "plpgsql" IMMUTABLE
+    AS $$
+DECLARE
+  slug TEXT;
+BEGIN
+  -- Convert to lowercase
+  slug := LOWER(version_name);
+
+  -- Replace spaces and special characters with hyphens
+  slug := REGEXP_REPLACE(slug, '[^a-z0-9]+', '-', 'g');
+
+  -- Remove leading/trailing hyphens
+  slug := TRIM(BOTH '-' FROM slug);
+
+  -- Collapse multiple consecutive hyphens
+  slug := REGEXP_REPLACE(slug, '-+', '-', 'g');
+
+  -- Prefix with version number if provided
+  IF version_number IS NOT NULL THEN
+    IF slug != '' THEN
+      slug := 'v' || version_number || '-' || slug;
+    ELSE
+      slug := 'v' || version_number;
+    END IF;
+  END IF;
+
+  -- Ensure the slug is not empty
+  IF slug = '' THEN
+    slug := 'version';
+  END IF;
+
+  RETURN slug;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."generate_version_slug"("version_name" "text", "version_number" integer) OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."get_organization_folders"("org_id" "uuid") RETURNS TABLE("id" "uuid", "title" "jsonb", "organization_id" "uuid", "workspace_type" "text")
@@ -562,7 +700,7 @@ CREATE OR REPLACE FUNCTION "public"."update_updated_at_column"() RETURNS "trigge
     LANGUAGE "plpgsql"
     AS $$
 BEGIN
-    NEW.updated_at = NOW();
+    NEW.updated_at = CURRENT_TIMESTAMP;
     RETURN NEW;
 END;
 $$;
@@ -1274,7 +1412,8 @@ CREATE TABLE IF NOT EXISTS "public"."prompt_templates_versions" (
     "template_id" "uuid",
     "is_current" boolean DEFAULT false,
     "optimized_for" "text"[],
-    "is_published" boolean DEFAULT false
+    "is_published" boolean DEFAULT false,
+    "slug" "text" NOT NULL
 );
 
 
@@ -1370,16 +1509,30 @@ ALTER TABLE "public"."subscription_audit_log" OWNER TO "postgres";
 
 CREATE TABLE IF NOT EXISTS "public"."teams" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "company_id" "uuid",
-    "name" "jsonb",
-    "description" "jsonb",
+    "organization_id" "uuid" NOT NULL,
+    "name" "text" NOT NULL,
+    "description" "text",
     "parent_team_id" "uuid",
-    "team_admins" "uuid"[]
+    "color" "text" DEFAULT '#3B82F6'::"text",
+    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "teams_no_self_reference" CHECK (("id" <> "parent_team_id"))
 );
 
 
 ALTER TABLE "public"."teams" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."teams" IS 'Organizational teams with hierarchical support';
+
+
+
+COMMENT ON COLUMN "public"."teams"."parent_team_id" IS 'Reference to parent team for hierarchical structure (NULL for root teams)';
+
+
+
+COMMENT ON COLUMN "public"."teams"."color" IS 'Hex color code for UI representation';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."user_organization_roles" (
@@ -1406,6 +1559,28 @@ COMMENT ON COLUMN "public"."user_organization_roles"."organization_id" IS 'ID de
 
 
 COMMENT ON COLUMN "public"."user_organization_roles"."role" IS 'Nom du rôle assigné (admin, writer, viewer, guest)';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."user_team_permissions" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "team_id" "uuid" NOT NULL,
+    "role" "text" DEFAULT 'member'::"text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "valid_role" CHECK (("role" = ANY (ARRAY['member'::"text", 'lead'::"text", 'admin'::"text"])))
+);
+
+
+ALTER TABLE "public"."user_team_permissions" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."user_team_permissions" IS 'Many-to-many relationship between users and teams with role-based permissions';
+
+
+
+COMMENT ON COLUMN "public"."user_team_permissions"."role" IS 'User role within the team: member, lead, or admin';
 
 
 
@@ -1563,6 +1738,11 @@ ALTER TABLE ONLY "public"."prompt_templates_versions"
 
 
 
+ALTER TABLE ONLY "public"."prompt_templates_versions"
+    ADD CONSTRAINT "prompt_templates_versions_template_id_slug_key" UNIQUE ("template_id", "slug");
+
+
+
 ALTER TABLE ONLY "public"."share_invitations"
     ADD CONSTRAINT "share_invitations_pkey" PRIMARY KEY ("id");
 
@@ -1594,6 +1774,11 @@ ALTER TABLE ONLY "public"."subscription_audit_log"
 
 
 ALTER TABLE ONLY "public"."teams"
+    ADD CONSTRAINT "teams_name_org_unique" UNIQUE ("organization_id", "name");
+
+
+
+ALTER TABLE ONLY "public"."teams"
     ADD CONSTRAINT "teams_pkey" PRIMARY KEY ("id");
 
 
@@ -1615,6 +1800,16 @@ ALTER TABLE ONLY "public"."user_organization_roles"
 
 ALTER TABLE ONLY "public"."user_organization_roles"
     ADD CONSTRAINT "user_organization_roles_user_id_organization_id_role_key" UNIQUE ("user_id", "organization_id", "role");
+
+
+
+ALTER TABLE ONLY "public"."user_team_permissions"
+    ADD CONSTRAINT "user_team_permissions_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."user_team_permissions"
+    ADD CONSTRAINT "user_team_unique" UNIQUE ("user_id", "team_id");
 
 
 
@@ -1640,6 +1835,10 @@ CREATE INDEX "idx_blog_posts_slug" ON "public"."blog_posts" USING "btree" ("slug
 
 
 CREATE INDEX "idx_blog_posts_status" ON "public"."blog_posts" USING "btree" ("status");
+
+
+
+CREATE INDEX "idx_chats_user_id" ON "public"."chats" USING "btree" ("user_id");
 
 
 
@@ -1719,6 +1918,10 @@ CREATE INDEX "idx_favorites_user_item" ON "public"."favorites" USING "btree" ("u
 
 
 
+CREATE INDEX "idx_messages_user_id" ON "public"."messages" USING "btree" ("user_id");
+
+
+
 CREATE INDEX "idx_organizations_type" ON "public"."organizations" USING "btree" ("type");
 
 
@@ -1752,6 +1955,10 @@ CREATE INDEX "idx_prompt_templates_versions_author_id" ON "public"."prompt_templ
 
 
 CREATE INDEX "idx_prompt_templates_versions_parent_version_id" ON "public"."prompt_templates_versions" USING "btree" ("parent_version_id") WHERE ("parent_version_id" IS NOT NULL);
+
+
+
+CREATE INDEX "idx_prompt_templates_versions_slug" ON "public"."prompt_templates_versions" USING "btree" ("slug");
 
 
 
@@ -1799,6 +2006,14 @@ CREATE INDEX "idx_stripe_webhook_events_type" ON "public"."stripe_webhook_events
 
 
 
+CREATE INDEX "idx_teams_organization_id" ON "public"."teams" USING "btree" ("organization_id");
+
+
+
+CREATE INDEX "idx_teams_parent_team_id" ON "public"."teams" USING "btree" ("parent_team_id");
+
+
+
 CREATE INDEX "idx_user_org_roles_org_id" ON "public"."user_organization_roles" USING "btree" ("organization_id");
 
 
@@ -1812,6 +2027,14 @@ CREATE INDEX "idx_user_org_roles_user_id" ON "public"."user_organization_roles" 
 
 
 CREATE INDEX "idx_user_org_roles_user_org" ON "public"."user_organization_roles" USING "btree" ("user_id", "organization_id");
+
+
+
+CREATE INDEX "idx_user_team_permissions_team_id" ON "public"."user_team_permissions" USING "btree" ("team_id");
+
+
+
+CREATE INDEX "idx_user_team_permissions_user_id" ON "public"."user_team_permissions" USING "btree" ("user_id");
 
 
 
@@ -1835,11 +2058,19 @@ CREATE OR REPLACE TRIGGER "ensure_single_current_version_trigger" BEFORE INSERT 
 
 
 
+CREATE OR REPLACE TRIGGER "prevent_circular_team_hierarchy" BEFORE INSERT OR UPDATE ON "public"."teams" FOR EACH ROW EXECUTE FUNCTION "public"."check_team_hierarchy"();
+
+
+
 CREATE OR REPLACE TRIGGER "prevent_stripe_updates_trigger" BEFORE UPDATE ON "public"."users_metadata" FOR EACH ROW EXECUTE FUNCTION "public"."prevent_stripe_column_updates"();
 
 
 
 CREATE OR REPLACE TRIGGER "subscription_audit_trigger" AFTER UPDATE ON "public"."users_metadata" FOR EACH ROW EXECUTE FUNCTION "public"."log_subscription_changes"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_auto_generate_version_slug" BEFORE INSERT ON "public"."prompt_templates_versions" FOR EACH ROW EXECUTE FUNCTION "public"."auto_generate_version_slug"();
 
 
 
@@ -1867,7 +2098,15 @@ CREATE OR REPLACE TRIGGER "update_prompt_templates_versions_updated_at" BEFORE U
 
 
 
+CREATE OR REPLACE TRIGGER "update_teams_updated_at" BEFORE UPDATE ON "public"."teams" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
 CREATE OR REPLACE TRIGGER "update_user_org_roles_updated_at" BEFORE UPDATE ON "public"."user_organization_roles" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_user_team_permissions_updated_at" BEFORE UPDATE ON "public"."user_team_permissions" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
 
 
 
@@ -1987,7 +2226,12 @@ ALTER TABLE ONLY "public"."stripe_subscriptions"
 
 
 ALTER TABLE ONLY "public"."teams"
-    ADD CONSTRAINT "teams_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "public"."companies"("id");
+    ADD CONSTRAINT "teams_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."teams"
+    ADD CONSTRAINT "teams_parent_team_id_fkey" FOREIGN KEY ("parent_team_id") REFERENCES "public"."teams"("id") ON DELETE CASCADE;
 
 
 
@@ -1998,6 +2242,16 @@ ALTER TABLE ONLY "public"."user_organization_roles"
 
 ALTER TABLE ONLY "public"."user_organization_roles"
     ADD CONSTRAINT "user_organization_roles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE DEFERRABLE;
+
+
+
+ALTER TABLE ONLY "public"."user_team_permissions"
+    ADD CONSTRAINT "user_team_permissions_team_id_fkey" FOREIGN KEY ("team_id") REFERENCES "public"."teams"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."user_team_permissions"
+    ADD CONSTRAINT "user_team_permissions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 
 
@@ -2092,6 +2346,14 @@ CREATE POLICY "Enable read access for all users" ON "public"."share_invitations"
 
 
 CREATE POLICY "Enable read access for all users" ON "public"."stripe_subscriptions" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."teams" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."user_team_permissions" FOR SELECT USING (true);
 
 
 
@@ -2387,6 +2649,9 @@ ALTER TABLE "public"."teams" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."user_organization_roles" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."user_team_permissions" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."users_metadata" ENABLE ROW LEVEL SECURITY;
 
 
@@ -2579,6 +2844,18 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 
 
 
+GRANT ALL ON FUNCTION "public"."auto_generate_version_slug"() TO "anon";
+GRANT ALL ON FUNCTION "public"."auto_generate_version_slug"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."auto_generate_version_slug"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."check_team_hierarchy"() TO "anon";
+GRANT ALL ON FUNCTION "public"."check_team_hierarchy"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."check_team_hierarchy"() TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."cleanup_test_data"("p_org_ids" "uuid"[]) TO "anon";
 GRANT ALL ON FUNCTION "public"."cleanup_test_data"("p_org_ids" "uuid"[]) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."cleanup_test_data"("p_org_ids" "uuid"[]) TO "service_role";
@@ -2606,6 +2883,18 @@ GRANT ALL ON FUNCTION "public"."create_test_user_role"("p_user_id" "uuid", "p_ro
 GRANT ALL ON FUNCTION "public"."ensure_single_current_version"() TO "anon";
 GRANT ALL ON FUNCTION "public"."ensure_single_current_version"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."ensure_single_current_version"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."ensure_unique_version_slug"("template_id" "uuid", "base_slug" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."ensure_unique_version_slug"("template_id" "uuid", "base_slug" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."ensure_unique_version_slug"("template_id" "uuid", "base_slug" "text") TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."generate_version_slug"("version_name" "text", "version_number" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."generate_version_slug"("version_name" "text", "version_number" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."generate_version_slug"("version_name" "text", "version_number" integer) TO "service_role";
 
 
 
@@ -2921,6 +3210,12 @@ GRANT ALL ON TABLE "public"."teams" TO "service_role";
 GRANT ALL ON TABLE "public"."user_organization_roles" TO "anon";
 GRANT ALL ON TABLE "public"."user_organization_roles" TO "authenticated";
 GRANT ALL ON TABLE "public"."user_organization_roles" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user_team_permissions" TO "anon";
+GRANT ALL ON TABLE "public"."user_team_permissions" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_team_permissions" TO "service_role";
 
 
 

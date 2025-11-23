@@ -145,25 +145,40 @@ class TeamRepository:
     @staticmethod
     def get_team_members(client: Client, team_id: str) -> list[TeamMember]:
         """Get all members of a team"""
-        response = client.table("user_team_permissions") \
-            .select("*, users:user_id(email, raw_user_meta_data)") \
+        # Get permissions first
+        permissions_response = client.table("user_team_permissions") \
+            .select("*") \
             .eq("team_id", team_id) \
             .execute()
 
-        if not response.data:
+        if not permissions_response.data:
             return []
 
+        # Get user_ids
+        user_ids = [row["user_id"] for row in permissions_response.data]
+
+        # Fetch user metadata separately
+        if not user_ids:
+            return []
+
+        users_response = client.table("users_metadata") \
+            .select("user_id, email, name") \
+            .in_("user_id", user_ids) \
+            .execute()
+
+        # Create a map of user_id to user data
+        users_map = {user["user_id"]: user for user in (users_response.data or [])}
+
         members = []
-        for row in response.data:
-            user_data = row.get("users", {})
-            meta_data = user_data.get("raw_user_meta_data", {})
+        for row in permissions_response.data:
+            user_data = users_map.get(row["user_id"], {})
 
             members.append(TeamMember(
                 user_id=row["user_id"],
                 team_id=row["team_id"],
                 role=row["role"],
                 email=user_data.get("email", ""),
-                name=meta_data.get("full_name"),
+                name=user_data.get("name"),
                 joined_at=row.get("created_at")
             ))
 
