@@ -17,7 +17,20 @@ from dtos.audit_dto import (
     IntentStatsWithContextDTO,
     TopUsersWithContextDTO,
     TopPromptsWithContextDTO,
-    RiskyPromptsWithContextDTO
+    RiskyPromptsWithContextDTO,
+    AdoptionCurveResponseDTO,
+    AdoptionCurveDataDTO,
+    RiskTimelineResponseDTO,
+    RiskTimelineDataDTO,
+    RiskTimelineDataPointDTO,
+    QualityTimelineResponseDTO,
+    QualityTimelineDataDTO,
+    QualityTimelineDataPointDTO,
+    TimeSeriesDataPointDTO,
+    ThemeTimelineResponseDTO,
+    ThemeDistributionDTO,
+    IntentTimelineResponseDTO,
+    IntentDistributionDTO
 )
 from utils.enrichment import (
     aggregate_quality_stats,

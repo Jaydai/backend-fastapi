@@ -16,4 +16,9 @@ from . import top_users
 from . import top_prompts
 from . import risky_prompts
 
+# Time-series endpoints
+from . import adoption_curve
+from . import risk_timeline
+from . import quality_timeline
+
 __all__ = ["router"]

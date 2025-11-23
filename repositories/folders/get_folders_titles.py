@@ -15,7 +15,7 @@ def get_folders_titles(
     Repository function to fetch folder titles from database.
     Applies filters as provided by the service layer.
     """
-    query = client.table("prompt_folders").select("id, title")
+    query = client.table("prompt_folders").select("id, title, parent_folder_id")
 
     # Apply filters as provided
     if user_id:
@@ -24,10 +24,8 @@ def get_folders_titles(
     if organization_id:
         query = query.eq("organization_id", organization_id)
 
-    if parent_folder_id is not None:
-        query = query.eq("parent_folder_id", parent_folder_id)
-    else:
-        query = query.is_("parent_folder_id", "null")
+    # Don't filter by parent_folder_id - we want ALL folders for tree building
+    # The tree building happens client-side using parent_folder_id field
 
     query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
     response = query.execute()

@@ -13,6 +13,7 @@ from .batch import router as batch_router
 from .notifications import router as notifications_router
 from .enrichment import router as enrichment_router
 from .audit import router as audit_router
+from .teams import router as teams_router
 
 
 router = APIRouter()
@@ -30,6 +31,7 @@ router.include_router(batch_router)
 router.include_router(notifications_router)
 router.include_router(enrichment_router, prefix="/enrichment", tags=["enrichment"])
 router.include_router(audit_router, prefix="/audit", tags=["audit"])
+router.include_router(teams_router)
 
 
 from . import root

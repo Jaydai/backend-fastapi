@@ -18,15 +18,16 @@ logger = logging.getLogger(__name__)
 async def get_organization_templates(
     request: Request,
     organization_id: str,
-    folder_id: str | None = Query(None, description="Folder ID to filter templates. Empty string for root only."),
     locale: str = Query("en", description="Locale for localization")
 ) -> list[TemplateTitleResponseDTO]:
     try:
+        # Fetch all templates for the organization (minimal data for tree building)
         templates = TemplateService.get_templates_titles(
             request.state.supabase_client,
             locale=locale,
+            user_id=None,
             organization_id=organization_id,
-            folder_id=folder_id,
+            folder_id=None,  # Not used anymore, we fetch all
             limit=1000,
             offset=0
         )

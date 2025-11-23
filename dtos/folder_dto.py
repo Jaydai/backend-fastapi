@@ -35,6 +35,7 @@ class FolderTitleResponseDTO(BaseModel):
     """Folder title response (minimal data for list endpoints)"""
     id: str
     title: str  # Localized title
+    parent_folder_id: str | None = None  # Needed for tree building
 
 class OrganizationFolderTitleDTO(BaseModel):
     """Folder title for organization context (with localization support)"""

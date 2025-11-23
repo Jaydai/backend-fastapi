@@ -10,7 +10,7 @@ from .update_pinned_status import update_pinned_status
 __all__ = [
     "get_templates_titles",
     "get_template_by_id",
-    "create_template", 
+    "create_template",
     "update_template",
     "delete_template",
     "increment_usage",

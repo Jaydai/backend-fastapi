@@ -15,7 +15,7 @@ def get_templates_titles(
     Repository function to fetch template titles from database.
     Applies filters as provided by the service layer.
     """
-    query = client.table("prompt_templates").select("id, title")
+    query = client.table("prompt_templates").select("id, title, folder_id")
 
     # Apply filters as provided
     if user_id:
@@ -24,10 +24,8 @@ def get_templates_titles(
     if organization_id:
         query = query.eq("organization_id", organization_id)
 
-    if folder_id is not None:
-        query = query.eq("folder_id", folder_id)
-    else:
-        query = query.is_("folder_id", "null")
+    # Don't filter by folder_id - we want ALL templates for tree building
+    # The tree building happens client-side using folder_id field
 
     query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
     response = query.execute()

@@ -63,3 +63,4 @@ class TemplateComment:
 class TemplateTitle:
     id: str
     title: dict[str, str]
+    folder_id: str | None = None

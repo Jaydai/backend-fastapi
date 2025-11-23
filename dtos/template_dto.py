@@ -106,6 +106,7 @@ class UsageResponseDTO(BaseModel):
 class TemplateTitleResponseDTO(BaseModel):
     id: str
     title: str
+    folder_id: str | None = None  # Needed for tree building
 
 class OrganizationTemplateTitleDTO(BaseModel):
     """Template title for organization context (with localization support)"""
