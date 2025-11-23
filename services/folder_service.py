@@ -10,6 +10,7 @@ from dtos import (
 
 from services.folders import (
     get_folder_by_id,
+    get_folders_titles,
     create_folder,
     update_folder,
     delete_folder,
@@ -18,10 +19,6 @@ from services.folders import (
     unpin_folder,
     update_pinned_folders,
 )
-
-from repositories import FolderRepository
-from utils import localize_object
-
 
 
 class FolderService:
@@ -33,23 +30,20 @@ class FolderService:
         locale: str = "en",
         user_id: str | None = None,
         organization_id: str | None = None,
-        parent_folder_id: list[str] | None = None,
+        parent_folder_id: str | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[FolderTitleResponseDTO]:
         """Get folder titles with optional filtering"""
-        folders = FolderRepository.get_folders_titles(
-        client=client,
-        user_id=user_id,
-        organization_id=organization_id,
-        parent_folder_id=parent_folder_id,
-        limit=limit,
-        offset=offset
+        return get_folders_titles(
+            client=client,
+            locale=locale,
+            user_id=user_id,
+            organization_id=organization_id,
+            parent_folder_id=parent_folder_id,
+            limit=limit,
+            offset=offset
         )
-        return [
-            FolderTitleResponseDTO(**localize_object(folder.__dict__, locale, ["title"]))
-            for folder in folders
-        ]
 
 
     @staticmethod

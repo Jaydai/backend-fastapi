@@ -7,7 +7,6 @@ from dtos import (
     TemplateTitleResponseDTO,
     TemplateResponseDTO,
     UsageResponseDTO,
-    TemplateTitleResponseDTO,
     OrganizationTemplateTitleDTO,
 )
 from repositories.template_repository import TemplateRepository
@@ -24,12 +23,20 @@ class TemplateService:
         locale: str = "en",
         user_id: str | None = None,
         organization_id: str | None = None,
-        folder_ids: list[str] | None = None,
-        published: bool | None = None,
+        folder_id: str | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[TemplateTitleResponseDTO]:
-        return get_templates_titles(client, locale, organization_id, folder_ids, published, user_id, limit, offset)
+        """Get template titles with simplified signature"""
+        return get_templates_titles(
+            client=client,
+            locale=locale,
+            user_id=user_id,
+            organization_id=organization_id,
+            folder_id=folder_id,
+            limit=limit,
+            offset=offset
+        )
 
     @staticmethod
     def get_template_by_id(

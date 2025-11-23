@@ -21,11 +21,17 @@ from repositories.folders import (
 class FolderRepository:
     """Folder repository class for backward compatibility"""
 
-  
     @staticmethod
     def get_folders_titles(client, user_id=None, organization_id=None, parent_folder_id=None, limit=100, offset=0):
         """Get folder titles"""
-        return get_folders_titles(client, user_id, organization_id, parent_folder_id, limit, offset)
+        return get_folders_titles(
+            client,
+            user_id=user_id,
+            organization_id=organization_id,
+            parent_folder_id=parent_folder_id,
+            limit=limit,
+            offset=offset
+        )
 
     @staticmethod
     def get_folder_by_id(client, folder_id: str):
