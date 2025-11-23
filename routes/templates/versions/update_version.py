@@ -2,7 +2,8 @@
 Update Template Version Route
 Allows updating a specific template version's properties
 """
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, Request, status, Body
+from pydantic import BaseModel
 import logging
 
 from . import router
@@ -13,7 +14,7 @@ from domains.enums import PermissionEnum
 logger = logging.getLogger(__name__)
 
 
-class UpdateVersionDTO:
+class UpdateVersionDTO(BaseModel):
     """DTO for updating version properties"""
     content: str | None = None
     change_notes: str | None = None
@@ -31,12 +32,7 @@ async def update_template_version(
     request: Request,
     template_id: str,
     version_id: int,
-    content: str | None = None,
-    change_notes: str | None = None,
-    status_val: str | None = None,
-    is_current: bool | None = None,
-    is_published: bool | None = None,
-    optimized_for: list[str] | None = None
+    update_data: UpdateVersionDTO = Body(...)
 ) -> dict:
     """
     Update a specific version of a template
@@ -69,15 +65,9 @@ async def update_template_version(
             f"User {user_id} attempting to update version {version_id} of template {template_id}"
         )
 
-        # Build request body from query parameters (FastAPI will parse JSON body if sent)
-        from fastapi import Body
-
-        # Get JSON body
-        body = await request.json() if request.headers.get("content-type") == "application/json" else {}
-
         # Check if version exists
         version_response = (
-            supabase_client.table("prompt_template_versions")
+            supabase_client.table("prompt_templates_versions")
             .select("id, template_id")
             .eq("id", version_id)
             .eq("template_id", template_id)
@@ -126,30 +116,30 @@ async def update_template_version(
                 detail="You don't have permission to update this template version"
             )
 
-        # Build update data from JSON body
-        update_data = {}
-        if body.get("content") is not None:
-            update_data["content"] = body["content"]
-        if body.get("change_notes") is not None:
-            update_data["change_notes"] = body["change_notes"]
-        if body.get("status") is not None:
-            update_data["status"] = body["status"]
-        if body.get("is_current") is not None:
-            update_data["is_current"] = body["is_current"]
-        if body.get("is_published") is not None:
-            update_data["is_published"] = body["is_published"]
-        if body.get("optimized_for") is not None:
-            update_data["optimized_for"] = body["optimized_for"]
+        # Build update data from DTO, excluding None values
+        update_dict = {}
+        if update_data.content is not None:
+            update_dict["content"] = update_data.content
+        if update_data.change_notes is not None:
+            update_dict["change_notes"] = update_data.change_notes
+        if update_data.status is not None:
+            update_dict["status"] = update_data.status
+        if update_data.is_current is not None:
+            update_dict["is_current"] = update_data.is_current
+        if update_data.is_published is not None:
+            update_dict["is_published"] = update_data.is_published
+        if update_data.optimized_for is not None:
+            update_dict["optimized_for"] = update_data.optimized_for
 
-        if not update_data:
+        if not update_dict:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No update data provided"
             )
 
         # If setting as current, unset other versions first
-        if update_data.get("is_current") is True:
-            supabase_client.table("prompt_template_versions").update({
+        if update_dict.get("is_current") is True:
+            supabase_client.table("prompt_templates_versions").update({
                 "is_current": False
             }).eq("template_id", template_id).execute()
 
@@ -160,8 +150,8 @@ async def update_template_version(
 
         # Update the version
         update_response = (
-            supabase_client.table("prompt_template_versions")
-            .update(update_data)
+            supabase_client.table("prompt_templates_versions")
+            .update(update_dict)
             .eq("id", version_id)
             .eq("template_id", template_id)
             .execute()

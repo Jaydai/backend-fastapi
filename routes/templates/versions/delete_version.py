@@ -50,7 +50,7 @@ async def delete_template_version(
 
         # First, check if the version exists and get its details
         version_response = (
-            supabase_client.table("prompt_template_versions")
+            supabase_client.table("prompt_templates_versions")
             .select("id, template_id, name, is_current")
             .eq("id", version_id)
             .eq("template_id", template_id)
@@ -110,7 +110,7 @@ async def delete_template_version(
 
         # Delete the version
         delete_response = (
-            supabase_client.table("prompt_template_versions")
+            supabase_client.table("prompt_templates_versions")
             .delete()
             .eq("id", version_id)
             .eq("template_id", template_id)

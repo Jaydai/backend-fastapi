@@ -55,7 +55,7 @@ async def set_default_version(
 
         # Check if version exists and belongs to this template
         version_response = (
-            supabase_client.table("prompt_template_versions")
+            supabase_client.table("prompt_templates_versions")
             .select("id, template_id, name")
             .eq("id", version_id)
             .eq("template_id", template_id)
@@ -112,13 +112,13 @@ async def set_default_version(
             )
 
         # Unset all other versions as current
-        supabase_client.table("prompt_template_versions").update({
+        supabase_client.table("prompt_templates_versions").update({
             "is_current": False
         }).eq("template_id", template_id).execute()
 
         # Set this version as current
         version_update_response = (
-            supabase_client.table("prompt_template_versions")
+            supabase_client.table("prompt_templates_versions")
             .update({"is_current": True})
             .eq("id", version_id)
             .eq("template_id", template_id)
