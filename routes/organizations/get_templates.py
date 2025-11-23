@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 async def get_organization_templates(
     request: Request,
     organization_id: str,
+    published: bool | None = None,
     locale: str = Query("en", description="Locale for localization")
 ) -> list[TemplateTitleResponseDTO]:
     try:
@@ -28,6 +29,7 @@ async def get_organization_templates(
             user_id=None,
             organization_id=organization_id,
             folder_id=None,  # Not used anymore, we fetch all
+            published=published,
             limit=1000,
             offset=0
         )

@@ -16,6 +16,9 @@ from . import (
     update_data_collection,
     me,
     get_ai_coach_insights,
+    get_templates_counts,
+    get_templates,
+    get_folders,
 )
 
 # Not implemented yet (501)

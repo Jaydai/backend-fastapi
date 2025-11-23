@@ -138,7 +138,7 @@ CREATE OR REPLACE FUNCTION "public"."check_team_hierarchy"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
 DECLARE
-    current_parent_id UUID;
+    current_parent_id UUID;  -- Changed from BIGINT to UUID
     depth INTEGER := 0;
     max_depth INTEGER := 10; -- Prevent infinite loops
 BEGIN
@@ -165,7 +165,7 @@ BEGIN
     END LOOP;
 
     IF depth >= max_depth THEN
-        RAISE EXCEPTION 'Team hierarchy too deep (max 10 levels)';
+        RAISE EXCEPTION 'Team hierarchy exceeds maximum depth of %', max_depth;
     END IF;
 
     RETURN NEW;

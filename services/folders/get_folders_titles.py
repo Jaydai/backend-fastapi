@@ -11,6 +11,7 @@ def get_folders_titles(
     user_id: str | None = None,
     organization_id: str | None = None,
     parent_folder_id: str | None = None,
+    published: bool | None = None,
     limit: int = 100,
     offset: int = 0
 ) -> list[FolderTitleResponseDTO]:
@@ -19,7 +20,6 @@ def get_folders_titles(
     filter_user_id = None
     filter_org_id = None
     filter_parent_id = parent_folder_id
-
     if parent_folder_id is not None:
         # Priority 1: Filter by parent folder only
         pass
@@ -36,6 +36,7 @@ def get_folders_titles(
         user_id=filter_user_id,
         organization_id=filter_org_id,
         parent_folder_id=filter_parent_id,
+        published=published,
         limit=limit,
         offset=offset
     )

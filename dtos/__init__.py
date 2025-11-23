@@ -20,6 +20,7 @@ from .template_dto import (
     VersionSummary,
     VersionContentDTO,
     TemplateMetadataDTO,
+    TemplateCountsResponseDTO
 )
 from .user_dto import UserProfileResponseDTO, UpdateUserProfileDTO, UpdateDataCollectionDTO
 from .organization_dto import (
@@ -93,6 +94,7 @@ __all__ = [
     "VersionSummary",
     "VersionContentDTO",
     "TemplateMetadataDTO",
+    "TemplateCountsResponseDTO",
     "UserProfileResponseDTO",
     "UpdateUserProfileDTO",
     "UpdateDataCollectionDTO",

@@ -11,6 +11,7 @@ def get_templates_titles(
     user_id: str | None = None,
     organization_id: str | None = None,
     folder_id: str | None = None,
+    published: bool | None = None,
     limit: int = 100,
     offset: int = 0
 ) -> list[TemplateTitleResponseDTO]:
@@ -35,6 +36,7 @@ def get_templates_titles(
         user_id=filter_user_id,
         organization_id=filter_org_id,
         folder_id=filter_folder_id,
+        published=published,
         limit=limit,
         offset=offset
     )

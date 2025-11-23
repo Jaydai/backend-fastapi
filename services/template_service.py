@@ -7,8 +7,9 @@ from dtos import (
     TemplateTitleResponseDTO,
     TemplateResponseDTO,
     UsageResponseDTO,
+    TemplateCountsResponseDTO
 )
-from repositories import TemplateRepository, TemplateVersionRepository
+from repositories import TemplateRepository, TemplateVersionRepository, PermissionRepository
 
 from mappers.template_mapper import TemplateMapper
 from services.templates import get_templates_titles, create_template, update_template
@@ -21,6 +22,7 @@ class TemplateService:
         user_id: str | None = None,
         organization_id: str | None = None,
         folder_id: str | None = None,
+        published: bool | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[TemplateTitleResponseDTO]:
@@ -31,6 +33,7 @@ class TemplateService:
             user_id=user_id,
             organization_id=organization_id,
             folder_id=folder_id,
+            published=published,
             limit=limit,
             offset=offset
         )
@@ -155,5 +158,17 @@ class TemplateService:
             limit,
             offset
         )
-
         return [TemplateMapper.entity_to_list_item_dto(t, locale) for t in templates]
+
+    @staticmethod
+    def get_templates_counts(client: Client, user_id: str) -> TemplateCountsResponseDTO:
+        user_counts = TemplateRepository.get_user_templates_count(client, user_id)
+        print("👀👀👀👀", user_counts)
+        user_all_roles = PermissionRepository.get_user_all_roles(client, user_id)
+        print("😈😈😈😈", user_all_roles)
+        organization_counts = {}
+        for role in user_all_roles:
+            if role.organization_id:
+                organization_counts[role.organization_id] = TemplateRepository.get_organization_templates_count(client, role.organization_id)
+        print(f"ORGANIZATION COUNTS==============={organization_counts}")
+        return TemplateCountsResponseDTO(user_counts=user_counts, organization_counts=organization_counts)

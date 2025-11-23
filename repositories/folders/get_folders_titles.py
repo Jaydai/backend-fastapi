@@ -7,6 +7,7 @@ def get_folders_titles(
     client: Client,
     user_id: str | None = None,
     organization_id: str | None = None,
+    published: bool | None = None,
     parent_folder_id: str | None = None,
     limit: int = 100,
     offset: int = 0
@@ -26,7 +27,8 @@ def get_folders_titles(
 
     # Don't filter by parent_folder_id - we want ALL folders for tree building
     # The tree building happens client-side using parent_folder_id field
-
+    if published is not None:
+        query = query.eq("published", published)
     query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
     response = query.execute()
     folders_data = response.data or []

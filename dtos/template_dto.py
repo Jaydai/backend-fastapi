@@ -1,3 +1,4 @@
+from ast import Dict
 from pydantic import BaseModel
 from domains.entities import VersionSummary
 
@@ -141,3 +142,7 @@ class TemplateMetadataDTO(BaseModel):
     is_free: bool
     is_published: bool
     versions: list[VersionSummary] = []  # List of versions without content
+
+class TemplateCountsResponseDTO(BaseModel):
+    user_counts: int
+    organization_counts: dict[str,int]

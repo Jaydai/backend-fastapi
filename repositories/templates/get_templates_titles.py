@@ -8,6 +8,7 @@ def get_templates_titles(
     user_id: str | None = None,
     organization_id: str | None = None,
     folder_id: str | None = None,
+    published: bool | None = None,
     limit: int = 100,
     offset: int = 0
 ) -> list[TemplateTitle]:
@@ -26,7 +27,8 @@ def get_templates_titles(
 
     # Don't filter by folder_id - we want ALL templates for tree building
     # The tree building happens client-side using folder_id field
-
+    if published is not None:
+        query = query.eq("published", published)
     query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
     response = query.execute()
     templates_data = response.data or []

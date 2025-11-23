@@ -1,7 +1,7 @@
 """Template repository - handles pure database operations for templates"""
 from supabase import Client
 from domains.entities import Template, TemplateTitle, TemplateVersion, TemplateComment
-from repositories.templates import get_templates_titles, get_template_by_id, create_template, update_template, delete_template, increment_usage, update_pinned_status
+from repositories.templates import get_templates_titles, get_template_by_id, create_template, update_template, delete_template, increment_usage, update_pinned_status, get_user_templates_count, get_organization_templates_count
 from repositories.template_versions_repository import TemplateVersionRepository
 
 class TemplateRepository:
@@ -77,3 +77,11 @@ class TemplateRepository:
     def get_comments(client: Client, template_id: str, locale: str = "en") -> list[TemplateComment]:
         # TODO: Implement comments repository
         return []
+    
+    @staticmethod
+    def get_user_templates_count(client: Client, user_id: str) -> int:
+        return get_user_templates_count(client, user_id)
+
+    @staticmethod
+    def get_organization_templates_count(client: Client, organization_id: str) -> int:
+        return get_organization_templates_count(client, organization_id)
