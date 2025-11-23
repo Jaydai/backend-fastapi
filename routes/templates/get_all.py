@@ -27,9 +27,10 @@ async def get_all_templates(
     """
     try:
         client = request.state.supabase_client
+        user_id = request.state.user_id
         locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
 
-        logger.info(f"Fetching template titles with folder_ids={folder_ids}, published={published}")
+        logger.info(f"Fetching template titles with folder_ids={folder_ids}, published={published}, organization_id={organization_id}")
 
         # Parse folder_ids
         folder_id_list: list[str] | None = None
@@ -42,7 +43,8 @@ async def get_all_templates(
         templates = TemplateService.get_templates_titles(
             client,
             locale,
-            organization_id,
+            user_id,           # Pass user_id for personal templates
+            organization_id,   # Pass organization_id for org templates
             folder_id_list,
             published,
             limit,

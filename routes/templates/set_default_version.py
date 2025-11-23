@@ -6,6 +6,8 @@ from fastapi import HTTPException, Request, status
 import logging
 
 from . import router
+from services import PermissionService
+from domains.enums import PermissionEnum
 
 logger = logging.getLogger(__name__)
 
@@ -89,21 +91,14 @@ async def set_default_version(
         # Check if user is the template owner
         has_permission = template.get("user_id") == user_id
 
-        # If template belongs to an organization, check organization permissions
+        # If template belongs to an organization, check organization permissions using new system
         if not has_permission and template.get("organization_id"):
-            org_member_response = (
-                supabase_client.table("organizations_users")
-                .select("role")
-                .eq("organization_id", template["organization_id"])
-                .eq("user_id", user_id)
-                .single()
-                .execute()
+            has_permission = PermissionService.user_has_permission_in_organization(
+                supabase_client,
+                user_id,
+                PermissionEnum.TEMPLATE_UPDATE,
+                template["organization_id"]
             )
-
-            if org_member_response.data:
-                # Allow admin and owner roles to set default
-                member_role = org_member_response.data.get("role")
-                has_permission = member_role in ["admin", "owner"]
 
         if not has_permission:
             raise HTTPException(

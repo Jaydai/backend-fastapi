@@ -1,7 +1,8 @@
 """Template repository - handles pure database operations for templates"""
 from supabase import Client
-from domains.entities import Template, TemplateTitle
+from domains.entities import Template, TemplateTitle, TemplateVersion, TemplateComment
 from repositories.templates import get_templates_titles, get_template_by_id, create_template, update_template, delete_template, increment_usage, update_pinned_status
+from repositories.template_versions_repository import TemplateVersionRepository
 
 class TemplateRepository:
     """Base repository for template database operations"""
@@ -67,3 +68,12 @@ class TemplateRepository:
         is_pinned: bool
     ) -> bool:
         return update_pinned_status(client, user_id, template_id, is_pinned)
+
+    @staticmethod
+    def get_versions(client: Client, template_id: str) -> list[TemplateVersion]:
+        return TemplateVersionRepository.get_versions(client, template_id)
+
+    @staticmethod
+    def get_comments(client: Client, template_id: str, locale: str = "en") -> list[TemplateComment]:
+        # TODO: Implement comments repository
+        return []

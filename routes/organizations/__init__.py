@@ -15,6 +15,7 @@ from . import (
     get_template_metadata,
     get_version_content,
     get_user_role,
+    get_ai_coach_insights,
 )
 
 # Not implemented yet (501)
