@@ -2,7 +2,7 @@ from supabase import Client
 from dtos import UpdateTemplateDTO, TemplateResponseDTO
 from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
-from services.templates import get_by_id
+from services.templates import get_template_by_id
 
 def update_template(
         client: Client,
@@ -10,7 +10,7 @@ def update_template(
         data: UpdateTemplateDTO,
         locale: str = "en"
     ) -> TemplateResponseDTO | None:
-        template = TemplateRepository.get_by_id(client, template_id)
+        template = TemplateRepository.get_template_by_id(client, template_id)
         if not template:
             return None
 
@@ -73,4 +73,4 @@ def update_template(
         if data.is_pinned is not None:
             TemplateRepository.update_pinned_status(client, template.user_id, template_id, data.is_pinned)
 
-        return get_by_id(client, template_id, locale)
+        return get_template_by_id(client, template_id, locale)

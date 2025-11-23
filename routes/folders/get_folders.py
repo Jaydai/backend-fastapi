@@ -14,13 +14,7 @@ async def get_folders(
     limit: int = Query(100, le=500),
     offset: int = Query(0, ge=0)
 ) -> list[FolderTitleResponseDTO]:
-    """
-    Get folder titles (id, title) with optional filtering.
-    Returns minimal data for list endpoints.
 
-    Filters:
-    - parent_folder_ids: comma-separated IDs, empty string for root only, omit for all
-    """
     try:
         client = request.state.supabase_client
         locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]

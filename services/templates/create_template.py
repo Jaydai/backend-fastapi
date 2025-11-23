@@ -2,7 +2,7 @@ from supabase import Client
 from dtos import CreateTemplateDTO, TemplateResponseDTO
 from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
-from services.templates import get_by_id
+from services.templates import get_template_by_id
 
 def create_template(
         client: Client,
@@ -48,4 +48,4 @@ def create_template(
             TemplateRepository.delete_template(client, template.id)
             raise Exception(f"Failed to create template version: {str(e)}")
 
-        return get_by_id(client, template.id, locale)
+        return get_template_by_id(client, template.id, locale)

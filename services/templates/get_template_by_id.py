@@ -4,7 +4,7 @@ from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
 
 
-def get_by_id(
+def get_template_by_id(
     client: Client,
     template_id: str,
     locale: str = "en"

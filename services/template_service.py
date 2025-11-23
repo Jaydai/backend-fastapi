@@ -14,12 +14,12 @@ from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
 from utils import localize_object
 from domains.entities import TemplateVersion
-from services.templates import get_titles, get_by_id, create_template, update_template
+from services.templates import get_templates_titles, get_template_by_id, create_template, update_template
 
 class TemplateService:
 
     @staticmethod
-    def get_titles(
+    def get_templates_titles(
         client: Client,
         locale: str = "en",
         user_id: str | None = None,
@@ -29,15 +29,15 @@ class TemplateService:
         limit: int = 100,
         offset: int = 0
     ) -> list[TemplateTitleResponseDTO]:
-        return get_titles(client, locale, organization_id, folder_ids, published, user_id, limit, offset)
+        return get_templates_titles(client, locale, organization_id, folder_ids, published, user_id, limit, offset)
 
     @staticmethod
-    def get_by_id(
+    def get_template_by_id(
         client: Client,
         template_id: str,
         locale: str = "en"
     ) -> TemplateResponseDTO | None:
-        return get_by_id(client, template_id, locale)
+        return get_template_by_id(client, template_id, locale)
 
 
     @staticmethod

@@ -1,3 +1,23 @@
-from .base_repository import FolderBaseRepository
+"""Folder repository - Re-exports all folder repository functions"""
 
-__all__ = ["FolderBaseRepository"]
+from .get_folder_by_id import get_folder_by_id
+from .create_folder import create_folder
+from .update_folder import update_folder
+from .delete_folder import delete_folder
+from .pinned_folders import (
+    get_pinned_folder_ids,
+    pin_folder,
+    unpin_folder,
+    update_pinned_folders
+)
+
+__all__ = [
+    "get_folder_by_id",
+    "create_folder",
+    "update_folder",
+    "delete_folder",
+    "get_pinned_folder_ids",
+    "pin_folder",
+    "unpin_folder",
+    "update_pinned_folders"
+]
