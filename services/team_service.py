@@ -62,7 +62,7 @@ class TeamService:
         )
 
     @staticmethod
-    def get_team_by_id(client: Client, team_id: int) -> Optional[TeamDTO]:
+    def get_team_by_id(client: Client, team_id: str) -> Optional[TeamDTO]:
         """Get a specific team by ID"""
         team = TeamRepository.get_team_by_id(client, team_id)
         if not team:
@@ -88,7 +88,7 @@ class TeamService:
         organization_id: str,
         name: str,
         description: Optional[str] = None,
-        parent_team_id: Optional[int] = None,
+        parent_team_id: Optional[str] = None,
         color: str = "#3B82F6"
     ) -> TeamDTO:
         """Create a new team"""
@@ -124,10 +124,10 @@ class TeamService:
     @staticmethod
     def update_team(
         client: Client,
-        team_id: int,
+        team_id: str,
         name: Optional[str] = None,
         description: Optional[str] = None,
-        parent_team_id: Optional[int] = None,
+        parent_team_id: Optional[str] = None,
         color: Optional[str] = None
     ) -> TeamDTO:
         """Update an existing team"""
@@ -171,7 +171,7 @@ class TeamService:
         )
 
     @staticmethod
-    def delete_team(client: Client, team_id: int) -> bool:
+    def delete_team(client: Client, team_id: str) -> bool:
         """Delete a team"""
         # Validate team exists
         team = TeamRepository.get_team_by_id(client, team_id)
@@ -181,7 +181,7 @@ class TeamService:
         return TeamRepository.delete_team(client, team_id)
 
     @staticmethod
-    def get_team_members(client: Client, team_id: int) -> list[TeamMemberDTO]:
+    def get_team_members(client: Client, team_id: str) -> list[TeamMemberDTO]:
         """Get all members of a team"""
         members = TeamRepository.get_team_members(client, team_id)
 
@@ -200,7 +200,7 @@ class TeamService:
     @staticmethod
     def add_user_to_team(
         client: Client,
-        team_id: int,
+        team_id: str,
         user_id: str,
         role: str = "member"
     ) -> TeamMemberDTO:
@@ -238,14 +238,14 @@ class TeamService:
         )
 
     @staticmethod
-    def remove_user_from_team(client: Client, team_id: int, user_id: str) -> bool:
+    def remove_user_from_team(client: Client, team_id: str, user_id: str) -> bool:
         """Remove a user from a team"""
         return TeamRepository.remove_user_from_team(client, user_id, team_id)
 
     @staticmethod
     def update_user_team_role(
         client: Client,
-        team_id: int,
+        team_id: str,
         user_id: str,
         role: str
     ) -> TeamMemberDTO:

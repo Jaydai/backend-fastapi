@@ -53,7 +53,7 @@ def _get_date_trunc_sql(granularity: str) -> str:
         return "DATE_TRUNC('day', created_at)"
 
 
-def _get_user_ids_for_teams(client: Client, organization_id: str, team_ids: Optional[List[int]]) -> List[str]:
+def _get_user_ids_for_teams(client: Client, organization_id: str, team_ids: Optional[List[str]]) -> List[str]:
     """Get user IDs filtered by teams, or all organization members if no teams specified"""
     if not team_ids or len(team_ids) == 0:
         # Get all organization members
@@ -82,7 +82,7 @@ class AuditTimeSeriesService:
         start_date: Optional[str],
         end_date: Optional[str],
         days: int,
-        team_ids: Optional[List[int]],
+        team_ids: Optional[List[str]],
         granularity: str
     ) -> AdoptionCurveResponseDTO:
         """Get adoption curve (usage over time) with team breakdown"""
@@ -200,7 +200,7 @@ class AuditTimeSeriesService:
         start_date: Optional[str],
         end_date: Optional[str],
         days: int,
-        team_ids: Optional[List[int]],
+        team_ids: Optional[List[str]],
         granularity: str
     ) -> RiskTimelineResponseDTO:
         """Get risk timeline with breakdown by risk level and type"""
@@ -293,7 +293,7 @@ class AuditTimeSeriesService:
         start_date: Optional[str],
         end_date: Optional[str],
         days: int,
-        team_ids: Optional[List[int]],
+        team_ids: Optional[List[str]],
         granularity: str
     ) -> QualityTimelineResponseDTO:
         """Get quality score evolution over time"""
@@ -409,7 +409,7 @@ class AuditTimeSeriesService:
         start_date: Optional[str],
         end_date: Optional[str],
         days: int,
-        team_ids: Optional[List[int]],
+        team_ids: Optional[List[str]],
         top_n: int
     ) -> ThemeTimelineResponseDTO:
         """Get theme distribution for the period"""
@@ -466,7 +466,7 @@ class AuditTimeSeriesService:
         start_date: Optional[str],
         end_date: Optional[str],
         days: int,
-        team_ids: Optional[List[int]],
+        team_ids: Optional[List[str]],
         top_n: int
     ) -> IntentTimelineResponseDTO:
         """Get intent distribution for the period"""

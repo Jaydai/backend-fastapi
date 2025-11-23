@@ -1,19 +1,33 @@
 """Template version repository - handles version database operations"""
 from supabase import Client
-from domains.entities import TemplateVersion
-from repositories.templates.versions import get_versions_names, get_version_by_id, create_version, update_version
+from domains.entities import TemplateVersion, VersionSummary
+from repositories.templates.versions import (
+    get_versions,
+    get_versions_summary,
+    get_version_by_id,
+    create_version,
+    update_version,
+    get_version_by_slug,
+)
 
 class TemplateVersionRepository:
     """Repository for template version database operations"""
 
     @staticmethod
-    def get_versions_names(client: Client, template_id: str) -> list[TemplateVersion]:
-        return get_versions_names(client, template_id)
-               
+    def get_versions(client: Client, template_id: str) -> list[TemplateVersion]:
+        return get_versions(client, template_id)
+
+    @staticmethod
+    def get_versions_summary(client: Client, template_id: str) -> list[VersionSummary]:
+        return get_versions_summary(client, template_id)
 
     @staticmethod
     def get_version_by_id(client: Client, version_id: int) -> TemplateVersion | None:
         return get_version_by_id(client, version_id)
+    
+    @staticmethod
+    def get_version_by_slug(client:Client, template_id: str, slug: str) -> TemplateVersion | None:
+        return get_version_by_slug(client, template_id, slug)
 
     @staticmethod
     def create_version(
@@ -37,5 +51,4 @@ class TemplateVersionRepository:
         status: str | None = None
     ) -> TemplateVersion | None:
         return update_version(client, version_id, template_id, content, status)
-
 

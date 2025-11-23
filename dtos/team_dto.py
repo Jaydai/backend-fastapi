@@ -111,7 +111,7 @@ class TeamUpdatedResponseDTO(BaseModel):
 
 class TeamDeletedResponseDTO(BaseModel):
     """Team deletion response"""
-    team_id: int
+    team_id: str
     message: str = "Team deleted successfully"
 
 

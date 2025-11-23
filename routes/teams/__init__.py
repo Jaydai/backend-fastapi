@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/api/teams", tags=["teams"])
+router = APIRouter(prefix="/teams", tags=["teams"])
 
 # Import all route handlers
 from . import (

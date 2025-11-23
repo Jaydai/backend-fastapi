@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/{team_id}", response_model=TeamDTO)
-async def get_team(request: Request, team_id: int) -> TeamDTO:
+async def get_team(request: Request, team_id: str) -> TeamDTO:
     """Get a specific team by ID"""
     try:
         team = TeamService.get_team_by_id(request.state.supabase_client, team_id)

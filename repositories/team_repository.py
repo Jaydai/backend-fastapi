@@ -43,7 +43,7 @@ class TeamRepository:
         return teams
 
     @staticmethod
-    def get_team_by_id(client: Client, team_id: int) -> Optional[Team]:
+    def get_team_by_id(client: Client, team_id: str) -> Optional[Team]:
         """Get a specific team by ID"""
         response = client.table("teams") \
             .select("*") \
@@ -72,7 +72,7 @@ class TeamRepository:
         organization_id: str,
         name: str,
         description: Optional[str] = None,
-        parent_team_id: Optional[int] = None,
+        parent_team_id: Optional[str] = None,
         color: str = "#3B82F6"
     ) -> Team:
         """Create a new team"""
@@ -99,10 +99,10 @@ class TeamRepository:
     @staticmethod
     def update_team(
         client: Client,
-        team_id: int,
+        team_id: str,
         name: Optional[str] = None,
         description: Optional[str] = None,
-        parent_team_id: Optional[int] = None,
+        parent_team_id: Optional[str] = None,
         color: Optional[str] = None
     ) -> Team:
         """Update an existing team"""
@@ -134,7 +134,7 @@ class TeamRepository:
         )
 
     @staticmethod
-    def delete_team(client: Client, team_id: int) -> bool:
+    def delete_team(client: Client, team_id: str) -> bool:
         """Delete a team (will cascade to children and permissions)"""
         client.table("teams") \
             .delete() \
@@ -143,7 +143,7 @@ class TeamRepository:
         return True
 
     @staticmethod
-    def get_team_members(client: Client, team_id: int) -> list[TeamMember]:
+    def get_team_members(client: Client, team_id: str) -> list[TeamMember]:
         """Get all members of a team"""
         response = client.table("user_team_permissions") \
             .select("*, users:user_id(email, raw_user_meta_data)") \
@@ -208,7 +208,7 @@ class TeamRepository:
     def add_user_to_team(
         client: Client,
         user_id: str,
-        team_id: int,
+        team_id: str,
         role: str = "member"
     ) -> UserTeamPermission:
         """Add a user to a team"""
@@ -229,7 +229,7 @@ class TeamRepository:
         )
 
     @staticmethod
-    def remove_user_from_team(client: Client, user_id: str, team_id: int) -> bool:
+    def remove_user_from_team(client: Client, user_id: str, team_id: str) -> bool:
         """Remove a user from a team"""
         client.table("user_team_permissions") \
             .delete() \
@@ -242,7 +242,7 @@ class TeamRepository:
     def update_user_team_role(
         client: Client,
         user_id: str,
-        team_id: int,
+        team_id: str,
         role: str
     ) -> UserTeamPermission:
         """Update a user's role in a team"""
@@ -263,7 +263,7 @@ class TeamRepository:
         )
 
     @staticmethod
-    def get_team_member_count(client: Client, team_id: int) -> int:
+    def get_team_member_count(client: Client, team_id: str) -> int:
         """Get the number of members in a team"""
         response = client.table("user_team_permissions") \
             .select("id", count="exact") \

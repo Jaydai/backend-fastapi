@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 @router.delete("/{team_id}/members/{user_id}", response_model=MemberRemovedResponseDTO)
 async def remove_team_member(
     request: Request,
-    team_id: int,
+    team_id: str,
     user_id: str
 ) -> MemberRemovedResponseDTO:
     """Remove a user from a team"""

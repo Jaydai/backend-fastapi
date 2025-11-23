@@ -12,6 +12,8 @@ from . import (
     get_invitations,
     get_templates,
     get_folders,
+    get_template_metadata,
+    get_version_content,
 )
 
 # Not implemented yet (501)

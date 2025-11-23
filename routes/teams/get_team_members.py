@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/{team_id}/members", response_model=list[TeamMemberDTO])
-async def get_team_members(request: Request, team_id: int) -> list[TeamMemberDTO]:
+async def get_team_members(request: Request, team_id: str) -> list[TeamMemberDTO]:
     """Get all members of a team"""
     try:
         members = TeamService.get_team_members(request.state.supabase_client, team_id)

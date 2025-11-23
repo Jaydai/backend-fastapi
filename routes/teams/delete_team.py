@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.delete("/{team_id}", response_model=TeamDeletedResponseDTO)
-async def delete_team(request: Request, team_id: int) -> TeamDeletedResponseDTO:
+async def delete_team(request: Request, team_id: str) -> TeamDeletedResponseDTO:
     """Delete a team"""
     try:
         TeamService.delete_team(request.state.supabase_client, team_id)

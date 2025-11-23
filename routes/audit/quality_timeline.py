@@ -16,7 +16,7 @@ async def get_quality_timeline(
     start_date: Optional[str] = Query(default=None, description="Start date (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(default=None, description="End date (YYYY-MM-DD)"),
     days: int = Query(default=30, ge=1, le=365, description="Number of days to look back"),
-    team_ids: Optional[List[int]] = Query(default=None, description="Filter by team IDs"),
+    team_ids: Optional[List[str]] = Query(default=None, description="Filter by team IDs"),
     granularity: str = Query(default="day", pattern="^(day|week|month)$", description="Time granularity")
 ):
     """

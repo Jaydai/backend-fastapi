@@ -17,6 +17,9 @@ from .template_dto import (
     UsageResponseDTO,
     TemplateTitleResponseDTO,
     OrganizationTemplateTitleDTO,
+    VersionSummary,
+    VersionContentDTO,
+    TemplateMetadataDTO,
 )
 from .user_dto import UserProfileResponseDTO, UpdateUserProfileDTO, UpdateDataCollectionDTO
 from .organization_dto import (
@@ -87,6 +90,9 @@ __all__ = [
     "UsageResponseDTO",
     "TemplateTitleResponseDTO",
     "OrganizationTemplateTitleDTO",
+    "VersionSummary",
+    "VersionContentDTO",
+    "TemplateMetadataDTO",
     "UserProfileResponseDTO",
     "UpdateUserProfileDTO",
     "UpdateDataCollectionDTO",

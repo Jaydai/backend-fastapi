@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 @router.patch("/{team_id}", response_model=TeamUpdatedResponseDTO)
 async def update_team(
     request: Request,
-    team_id: int,
+    team_id: str,
     body: UpdateTeamRequestDTO
 ) -> TeamUpdatedResponseDTO:
     """Update a team"""

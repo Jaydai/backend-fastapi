@@ -1,4 +1,4 @@
-from domains.entities import Template, TemplateVersion, TemplateComment, TemplateCommentAuthor
+from domains.entities import Template, TemplateVersion, TemplateComment, TemplateCommentAuthor, VersionSummary
 from dtos import (
     TemplateListItemDTO,
     TemplateResponseDTO,
@@ -48,49 +48,26 @@ class TemplateMapper:
     @staticmethod
     def entity_to_response_dto(
         template: Template,
-        versions: list[TemplateVersion],
-        comments: list[TemplateComment] | None = None,
+        versions_summary: list[VersionSummary],
         locale: str = "en"
     ) -> TemplateResponseDTO:
-        version_dtos = [TemplateMapper.version_entity_to_dto(v, locale) for v in versions]
-
-        current_version = None
-        current_content = ""
-
-        if template.current_version_id:
-            for v in versions:
-                if v.id == template.current_version_id:
-                    current_version = TemplateMapper.version_entity_to_dto(v, locale)
-                    current_content = current_version.content
-                    break
-
-        if not current_version and version_dtos:
-            current_version = version_dtos[0]
-            current_content = current_version.content
-
-        comment_dtos = [TemplateMapper.comment_entity_to_dto(c) for c in comments] if comments else []
+        version_dtos = [VersionSummary(v.id, TemplateMapper.localize_string(v.name, locale), v.slug, v.is_current) for v in versions_summary]
 
         return TemplateResponseDTO(
             id=template.id,
             title=TemplateMapper.localize_string(template.title, locale),
             description=TemplateMapper.localize_string(template.description, locale) if template.description else None,
-            content=current_content,
             folder_id=template.folder_id,
             organization_id=template.organization_id,
             user_id=template.user_id,
-            workspace_type=template.workspace_type,
             created_at=template.created_at,
             updated_at=template.updated_at,
-            tags=template.tags,
-            usage_count=template.usage_count,
             last_used_at=template.last_used_at,
+            usage_count=template.usage_count,
             current_version_id=template.current_version_id,
-            is_free=template.is_free,
             is_published=template.is_published,
-            versions=version_dtos,
-            current_version=current_version,
-            comments=comment_dtos
-        )
+            versions=version_dtos
+            )
 
     @staticmethod
     def version_entity_to_dto(version: TemplateVersion, locale: str = "en") -> TemplateVersionResponseDTO:

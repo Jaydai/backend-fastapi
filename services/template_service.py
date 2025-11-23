@@ -7,16 +7,13 @@ from dtos import (
     TemplateTitleResponseDTO,
     TemplateResponseDTO,
     UsageResponseDTO,
-    OrganizationTemplateTitleDTO,
 )
-from repositories.template_repository import TemplateRepository
+from repositories import TemplateRepository, TemplateVersionRepository
+
 from mappers.template_mapper import TemplateMapper
-from utils import localize_object
-from domains.entities import TemplateVersion
-from services.templates import get_templates_titles, get_template_by_id, create_template, update_template
+from services.templates import get_templates_titles, create_template, update_template
 
 class TemplateService:
-
     @staticmethod
     def get_templates_titles(
         client: Client,
@@ -44,7 +41,14 @@ class TemplateService:
         template_id: str,
         locale: str = "en"
     ) -> TemplateResponseDTO | None:
-        return get_template_by_id(client, template_id, locale)
+        template = TemplateRepository.get_template_by_id(client, template_id)
+        if not template:
+            return None
+
+        versions_summary = TemplateVersionRepository.get_versions_summary(client, template_id)
+
+        return TemplateMapper.entity_to_response_dto(template, versions_summary, locale)
+
 
 
     @staticmethod
@@ -115,6 +119,21 @@ class TemplateService:
         )
 
         return TemplateMapper.version_entity_to_dto(version, locale)
+
+    
+    @staticmethod
+    def get_version_by_slug(
+        client: Client,
+        template_id: str,
+        slug: str,
+        locale: str = "en"
+    ) -> TemplateVersionResponseDTO | None:
+        version = TemplateVersionRepository.get_version_by_slug(client, template_id, slug)
+        if not version:
+            return None
+
+        return TemplateMapper.version_entity_to_dto(version, locale)
+
 
     @staticmethod
     def search_templates(

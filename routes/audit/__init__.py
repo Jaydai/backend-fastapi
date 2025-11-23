@@ -20,5 +20,7 @@ from . import risky_prompts
 from . import adoption_curve
 from . import risk_timeline
 from . import quality_timeline
+from . import theme_distribution
+from . import intent_distribution
 
 __all__ = ["router"]

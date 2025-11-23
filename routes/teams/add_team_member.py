@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 @router.post("/{team_id}/members", response_model=MemberAddedResponseDTO)
 async def add_team_member(
     request: Request,
-    team_id: int,
+    team_id: str,
     body: AddTeamMemberRequestDTO
 ) -> MemberAddedResponseDTO:
     """Add a user to a team"""
