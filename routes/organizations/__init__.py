@@ -14,6 +14,7 @@ from . import (
     get_folders,
     get_template_metadata,
     get_version_content,
+    get_user_role,
 )
 
 # Not implemented yet (501)

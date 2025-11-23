@@ -254,22 +254,30 @@ def aggregate_top_prompts(top_prompts_data: dict) -> list[TopPrompt]:
 def aggregate_risky_prompts(risky_prompts_data: dict) -> list[RiskyPrompt]:
     """
     Aggregate riskiest prompts
-    Joins risk data with message content
+    Joins risk data with message content and user info
     """
     risks = risky_prompts_data.get("risks", [])
     messages = risky_prompts_data.get("messages", [])
+    users = risky_prompts_data.get("users", [])
 
     # Build message content map
-    message_map = {msg.get("provider_id"): msg.get("content", "") for msg in messages}
+    message_map = {msg.get("message_provider_id"): msg.get("content", "") for msg in messages}
+
+    # Build user info map
+    user_map = {user.get("user_id"): user for user in users}
 
     risky_prompts = []
-    for risk in risks[:10]:
+    for risk in risks:
         msg_provider_id = risk.get("message_provider_id")
-        content = message_map.get(msg_provider_id, "")
-        content_preview = content[:200] if content else "[No content]"
+        content_full = message_map.get(msg_provider_id, "")
+        content_preview = content_full[:200] if content_full else "[No content]"
 
         # Extract risk categories
         risk_categories = _extract_risk_category_names(risk.get("risk_categories", {}))
+
+        # Get user info
+        user_id = risk.get("user_id")
+        user_info = user_map.get(user_id, {})
 
         risky_prompts.append(RiskyPrompt(
             message_provider_id=msg_provider_id,
@@ -277,8 +285,11 @@ def aggregate_risky_prompts(risky_prompts_data: dict) -> list[RiskyPrompt]:
             risk_score=risk.get("overall_risk_score", 0.0),
             risk_categories=risk_categories,
             content_preview=content_preview,
+            content_full=content_full if content_full else "[No content]",
             created_at=datetime.fromisoformat(risk.get("created_at")) if risk.get("created_at") else datetime.now(),
-            user_whitelist=risk.get("user_whitelist", False)
+            user_whitelist=risk.get("user_whitelist", False),
+            user_email=user_info.get("email"),
+            user_name=user_info.get("name")
         ))
 
     return risky_prompts

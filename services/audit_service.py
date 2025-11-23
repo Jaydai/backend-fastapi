@@ -388,7 +388,7 @@ class AuditService:
                 generated_at=datetime.now()
             )
 
-        risky_prompts_data = await AuditRepository.get_riskiest_prompts_async(client, user_ids, start_dt, end_dt)
+        risky_prompts_data = await AuditRepository.get_riskiest_prompts_async(client, user_ids, start_dt, end_dt, limit=100)
         risky_prompts = aggregate_risky_prompts(risky_prompts_data)
 
         return RiskyPromptsWithContextDTO(

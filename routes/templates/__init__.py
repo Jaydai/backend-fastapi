@@ -13,4 +13,9 @@ from . import (
     get_versions,
     get_version_by_slug,
     create_version,
+    set_default_version,
 )
+
+# Include the versions sub-router for update and delete operations
+from .versions import router as versions_router
+router.include_router(versions_router)

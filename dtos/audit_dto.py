@@ -99,8 +99,11 @@ class RiskyPromptDTO(BaseModel):
     risk_score: float
     risk_categories: list[str]
     content_preview: str
+    content_full: str
     created_at: datetime
     user_whitelist: bool = False
+    user_email: Optional[str] = None
+    user_name: Optional[str] = None
 
 
 class OrganizationAuditResponseDTO(BaseModel):
@@ -205,7 +208,7 @@ class AdoptionCurveRequestDTO(BaseModel):
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[int]] = Field(None, description="Filter by team IDs (empty = all teams)")
+    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs (empty = all teams)")
     granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
 
 
@@ -223,7 +226,7 @@ class AdoptionCurveResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: Optional[list[int]] = None
+    team_filter: Optional[list[str]] = None
     data: AdoptionCurveDataDTO
     generated_at: datetime
 
@@ -233,7 +236,7 @@ class RiskTimelineRequestDTO(BaseModel):
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[int]] = Field(None, description="Filter by team IDs")
+    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
     granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
 
 
@@ -258,7 +261,7 @@ class RiskTimelineResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: Optional[list[int]] = None
+    team_filter: Optional[list[str]] = None
     data: RiskTimelineDataDTO
     generated_at: datetime
 
@@ -268,7 +271,7 @@ class QualityTimelineRequestDTO(BaseModel):
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[int]] = Field(None, description="Filter by team IDs")
+    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
     granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
 
 
@@ -293,7 +296,7 @@ class QualityTimelineResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: Optional[list[int]] = None
+    team_filter: Optional[list[str]] = None
     data: QualityTimelineDataDTO
     generated_at: datetime
 
@@ -303,7 +306,7 @@ class ThemeTimelineRequestDTO(BaseModel):
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[int]] = Field(None, description="Filter by team IDs")
+    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
     top_n: int = Field(default=10, ge=1, le=50, description="Number of top themes to track")
 
 
@@ -317,7 +320,7 @@ class ThemeTimelineResponseDTO(BaseModel):
     """Theme timeline response"""
     organization_id: str
     date_range: dict[str, str]
-    team_filter: Optional[list[int]] = None
+    team_filter: Optional[list[str]] = None
     top_themes: list[str]  # Top N themes being tracked
     current_distribution: ThemeDistributionDTO
     generated_at: datetime
@@ -328,7 +331,7 @@ class IntentTimelineRequestDTO(BaseModel):
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[int]] = Field(None, description="Filter by team IDs")
+    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
     top_n: int = Field(default=10, ge=1, le=50, description="Number of top intents to track")
 
 
@@ -342,7 +345,7 @@ class IntentTimelineResponseDTO(BaseModel):
     """Intent timeline response"""
     organization_id: str
     date_range: dict[str, str]
-    team_filter: Optional[list[int]] = None
+    team_filter: Optional[list[str]] = None
     top_intents: list[str]  # Top N intents being tracked
     current_distribution: IntentDistributionDTO
     generated_at: datetime

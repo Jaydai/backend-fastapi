@@ -138,7 +138,7 @@ CREATE OR REPLACE FUNCTION "public"."check_team_hierarchy"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
 DECLARE
-    current_parent_id BIGINT;
+    current_parent_id UUID;
     depth INTEGER := 0;
     max_depth INTEGER := 10; -- Prevent infinite loops
 BEGIN
