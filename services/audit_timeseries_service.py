@@ -105,33 +105,37 @@ class AuditTimeSeriesService:
                 generated_at=datetime.now()
             )
 
-        date_trunc = _get_date_trunc_sql(granularity)
+        # Fetch all enriched_chats for the organization within date range
+        overall_result = client.table("enriched_chats") \
+            .select("created_at, chat_id, user_id") \
+            .in_("user_id", user_ids) \
+            .gte("created_at", start_dt.isoformat()) \
+            .lte("created_at", end_dt.isoformat()) \
+            .execute()
 
-        # Get overall usage timeline
-        overall_query = f"""
-            SELECT
-                {date_trunc} as date,
-                COUNT(DISTINCT chat_id) as chat_count,
-                COUNT(*) as message_count
-            FROM enriched_chats
-            WHERE user_id = ANY($1)
-                AND created_at >= $2
-                AND created_at <= $3
-            GROUP BY date
-            ORDER BY date
-        """
+        # Group by date based on granularity
+        date_counts = defaultdict(int)
+        for row in (overall_result.data or []):
+            created_at = datetime.fromisoformat(row["created_at"].replace('Z', '+00:00'))
 
-        overall_result = client.rpc('exec_sql', {
-            'sql': overall_query,
-            'params': [user_ids, start_dt.isoformat(), end_dt.isoformat()]
-        }).execute()
+            # Truncate date based on granularity
+            if granularity == "week":
+                # Get start of week (Monday)
+                date_key = (created_at - timedelta(days=created_at.weekday())).date()
+            elif granularity == "month":
+                date_key = created_at.replace(day=1).date()
+            else:  # day
+                date_key = created_at.date()
 
+            date_counts[date_key] += 1
+
+        # Convert to sorted timeline
         overall_timeline = [
             TimeSeriesDataPointDTO(
-                date=row["date"].split("T")[0],
-                value=float(row["message_count"])
+                date=str(date),
+                value=float(count)
             )
-            for row in (overall_result.data or [])
+            for date, count in sorted(date_counts.items())
         ]
 
         # Get by-team breakdown if teams specified
@@ -149,17 +153,30 @@ class AuditTimeSeriesService:
                 if not team_user_ids:
                     continue
 
-                team_result = client.rpc('exec_sql', {
-                    'sql': overall_query,
-                    'params': [team_user_ids, start_dt.isoformat(), end_dt.isoformat()]
-                }).execute()
+                # Filter data for this team
+                team_date_counts = defaultdict(int)
+                for row in (overall_result.data or []):
+                    if row["user_id"] not in team_user_ids:
+                        continue
+
+                    created_at = datetime.fromisoformat(row["created_at"].replace('Z', '+00:00'))
+
+                    # Truncate date based on granularity
+                    if granularity == "week":
+                        date_key = (created_at - timedelta(days=created_at.weekday())).date()
+                    elif granularity == "month":
+                        date_key = created_at.replace(day=1).date()
+                    else:  # day
+                        date_key = created_at.date()
+
+                    team_date_counts[date_key] += 1
 
                 by_team[team.name] = [
                     TimeSeriesDataPointDTO(
-                        date=row["date"].split("T")[0],
-                        value=float(row["message_count"])
+                        date=str(date),
+                        value=float(count)
                     )
-                    for row in (team_result.data or [])
+                    for date, count in sorted(team_date_counts.items())
                 ]
 
         # Calculate totals
