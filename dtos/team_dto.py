@@ -40,7 +40,7 @@ class UpdateTeamMemberRoleRequestDTO(BaseModel):
 class TeamMemberDTO(BaseModel):
     """Team member response"""
     user_id: str
-    team_id: int
+    team_id: str
     role: str
     email: str
     name: Optional[str] = None
@@ -49,11 +49,11 @@ class TeamMemberDTO(BaseModel):
 
 class TeamDTO(BaseModel):
     """Basic team response"""
-    id: int
+    id: str
     organization_id: str
     name: str
     description: Optional[str] = None
-    parent_team_id: Optional[int] = None
+    parent_team_id: Optional[str] = None
     color: str
     created_at: datetime
     updated_at: datetime
@@ -62,11 +62,11 @@ class TeamDTO(BaseModel):
 
 class TeamWithMembersDTO(BaseModel):
     """Team with member details"""
-    id: int
+    id: str
     organization_id: str
     name: str
     description: Optional[str] = None
-    parent_team_id: Optional[int] = None
+    parent_team_id: Optional[str] = None
     color: str
     created_at: datetime
     updated_at: datetime
@@ -76,15 +76,15 @@ class TeamWithMembersDTO(BaseModel):
 
 class TeamTreeNodeDTO(BaseModel):
     """Hierarchical team tree node"""
-    id: int
+    id: str
     organization_id: str
     name: str
     description: Optional[str] = None
-    parent_team_id: Optional[int] = None
+    parent_team_id: Optional[str] = None
     color: str
     member_count: int = 0
     depth: int = 0
-    path: list[int] = []
+    path: list[str] = []
     children: list['TeamTreeNodeDTO'] = []
 
 
