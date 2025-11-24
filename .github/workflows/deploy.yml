@@ -24,6 +24,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+        # Add runtime env variables for enrichment/chat classification and OpenAI
+        env:
+          MESSAGE_ENRICHMENT_ASSISTANT_ID: ${{ secrets.MESSAGE_ENRICHMENT_ASSISTANT_ID }}
+          CHAT_CLASSIFICATION_ASSISTANT_ID: ${{ secrets.CHAT_CLASSIFICATION_ASSISTANT_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEFAULT_MODEL: ${{ secrets.DEFAULT_MODEL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         
       - name: Set environment based on branch
         id: set-env
@@ -36,6 +45,12 @@ jobs:
             echo "SUPABASE_SECRET_KEY=${{ secrets.SUPABASE_SECRET_KEY_PROD }}" >> $GITHUB_ENV
             echo "SUPABASE_PUBLISHABLE_KEY=${{ secrets.SUPABASE_PUBLISHABLE_KEY_PROD }}" >> $GITHUB_ENV
             echo "FRONTEND_URL=${{ secrets.FRONTEND_URL_PROD }}" >> $GITHUB_ENV
+            echo "MESSAGE_ENRICHMENT_ASSISTANT_ID=${{ secrets.MESSAGE_ENRICHMENT_ASSISTANT_ID }}" >> $GITHUB_ENV
+            echo "CHAT_CLASSIFICATION_ASSISTANT_ID=${{ secrets.CHAT_CLASSIFICATION_ASSISTANT_ID }}" >> $GITHUB_ENV
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+            echo "DEFAULT_MODEL=${{ secrets.DEFAULT_MODEL }}" >> $GITHUB_ENV
+            echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
           fi
           
       - name: Google Auth
@@ -79,6 +94,12 @@ jobs:
             SUPABASE_SECRET_KEY=${{ env.SUPABASE_SECRET_KEY }}
             SUPABASE_PUBLISHABLE_KEY=${{ env.SUPABASE_PUBLISHABLE_KEY }}
             FRONTEND_URL=${{ env.FRONTEND_URL }}
+            MESSAGE_ENRICHMENT_ASSISTANT_ID=${{ env.MESSAGE_ENRICHMENT_ASSISTANT_ID }}
+            CHAT_CLASSIFICATION_ASSISTANT_ID=${{ env.CHAT_CLASSIFICATION_ASSISTANT_ID }}
+            OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
+            DEFAULT_MODEL=${{ env.DEFAULT_MODEL }}
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ env.GOOGLE_CLIENT_SECRET }}
       - name: Check Domain Verification
         if: env.CUSTOM_DOMAIN != ''
         id: check-domain
