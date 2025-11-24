@@ -12,9 +12,12 @@ logger = logging.getLogger(__name__)
 async def enrich_message(request: Request, dto: EnrichMessageRequestDTO):
     """
     Enrich a single message with risk assessment
+
+    This endpoint can be called without authentication for batch processing scripts.
     """
     try:
-        user_id = request.state.user_id
+        # Allow unauthenticated access for scripts - user_id will be None
+        user_id = getattr(request.state, 'user_id', None)
         result = EnrichmentService.enrich_message(
             request.state.supabase_client,
             user_id,

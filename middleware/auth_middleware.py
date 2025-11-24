@@ -14,7 +14,9 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
     PUBLIC_PATHS_WITHOUT_AUTH = [
         "/",
         "/enrichment",
+        "/enrichment/enrich-message",
         "/enrichment/enrich-message-batch",
+        "/enrichment/enrich-chat",
         "/enrichment/enrich-chat-batch",
         "/docs", # TODO: désactiver en prod
         "/redoc",

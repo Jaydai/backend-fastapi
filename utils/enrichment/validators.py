@@ -34,14 +34,27 @@ def validate_quality_scores(quality_data: dict) -> dict:
     """
     validated = quality_data.copy()
 
-    # Clamp overall score to 0-100
+    # Clamp overall score to 0-100 and convert to int
     if "overall_score" in validated:
-        validated["overall_score"] = max(0, min(100, validated.get("overall_score", 0)))
+        validated["overall_score"] = int(max(0, min(100, validated.get("overall_score", 0))))
 
-    # Clamp individual scores to 1-5
+    # Clamp individual scores to 1-5 and convert to int
     for field in ["clarity", "context", "specificity", "actionability"]:
         if field in validated:
-            validated[field] = max(1, min(5, validated.get(field, 1)))
+            score = validated.get(field, 1)
+            # Convert float to int by rounding
+            validated[field] = int(round(max(1, min(5, score))))
+
+    # Handle complexity score - optional field, but if present must be 1-5, or None if 0
+    if "complexity" in validated:
+        complexity = validated["complexity"]
+        if complexity is not None and isinstance(complexity, (int, float)):
+            if complexity <= 0:
+                # If LLM returns 0 or negative, treat as None (not assessed)
+                validated["complexity"] = None
+            else:
+                # Clamp to valid range 1-5
+                validated["complexity"] = max(1, min(5, int(complexity)))
 
     return validated
 
@@ -73,9 +86,43 @@ def validate_risk_scores(risk_data: dict) -> dict:
                 if cat_data["risk_level"] not in valid_levels:
                     cat_data["risk_level"] = "none"
 
+            # Validate confidence - convert string to number if needed
+            if "confidence" in cat_data:
+                confidence = cat_data["confidence"]
+                if isinstance(confidence, str):
+                    # LLM sometimes returns confidence as string ("low", "medium", "high")
+                    # Convert to numeric value
+                    confidence_map = {
+                        "low": 35.0,
+                        "medium": 65.0,
+                        "high": 90.0
+                    }
+                    cat_data["confidence"] = confidence_map.get(confidence.lower(), 50.0)
+                elif isinstance(confidence, (int, float)):
+                    # Clamp numeric confidence to 0-100
+                    cat_data["confidence"] = max(0.0, min(100.0, float(confidence)))
+                else:
+                    # Invalid type, set to None
+                    cat_data["confidence"] = None
+
     # Validate overall risk score
     if "overall_risk_score" in validated:
         validated["overall_risk_score"] = max(0.0, min(100.0, validated.get("overall_risk_score", 0.0)))
+
+    # Validate overall confidence
+    if "overall_confidence" in validated:
+        confidence = validated["overall_confidence"]
+        if isinstance(confidence, str):
+            confidence_map = {
+                "low": 35.0,
+                "medium": 65.0,
+                "high": 90.0
+            }
+            validated["overall_confidence"] = confidence_map.get(confidence.lower(), 50.0)
+        elif isinstance(confidence, (int, float)):
+            validated["overall_confidence"] = max(0.0, min(100.0, float(confidence)))
+        else:
+            validated["overall_confidence"] = None
 
     return validated
 

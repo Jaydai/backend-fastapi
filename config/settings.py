@@ -71,6 +71,8 @@ class ProdSettings(BaseSettings):
 
     ALLOWED_ORIGINS: list = [
         "https://app.jayd.ai",
+        "https://app.dev.jayd.ai",
+        "https://app.staging.jayd.ai",
         "chrome-extension://enfcjmbdbldomiobfndablekgdkmcipd",
         "https://chatgpt.com",
         "https://claude.ai",
