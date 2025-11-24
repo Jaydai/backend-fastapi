@@ -1,16 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
+
+from fastapi import HTTPException, Request, status
+
+from dtos import BlockResponseDTO, CreateBlockDTO
 from services.block_service import BlockService
-from dtos import CreateBlockDTO, BlockResponseDTO
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.post("", response_model=BlockResponseDTO, status_code=status.HTTP_201_CREATED)
-async def create_block(
-    request: Request,
-    data: CreateBlockDTO
-) -> BlockResponseDTO:
+async def create_block(request: Request, data: CreateBlockDTO) -> BlockResponseDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

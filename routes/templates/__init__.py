@@ -2,9 +2,7 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/templates", tags=["Templates"])
 
-from . import (
-    search_templates,
-    get_all,
+from . import (  # noqa: E402
     create_template,
     get_template_by_id,
     update_template,

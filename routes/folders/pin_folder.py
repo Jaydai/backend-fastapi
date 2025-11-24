@@ -1,16 +1,16 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
+
+from fastapi import HTTPException, Request, status
+
 from services.folder_service import FolderService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.patch("/{folder_id}/pin", status_code=status.HTTP_200_OK)
-async def toggle_pin_folder(
-    request: Request,
-    folder_id: str,
-    pinned: bool
-):
+async def toggle_pin_folder(request: Request, folder_id: str, pinned: bool):
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

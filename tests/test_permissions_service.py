@@ -43,19 +43,10 @@ class TestPermissionsServiceLayer:
         self.user_ids_to_cleanup = []
 
         try:
-            supabase_admin.table("organizations").insert({
-                "id": self.org1_id,
-                "name": "Test Org 1"
-            }).execute()
-            supabase_admin.table("organizations").insert({
-                "id": self.org2_id,
-                "name": "Test Org 2"
-            }).execute()
-            supabase_admin.table("organizations").insert({
-                "id": self.org3_id,
-                "name": "Test Org 3"
-            }).execute()
-            print(f"✅ Created test organizations")
+            supabase_admin.table("organizations").insert({"id": self.org1_id, "name": "Test Org 1"}).execute()
+            supabase_admin.table("organizations").insert({"id": self.org2_id, "name": "Test Org 2"}).execute()
+            supabase_admin.table("organizations").insert({"id": self.org3_id, "name": "Test Org 3"}).execute()
+            print("✅ Created test organizations")
         except Exception as e:
             print(f"⚠️ Could not create organizations: {e}")
 
@@ -69,10 +60,9 @@ class TestPermissionsServiceLayer:
             supabase_admin.table("organizations").delete().eq("id", self.org1_id).execute()
             supabase_admin.table("organizations").delete().eq("id", self.org2_id).execute()
             supabase_admin.table("organizations").delete().eq("id", self.org3_id).execute()
-            print(f"✅ Cleaned up test data")
+            print("✅ Cleaned up test data")
         except Exception as e:
             print(f"⚠️ Cleanup warning: {e}")
-
 
     def assign_role(self, user_id: str, role: RoleEnum, organization_id: str | None) -> str:
         """Helper pour assigner un rôle via insertions directes. Retourne le user_id réel."""
@@ -80,35 +70,35 @@ class TestPermissionsServiceLayer:
             if user_id not in self.user_ids_to_cleanup:
                 email = f"test-{user_id[:8]}@test.com"
 
-                auth_response = supabase_admin.auth.admin.create_user({
-                    "email": email,
-                    "password": "test_password_123",
-                    "email_confirm": True,
-                    "user_metadata": {
-                        "name": f"Test User {user_id[:8]}"
+                auth_response = supabase_admin.auth.admin.create_user(
+                    {
+                        "email": email,
+                        "password": "test_password_123",
+                        "email_confirm": True,
+                        "user_metadata": {"name": f"Test User {user_id[:8]}"},
                     }
-                })
+                )
 
                 created_user_id = auth_response.user.id if auth_response.user else user_id
 
-                supabase_admin.table("users_metadata").insert({
-                    "user_id": created_user_id,
-                    "email": email,
-                    "name": f"Test User {user_id[:8]}",
-                    "pinned_folder_ids": [],
-                    "pinned_block_ids": [],
-                    "pinned_template_ids": [],
-                    "roles": {"organizations": {}}
-                }).execute()
+                supabase_admin.table("users_metadata").insert(
+                    {
+                        "user_id": created_user_id,
+                        "email": email,
+                        "name": f"Test User {user_id[:8]}",
+                        "pinned_folder_ids": [],
+                        "pinned_block_ids": [],
+                        "pinned_template_ids": [],
+                        "roles": {"organizations": {}},
+                    }
+                ).execute()
 
                 self.user_ids_to_cleanup.append(created_user_id)
                 user_id = created_user_id
 
-            supabase_admin.table("user_organization_roles").insert({
-                "user_id": user_id,
-                "role": role.value,
-                "organization_id": organization_id
-            }).execute()
+            supabase_admin.table("user_organization_roles").insert(
+                {"user_id": user_id, "role": role.value, "organization_id": organization_id}
+            ).execute()
 
             org_display = organization_id[:8] + "..." if organization_id else "GLOBAL"
             print(f"  ✅ Assigned {role.value} to user {user_id[:8]}... in org {org_display}")
@@ -116,8 +106,7 @@ class TestPermissionsServiceLayer:
         except Exception as e:
             print(f"  ⚠️ Could not assign role: {e}")
             return user_id
-    
-    
+
     # ========================================================================
     # SCÉNARIO 1: User viewer dans UNE organisation SANS admin global
     # ========================================================================
@@ -138,14 +127,18 @@ class TestPermissionsServiceLayer:
 
         user_id = str(uuid.uuid4())
         user_id = self.assign_role(user_id, RoleEnum.VIEWER, self.org1_id)
-        
+
         # Test READ dans son org: DOIT pouvoir
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id
+        )
         print(f"\n  READ org1: {result}")
         assert result, "❌ Viewer devrait pouvoir lire dans son org"
 
         # Test READ dans autre org: NE DOIT PAS pouvoir
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org2_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org2_id
+        )
         print(f"  READ org2: {result}")
         assert not result, "❌ Viewer ne devrait PAS pouvoir lire autre org"
 
@@ -155,7 +148,9 @@ class TestPermissionsServiceLayer:
         assert result, "❌ Viewer devrait pouvoir lire ressources globales"
 
         # Test CREATE dans son org: NE DOIT PAS pouvoir (viewer = lecture uniquement)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_CREATE, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_CREATE, self.org1_id
+        )
         print(f"  CREATE org1: {result}")
         assert not result, "❌ Viewer ne devrait PAS pouvoir créer"
 
@@ -182,29 +177,37 @@ class TestPermissionsServiceLayer:
         user_id = str(uuid.uuid4())
         user_id = self.assign_role(user_id, RoleEnum.ADMIN, organization_id=None)  # Admin global
         user_id = self.assign_role(user_id, RoleEnum.VIEWER, self.org1_id)  # Aussi viewer dans org1
-        
+
         # Test: Vérifier que c'est bien un admin global
         is_admin = PermissionService.user_is_global_admin(supabase_admin, user_id)
         print(f"\n  Is global admin: {is_admin}")
         assert is_admin, "❌ Devrait être admin global"
 
         # Test READ org1: DOIT pouvoir
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id
+        )
         print(f"  READ org1: {result}")
         assert result, "❌ Admin global devrait pouvoir lire org1"
 
         # Test READ org2 (pas de rôle org): DOIT pouvoir (fallback admin global)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org2_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org2_id
+        )
         print(f"  READ org2: {result}")
         assert result, "❌ Admin global devrait pouvoir lire org2"
 
         # Test READ org3 (pas de rôle org): DOIT pouvoir (fallback admin global)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org3_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org3_id
+        )
         print(f"  READ org3: {result}")
         assert result, "❌ Admin global devrait pouvoir lire org3"
 
         # Test DELETE org2 (permission haute): DOIT pouvoir (admin global bypass)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_DELETE, self.org2_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_DELETE, self.org2_id
+        )
         print(f"  DELETE org2: {result}")
         assert result, "❌ Admin global devrait pouvoir supprimer partout"
 
@@ -236,24 +239,32 @@ class TestPermissionsServiceLayer:
         user_id = str(uuid.uuid4())
         user_id = self.assign_role(user_id, RoleEnum.VIEWER, self.org1_id)
         user_id = self.assign_role(user_id, RoleEnum.VIEWER, self.org2_id)
-        
+
         # Test READ org1: DOIT pouvoir
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id
+        )
         print(f"\n  READ org1: {result}")
         assert result, "❌ Viewer devrait pouvoir lire org1"
 
         # Test READ org2: DOIT pouvoir
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org2_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org2_id
+        )
         print(f"  READ org2: {result}")
         assert result, "❌ Viewer devrait pouvoir lire org2"
 
         # Test READ org3 (pas membre): NE DOIT PAS pouvoir
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org3_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org3_id
+        )
         print(f"  READ org3: {result}")
         assert not result, "❌ Viewer ne devrait PAS pouvoir lire org3"
 
         # Test CREATE org1: NE DOIT PAS pouvoir (viewer uniquement)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_CREATE, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_CREATE, self.org1_id
+        )
         print(f"  CREATE org1: {result}")
         assert not result, "❌ Viewer ne devrait PAS pouvoir créer"
 
@@ -286,39 +297,53 @@ class TestPermissionsServiceLayer:
         user_id = str(uuid.uuid4())
         user_id = self.assign_role(user_id, RoleEnum.ADMIN, self.org1_id)
         user_id = self.assign_role(user_id, RoleEnum.VIEWER, self.org2_id)
-        
+
         # Test READ org1: DOIT pouvoir (admin)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id
+        )
         print(f"\n  READ org1: {result}")
         assert result, "❌ Admin org1 devrait pouvoir lire org1"
 
         # Test CREATE org1: DOIT pouvoir (admin)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_CREATE, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_CREATE, self.org1_id
+        )
         print(f"  CREATE org1: {result}")
         assert result, "❌ Admin org1 devrait pouvoir créer dans org1"
 
         # Test DELETE org1: DOIT pouvoir (admin)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_DELETE, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_DELETE, self.org1_id
+        )
         print(f"  DELETE org1: {result}")
         assert result, "❌ Admin org1 devrait pouvoir supprimer dans org1"
 
         # Test READ org2: DOIT pouvoir (viewer)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org2_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org2_id
+        )
         print(f"  READ org2: {result}")
         assert result, "❌ Viewer org2 devrait pouvoir lire org2"
 
         # Test CREATE org2: NE DOIT PAS pouvoir (viewer uniquement)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_CREATE, self.org2_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_CREATE, self.org2_id
+        )
         print(f"  CREATE org2: {result}")
         assert not result, "❌ Viewer org2 ne devrait PAS pouvoir créer dans org2"
 
         # Test DELETE org2: NE DOIT PAS pouvoir (viewer uniquement)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_DELETE, self.org2_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_DELETE, self.org2_id
+        )
         print(f"  DELETE org2: {result}")
         assert not result, "❌ Viewer org2 ne devrait PAS pouvoir supprimer dans org2"
 
         # Test READ org3: NE DOIT PAS pouvoir (pas de rôle)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org3_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org3_id
+        )
         print(f"  READ org3: {result}")
         assert not result, "❌ Ne devrait PAS pouvoir lire org3"
 
@@ -354,7 +379,9 @@ class TestPermissionsServiceLayer:
         assert result, "❌ Ressources globales devraient être accessibles à tous"
 
         # Test READ org1: NE DOIT PAS pouvoir (pas de rôle)
-        result = PermissionService.user_has_permission(supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id)
+        result = PermissionService.user_has_permission(
+            supabase_admin, user_id, PermissionEnum.TEMPLATE_READ, self.org1_id
+        )
         print(f"  READ org1: {result}")
         assert not result, "❌ User sans rôle ne devrait PAS accéder aux orgs"
 

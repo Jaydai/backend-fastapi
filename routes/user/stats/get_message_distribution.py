@@ -1,9 +1,11 @@
-from fastapi import Request, status, HTTPException
 import logging
 
-from . import router
-from services.stats_service import StatsService
+from fastapi import HTTPException, Request, status
+
 from dtos.stats_dto import MessageDistributionDTO
+from services.stats_service import StatsService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +32,5 @@ async def get_message_distribution(request: Request) -> MessageDistributionDTO:
     except Exception as e:
         logger.error(f"Error getting message distribution for {user_id}: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get message distribution: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get message distribution: {str(e)}"
         )

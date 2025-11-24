@@ -1,9 +1,13 @@
 """Enrich multiple messages endpoint"""
+
+import logging
+
 from fastapi import HTTPException, Request
-from . import router
+
 from dtos.enrichment_dto import EnrichMessageBatchRequestDTO
 from services.enrichment_service import EnrichmentService
-import logging
+
+from . import router
 
 logger = logging.getLogger(__name__)
 

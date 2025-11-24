@@ -2,6 +2,7 @@ from domains.entities import Folder, Template
 from dtos import FolderResponseDTO, FolderWithItemsDTO
 from services.locale_service import LocaleService
 
+
 class FolderMapper:
     @staticmethod
     def entity_to_response_dto(folder: Folder, locale: str = LocaleService.DEFAULT_LOCALE) -> FolderResponseDTO:
@@ -14,7 +15,7 @@ class FolderMapper:
             parent_folder_id=folder.parent_folder_id,
             workspace_type=folder.workspace_type,
             created_at=folder.created_at,
-            updated_at=folder.updated_at
+            updated_at=folder.updated_at,
         )
 
     @staticmethod
@@ -23,7 +24,7 @@ class FolderMapper:
         templates: list[Template],
         locale: str = LocaleService.DEFAULT_LOCALE,
         total_count: int = 0,
-        has_more: bool = False
+        has_more: bool = False,
     ) -> FolderWithItemsDTO:
         from mappers.template_mapper import TemplateMapper
 
@@ -31,8 +32,5 @@ class FolderMapper:
         template_dtos = [TemplateMapper.entity_to_list_item_dto(t, locale) for t in templates]
 
         return FolderWithItemsDTO(
-            folders=folder_dtos,
-            templates=template_dtos,
-            total_count=total_count,
-            has_more=has_more
+            folders=folder_dtos, templates=template_dtos, total_count=total_count, has_more=has_more
         )

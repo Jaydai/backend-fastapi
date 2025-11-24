@@ -1,11 +1,13 @@
 """
 Improved Classification Service with better error handling and validation
 """
+
 import json
 import logging
 import time
+
 from openai import OpenAI
-from typing import Optional
+
 from config.enrichment_config import enrichment_config
 
 logger = logging.getLogger(__name__)
@@ -30,17 +32,13 @@ class ClassificationService:
     def _load_prompt_template() -> str:
         """Load classification prompt from file (legacy mode)"""
         try:
-            with open("prompts/chat_classification_quality.txt", "r") as f:
+            with open("prompts/chat_classification_quality.txt") as f:
                 return f.read()
         except FileNotFoundError:
             logger.error("Classification prompt file not found")
             raise
 
-    def classify_chat(
-        self,
-        user_message: str,
-        assistant_response: Optional[str] = None
-    ) -> dict:
+    def classify_chat(self, user_message: str, assistant_response: str | None = None) -> dict:
         """
         Classify a chat and evaluate its quality
 
@@ -50,11 +48,9 @@ class ClassificationService:
         start_time = time.time()
 
         # Truncate messages if needed
-        user_message_truncated = user_message[:enrichment_config.MAX_TRUNCATED_MESSAGE_LENGTH]
+        user_message_truncated = user_message[: enrichment_config.MAX_TRUNCATED_MESSAGE_LENGTH]
         assistant_response_truncated = (
-            assistant_response[:enrichment_config.MAX_TRUNCATED_MESSAGE_LENGTH]
-            if assistant_response
-            else "N/A"
+            assistant_response[: enrichment_config.MAX_TRUNCATED_MESSAGE_LENGTH] if assistant_response else "N/A"
         )
 
         if self.use_assistant:
@@ -96,16 +92,13 @@ class ClassificationService:
                     messages=[
                         {
                             "role": "system",
-                            "content": "You are a prompt classification and quality evaluation expert. Respond only with valid JSON."
+                            "content": "You are a prompt classification and quality evaluation expert. Respond only with valid JSON.",
                         },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
+                        {"role": "user", "content": prompt},
                     ],
                     temperature=enrichment_config.CLASSIFICATION_TEMPERATURE,
                     max_tokens=enrichment_config.CLASSIFICATION_MAX_TOKENS,
-                    response_format={"type": "json_object"}
+                    response_format={"type": "json_object"},
                 )
 
                 content = response.choices[0].message.content
@@ -224,6 +217,7 @@ class ClassificationService:
         Validate LLM response structure and provide defaults if needed
         """
         from utils.enrichment import sanitize_classification_result
+
         return sanitize_classification_result(raw_response)
 
 

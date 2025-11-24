@@ -1,8 +1,7 @@
-from supabase import Client
-from repositories import PermissionRepository
 from domains.entities import UserOrganizationRole
 from domains.enums import PermissionEnum, RoleEnum
 from repositories import PermissionRepository
+from supabase import Client
 
 
 class PermissionService:
@@ -12,9 +11,7 @@ class PermissionService:
 
     @staticmethod
     def _check_organization_permission(
-        org_roles: list[UserOrganizationRole],
-        global_roles: list[UserOrganizationRole],
-        permission: PermissionEnum
+        org_roles: list[UserOrganizationRole], global_roles: list[UserOrganizationRole], permission: PermissionEnum
     ) -> bool:
         for role in org_roles:
             if role.has_permission(permission):
@@ -34,7 +31,9 @@ class PermissionService:
         return False
 
     @staticmethod
-    def user_has_permission(client: Client, user_id: str, permission: PermissionEnum, organization_id: str | None = None) -> bool:
+    def user_has_permission(
+        client: Client, user_id: str, permission: PermissionEnum, organization_id: str | None = None
+    ) -> bool:
         """Check if user has permission for a resource (organization or global)."""
         if PermissionService._is_global_resource(organization_id):
             # Global resources are PUBLIC - accessible to everyone
@@ -47,7 +46,9 @@ class PermissionService:
             return PermissionService._is_global_admin(global_roles)
 
         # Organization-specific resource
-        roles: list[UserOrganizationRole] = PermissionRepository.get_user_organization_roles(client, user_id, organization_id)
+        roles: list[UserOrganizationRole] = PermissionRepository.get_user_organization_roles(
+            client, user_id, organization_id
+        )
         if not roles:
             return False
 
@@ -57,7 +58,9 @@ class PermissionService:
         return PermissionService._check_organization_permission(org_roles, global_roles, permission)
 
     @staticmethod
-    def user_has_permission_in_organization(client: Client, user_id: str, permission: PermissionEnum, organization_id: str) -> bool:
+    def user_has_permission_in_organization(
+        client: Client, user_id: str, permission: PermissionEnum, organization_id: str
+    ) -> bool:
         """Alias for user_has_permission for backward compatibility."""
         return PermissionService.user_has_permission(client, user_id, permission, organization_id)
 

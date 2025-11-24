@@ -32,7 +32,8 @@ async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
         set_auth_cookies(response, session)
 
         # Get Supabase auth user (for email, created_at, etc.)
-        from core.supabase import supabase, create_authenticated_client
+        from core.supabase import create_authenticated_client, supabase
+
         auth_response = supabase.auth.get_user(session.access_token)
         auth_user = auth_response.user
 
@@ -53,17 +54,14 @@ async def sign_in(sign_in_dto: SignInDTO, request: Request, response: Response):
         # Return complete user info
         return {
             "success": True,
-            "session": {
-                "access_token": session.access_token,
-                "refresh_token": session.refresh_token
-            },
+            "session": {"access_token": session.access_token, "refresh_token": session.refresh_token},
             "user": {
                 "id": auth_user.id,
                 "email": auth_user.email,
                 "full_name": metadata.name if metadata else auth_user.user_metadata.get("full_name"),
                 "avatar_url": metadata.profile_picture_url if metadata else auth_user.user_metadata.get("avatar_url"),
-                "created_at": auth_user.created_at
-            }
+                "created_at": auth_user.created_at,
+            },
         }
 
     except HTTPException:

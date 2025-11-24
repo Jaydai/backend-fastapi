@@ -89,6 +89,7 @@ def create_test_user(supabase_admin: Client):
     Factory fixture pour se connecter avec l'utilisateur de test existant
     Returns tuple (user_id, access_token)
     """
+
     def _create_user(user_id: str | None = None, email: str | None = None) -> tuple[str, str]:
         # Use existing test user instead of creating new ones
         email = "vincent@jayd.ai"
@@ -96,10 +97,7 @@ def create_test_user(supabase_admin: Client):
 
         try:
             # Sign in with existing user
-            sign_in_response = supabase_admin.auth.sign_in_with_password({
-                "email": email,
-                "password": password
-            })
+            sign_in_response = supabase_admin.auth.sign_in_with_password({"email": email, "password": password})
 
             if not sign_in_response.session or not sign_in_response.user:
                 print("Warning: Failed to sign in test user")
@@ -112,15 +110,17 @@ def create_test_user(supabase_admin: Client):
             existing = supabase_admin.table("users_metadata").select("*").eq("user_id", created_user_id).execute()
 
             if not existing.data:
-                supabase_admin.table("users_metadata").insert({
-                    "user_id": created_user_id,
-                    "email": email,
-                    "name": "Vincent Test",
-                    "pinned_folder_ids": [],
-                    "pinned_block_ids": [],
-                    "pinned_template_ids": [],
-                    "roles": {"organizations": {}}
-                }).execute()
+                supabase_admin.table("users_metadata").insert(
+                    {
+                        "user_id": created_user_id,
+                        "email": email,
+                        "name": "Vincent Test",
+                        "pinned_folder_ids": [],
+                        "pinned_block_ids": [],
+                        "pinned_template_ids": [],
+                        "roles": {"organizations": {}},
+                    }
+                ).execute()
 
             return (created_user_id, access_token)
         except Exception as e:
@@ -135,6 +135,7 @@ def create_test_organization(supabase_admin: Client):
     """
     Factory fixture pour utiliser l'organisation existante de vincent@jayd.ai
     """
+
     def _create_org(org_id: str | None = None, org_name: str | None = None) -> str:
         # Use existing Jaydai organization for vincent@jayd.ai
         return "19864b30-936d-4a8d-996a-27d17f11f00f"
@@ -147,29 +148,28 @@ def assign_role(supabase_admin: Client):
     """
     Factory fixture pour assigner ou mettre à jour des rôles
     """
+
     def _assign_role(user_id: str, role: str, organization_id: str | None = None):
         try:
             # Check if role already exists
-            existing = supabase_admin.table("user_organization_roles")\
-                .select("*")\
-                .eq("user_id", user_id)\
-                .eq("organization_id", organization_id)\
+            existing = (
+                supabase_admin.table("user_organization_roles")
+                .select("*")
+                .eq("user_id", user_id)
+                .eq("organization_id", organization_id)
                 .execute()
+            )
 
             if existing.data:
                 # Update existing role
-                supabase_admin.table("user_organization_roles")\
-                    .update({"role": role})\
-                    .eq("user_id", user_id)\
-                    .eq("organization_id", organization_id)\
-                    .execute()
+                supabase_admin.table("user_organization_roles").update({"role": role}).eq("user_id", user_id).eq(
+                    "organization_id", organization_id
+                ).execute()
             else:
                 # Insert new role
-                supabase_admin.table("user_organization_roles").insert({
-                    "user_id": user_id,
-                    "role": role,
-                    "organization_id": organization_id
-                }).execute()
+                supabase_admin.table("user_organization_roles").insert(
+                    {"user_id": user_id, "role": role, "organization_id": organization_id}
+                ).execute()
         except Exception as e:
             print(f"Warning assigning role: {e}")
 
@@ -181,10 +181,7 @@ def authenticated_headers(test_user_id: str) -> dict:
     """
     Headers d'authentification pour les tests
     """
-    return {
-        "Authorization": f"Bearer mock_token_{test_user_id}",
-        "Accept-Language": "en"
-    }
+    return {"Authorization": f"Bearer mock_token_{test_user_id}", "Accept-Language": "en"}
 
 
 @pytest.fixture

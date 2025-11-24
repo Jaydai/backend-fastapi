@@ -1,15 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
+
+from fastapi import HTTPException, Request, status
+
+from dtos import BlockResponseDTO, BlockType, CreateBlockDTO
 from services.block_service import BlockService
-from dtos import BlockResponseDTO, CreateBlockDTO, BlockType
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.post("/seed-samples", response_model=list[BlockResponseDTO], status_code=status.HTTP_201_CREATED)
-async def seed_sample_blocks(
-    request: Request
-) -> list[BlockResponseDTO]:
+async def seed_sample_blocks(request: Request) -> list[BlockResponseDTO]:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
@@ -28,29 +30,29 @@ async def seed_sample_blocks(
                 title="Professional Context",
                 description="Sets a professional tone for business communications",
                 content="You are a professional assistant helping with business tasks. Maintain a formal and respectful tone.",
-                published=True
+                published=True,
             ),
             CreateBlockDTO(
                 type=BlockType.OUTPUT_FORMAT,
                 title="Markdown Output",
                 description="Format output as markdown",
                 content="Format your response using markdown syntax with proper headings, lists, and code blocks where appropriate.",
-                published=True
+                published=True,
             ),
             CreateBlockDTO(
                 type=BlockType.EXAMPLE,
                 title="API Response Example",
                 description="Example of a well-structured API response",
                 content='{\n  "status": "success",\n  "data": {\n    "id": 123,\n    "name": "Example"\n  }\n}',
-                published=True
+                published=True,
             ),
             CreateBlockDTO(
                 type=BlockType.CONSTRAINT,
                 title="Concise Responses",
                 description="Keep responses brief and to the point",
                 content="Keep your responses concise and focused. Avoid unnecessary elaboration.",
-                published=True
-            )
+                published=True,
+            ),
         ]
 
         created_blocks = []

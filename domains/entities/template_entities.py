@@ -16,11 +16,13 @@ class Template:
     published: bool
 
 
+
 @dataclass
 class TemplateCommentAuthor:
     id: str
     name: str
     avatar: str | None
+
 
 @dataclass
 class TemplateComment:
@@ -32,6 +34,7 @@ class TemplateComment:
     author: TemplateCommentAuthor
     mentions: list
     replies: list
+
 
 @dataclass
 class TemplateTitle:

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class Folder:
     id: str
@@ -11,6 +12,7 @@ class Folder:
     workspace_type: str
     created_at: str
     updated_at: str | None
+
 
 @dataclass
 class FolderWithItems:

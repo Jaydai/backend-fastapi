@@ -1,7 +1,6 @@
 from fastapi import Response
-from domains.entities import Session
-from config.settings import settings, Environment
 
+from config.settings import Environment, settings
 from domains.entities import Session
 
 COOKIE_MAX_AGE = 7 * 24 * 60 * 60  # 7 days
@@ -43,31 +42,17 @@ def set_auth_cookies(response: Response, session: Session) -> None:
     secure = is_secure_cookie()
 
     # Common cookie parameters
-    cookie_params = {
-        "httponly": True,
-        "secure": secure,
-        "samesite": "lax",
-        "max_age": COOKIE_MAX_AGE,
-        "path": "/"
-    }
+    cookie_params = {"httponly": True, "secure": secure, "samesite": "lax", "max_age": COOKIE_MAX_AGE, "path": "/"}
 
     # Add domain if applicable (not for localhost)
     if cookie_domain:
         cookie_params["domain"] = cookie_domain
 
     # Set access token cookie
-    response.set_cookie(
-        key=ACCESS_COOKIE_KEY,
-        value=session.access_token,
-        **cookie_params
-    )
+    response.set_cookie(key=ACCESS_COOKIE_KEY, value=session.access_token, **cookie_params)
 
     # Set refresh token cookie
-    response.set_cookie(
-        key=REFRESH_COOKIE_KEY,
-        value=session.refresh_token,
-        **cookie_params
-    )
+    response.set_cookie(key=REFRESH_COOKIE_KEY, value=session.refresh_token, **cookie_params)
 
 
 def clear_auth_cookies(response: Response) -> None:
@@ -82,11 +67,5 @@ def clear_auth_cookies(response: Response) -> None:
     if cookie_domain:
         delete_params["domain"] = cookie_domain
 
-    response.delete_cookie(
-        key=ACCESS_COOKIE_KEY,
-        **delete_params
-    )
-    response.delete_cookie(
-        key=REFRESH_COOKIE_KEY,
-        **delete_params
-    )
+    response.delete_cookie(key=ACCESS_COOKIE_KEY, **delete_params)
+    response.delete_cookie(key=REFRESH_COOKIE_KEY, **delete_params)

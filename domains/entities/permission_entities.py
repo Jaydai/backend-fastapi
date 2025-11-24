@@ -11,7 +11,7 @@ class UserOrganizationRole:
 
     def has_permission(self, permission: PermissionEnum) -> bool:
         return permission in ROLE_PERMISSIONS.get(self.role, [])
-    
+
     def is_global(self) -> bool:
         return self.organization_id is None
 
@@ -54,7 +54,7 @@ ROLE_PERMISSIONS: dict[RoleEnum, list[PermissionEnum]] = {
         PermissionEnum.BLOCK_READ,
         PermissionEnum.BLOCK_UPDATE,
         PermissionEnum.BLOCK_DELETE,
-        PermissionEnum.ORGANIZATION_READ
+        PermissionEnum.ORGANIZATION_READ,
     ],
     RoleEnum.VIEWER: [
         PermissionEnum.COMMENT_CREATE,
@@ -63,12 +63,12 @@ ROLE_PERMISSIONS: dict[RoleEnum, list[PermissionEnum]] = {
         PermissionEnum.COMMENT_DELETE,
         PermissionEnum.TEMPLATE_READ,
         PermissionEnum.BLOCK_READ,
-        PermissionEnum.ORGANIZATION_READ
+        PermissionEnum.ORGANIZATION_READ,
     ],
     RoleEnum.GUEST: [
         PermissionEnum.COMMENT_READ,
         PermissionEnum.TEMPLATE_READ,
         PermissionEnum.BLOCK_READ,
-        PermissionEnum.ORGANIZATION_READ
+        PermissionEnum.ORGANIZATION_READ,
     ],
 }

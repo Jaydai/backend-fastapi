@@ -1,5 +1,6 @@
-from fastapi import HTTPException, Request, status
 import logging
+
+from fastapi import HTTPException, Request, status
 
 from . import router
 
@@ -10,6 +11,5 @@ logger = logging.getLogger(__name__)
 async def delete_organization(request: Request, organization_id: str) -> dict:
     logger.warning(f"Attempted to call unimplemented endpoint: DELETE /organizations/{organization_id}")
     raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Organization deletion is not yet implemented"
+        status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Organization deletion is not yet implemented"
     )

@@ -1,33 +1,30 @@
 """
 Domain entities for audit functionality
 """
+
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 
 
 @dataclass
 class QualityStats:
     """Quality statistics aggregation"""
+
     average_score: float
-    median_score: Optional[float] = None
-    distribution: Optional[dict[str, int]] = None  # excellent, good, medium, poor
+    median_score: float | None = None
+    distribution: dict[str, int] | None = None  # excellent, good, medium, poor
     total_rated: int = 0
-    trend_change: Optional[float] = None  # Percentage change vs previous period
+    trend_change: float | None = None  # Percentage change vs previous period
 
     def __post_init__(self):
         if self.distribution is None:
-            self.distribution = {
-                "excellent": 0,
-                "good": 0,
-                "medium": 0,
-                "poor": 0
-            }
+            self.distribution = {"excellent": 0, "good": 0, "medium": 0, "poor": 0}
 
 
 @dataclass
 class RiskStats:
     """Risk statistics aggregation"""
+
     total_messages_assessed: int = 0
     critical_count: int = 0
     high_count: int = 0
@@ -38,7 +35,7 @@ class RiskStats:
     credentials_detected_count: int = 0
     sensitive_data_count: int = 0
     average_risk_score: float = 0.0
-    risk_distribution: Optional[dict[str, int]] = None
+    risk_distribution: dict[str, int] | None = None
 
     def __post_init__(self):
         if self.risk_distribution is None:
@@ -47,13 +44,14 @@ class RiskStats:
                 "high": self.high_count,
                 "medium": self.medium_count,
                 "low": self.low_count,
-                "none": self.none_count
+                "none": self.none_count,
             }
 
 
 @dataclass
 class UsageStats:
     """Usage statistics aggregation"""
+
     total_prompts: int = 0
     total_chats: int = 0
     active_users: int = 0
@@ -67,9 +65,10 @@ class UsageStats:
 @dataclass
 class ThemeStats:
     """Theme distribution statistics"""
+
     top_themes: list[dict[str, any]] = None  # [{"theme": str, "count": int, "percentage": float}]
     total_categorized: int = 0
-    trend_change: Optional[dict[str, float]] = None  # Per-theme percentage changes
+    trend_change: dict[str, float] | None = None  # Per-theme percentage changes
 
     def __post_init__(self):
         if self.top_themes is None:
@@ -81,6 +80,7 @@ class ThemeStats:
 @dataclass
 class IntentStats:
     """Intent distribution statistics"""
+
     top_intents: list[dict[str, any]] = None  # [{"intent": str, "count": int, "avg_quality": float}]
     total_categorized: int = 0
 
@@ -92,30 +92,33 @@ class IntentStats:
 @dataclass
 class TopUser:
     """Top user by activity"""
+
     user_id: str
     email: str
     total_prompts: int
     average_quality: float
     work_prompts: int
     high_risk_messages: int
-    name: Optional[str] = None
+    name: str | None = None
 
 
 @dataclass
 class TopPrompt:
     """Top quality prompt"""
+
     chat_provider_id: str
     quality_score: int
     theme: str
     intent: str
     content_preview: str  # First 200 chars
     created_at: datetime
-    message_provider_id: Optional[str] = None
+    message_provider_id: str | None = None
 
 
 @dataclass
 class RiskyPrompt:
     """High-risk prompt"""
+
     message_provider_id: str
     risk_level: str
     risk_score: float
@@ -131,6 +134,7 @@ class RiskyPrompt:
 @dataclass
 class OrganizationAudit:
     """Complete organization audit data"""
+
     organization_id: str
     organization_name: str
     date_range: dict[str, str]  # start_date, end_date

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from domains.entities import VersionSummary
 
+
 class CreateTemplateDTO(BaseModel):
     title: str
     description: str | None = None
@@ -11,6 +12,7 @@ class CreateTemplateDTO(BaseModel):
     category: str | None = None
     is_public: bool | None = None
     optimized_for: list[str] | None = None
+
 
 class UpdateTemplateDTO(BaseModel):
     title: str | None = None
@@ -24,6 +26,7 @@ class UpdateTemplateDTO(BaseModel):
     current_version_id: int | None = None
     version_id: int | None = None
     status: str | None = None
+
 
 class CreateVersionDTO(BaseModel):
     content: str | None = None
@@ -50,10 +53,12 @@ class TemplateListItemDTO(BaseModel):
     is_free: bool
     published: bool
 
+
 class TemplateCommentAuthorDTO(BaseModel):
     id: str
     name: str
     avatar: str | None = None
+
 
 class TemplateCommentDTO(BaseModel):
     id: int
@@ -64,6 +69,7 @@ class TemplateCommentDTO(BaseModel):
     author: TemplateCommentAuthorDTO
     mentions: list = []
     replies: list["TemplateCommentDTO"] = []
+
 
 class TemplateResponseDTO(BaseModel):
     id: str
@@ -80,8 +86,10 @@ class TemplateResponseDTO(BaseModel):
     published: bool
     versions: list[VersionSummary] = []
 
+
 class UsageResponseDTO(BaseModel):
     usage_count: int
+
 
 class TemplateTitleResponseDTO(BaseModel):
     id: str

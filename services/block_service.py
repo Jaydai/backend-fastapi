@@ -21,16 +21,10 @@ class BlockService:
         workspace_type: str | None = None,
         organization_id: str | None = None,
         published: bool | None = None,
-        search_query: str | None = None
+        search_query: str | None = None,
     ) -> list[BlockResponseDTO]:
         blocks = BlockRepository.get_blocks(
-            client,
-            user_id,
-            block_type,
-            workspace_type,
-            organization_id,
-            published,
-            search_query
+            client, user_id, block_type, workspace_type, organization_id, published, search_query
         )
 
         return [BlockMapper.entity_to_response_dto(b, locale) for b in blocks]
@@ -96,7 +90,7 @@ class BlockService:
             content_dict,
             data.published,
             data.organization_id,
-            workspace_type
+            workspace_type,
         )
 
         return BlockMapper.entity_to_response_dto(block, locale)
@@ -114,13 +108,7 @@ class BlockService:
         content_dict = LocaleService.ensure_localized_dict(data.content, locale) if data.content else None
 
         block = BlockRepository.update_block(
-            client,
-            block_id,
-            block_type,
-            title_dict,
-            description_dict,
-            content_dict,
-            data.published
+            client, block_id, block_type, title_dict, description_dict, content_dict, data.published
         )
 
         if not block:
@@ -156,11 +144,7 @@ class BlockService:
         return [BlockMapper.entity_to_response_dto(b, locale) for b in blocks]
 
     @staticmethod
-    def update_pinned_blocks(
-        client: Client,
-        user_id: str,
-        data: UpdatePinnedBlocksDTO
-    ) -> dict:
+    def update_pinned_blocks(client: Client, user_id: str, data: UpdatePinnedBlocksDTO) -> dict:
         for block_id in data.block_ids:
             block = BlockRepository.get_block_by_id(client, block_id)
             if not block:

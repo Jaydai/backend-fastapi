@@ -67,7 +67,7 @@ class TemplateRepository:
         folder_id: str | None,
         organization_id: str | None,
         tags: list[str] | None,
-        workspace_type: str
+        workspace_type: str,
     ) -> Template:
         template_data = {
             "user_id": user_id,
@@ -204,7 +204,7 @@ class TemplateRepository:
         tags: list[str] | None = None,
         include_public: bool = True,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[Template]:
         # Search only user's own templates
         query_builder = client.table("prompt_templates").select("*").eq("user_id", user_id)
@@ -215,18 +215,23 @@ class TemplateRepository:
         if tags:
             query_builder = query_builder.contains("tags", tags)
 
-        query_builder = query_builder.order("usage_count", desc=True).order("created_at", desc=True).range(offset, offset + limit - 1)
+        query_builder = (
+            query_builder.order("usage_count", desc=True)
+            .order("created_at", desc=True)
+            .range(offset, offset + limit - 1)
+        )
 
         response = query_builder.execute()
 
         templates = []
         for data in response.data or []:
-            templates.append(Template(
-                id=data["id"],
-                title=data.get("title", {}),
-                description=data.get("description"),
-                folder_id=data.get("folder_id"),
-                organization_id=data.get("organization_id"),
+            templates.append(
+                Template(
+                    id=data["id"],
+                    title=data.get("title", {}),
+                    description=data.get("description"),
+                    folder_id=data.get("folder_id"),
+                    organization_id=data.get("organization_id"),
                     user_id=data["user_id"],
                 workspace_type=data["workspace_type"],
                 created_at=data["created_at"],
@@ -245,23 +250,27 @@ class TemplateRepository:
     def get_comments(client: Client, template_id: str, locale: str = LocaleService.DEFAULT_LOCALE) -> list[TemplateComment]:
         from domains.entities import TemplateComment, TemplateCommentAuthor
 
-        parent_comments_response = client.table("prompt_templates_comments")\
-            .select("*")\
-            .eq("template_id", template_id)\
-            .is_("parent_comment_id", "null")\
-            .order("created_at", desc=True)\
+        parent_comments_response = (
+            client.table("prompt_templates_comments")
+            .select("*")
+            .eq("template_id", template_id)
+            .is_("parent_comment_id", "null")
+            .order("created_at", desc=True)
             .execute()
+        )
 
         parent_comments_data = parent_comments_response.data or []
 
         all_user_ids = [c.get("user_id") for c in parent_comments_data if c.get("user_id")]
 
         for parent_comment in parent_comments_data:
-            replies_response = client.table("prompt_templates_comments")\
-                .select("*")\
-                .eq("parent_comment_id", parent_comment["id"])\
-                .order("created_at")\
+            replies_response = (
+                client.table("prompt_templates_comments")
+                .select("*")
+                .eq("parent_comment_id", parent_comment["id"])
+                .order("created_at")
                 .execute()
+            )
 
             replies_data = replies_response.data or []
             parent_comment["_replies"] = replies_data
@@ -272,10 +281,12 @@ class TemplateRepository:
 
         users_map = {}
         if all_user_ids:
-            users_resp = client.table("users_metadata")\
-                .select("user_id, name, email, profile_picture_url, metadata")\
-                .in_("user_id", list(set(all_user_ids)))\
+            users_resp = (
+                client.table("users_metadata")
+                .select("user_id, name, email, profile_picture_url, metadata")
+                .in_("user_id", list(set(all_user_ids)))
                 .execute()
+            )
 
             for u in users_resp.data or []:
                 meta = u.get("metadata") or {}
@@ -292,9 +303,7 @@ class TemplateRepository:
             content = LocaleService.localize_string(comment_data.get("content"), locale)
 
             author = TemplateCommentAuthor(
-                id=user_id,
-                name=user_info.get("name", "Unknown"),
-                avatar=user_info.get("profile_picture_url")
+                id=user_id, name=user_info.get("name", "Unknown"), avatar=user_info.get("profile_picture_url")
             )
 
             return TemplateComment(
@@ -305,7 +314,7 @@ class TemplateRepository:
                 created_at=comment_data.get("created_at"),
                 author=author,
                 mentions=comment_data.get("mentions", []),
-                replies=[]
+                replies=[],
             )
 
         comments = []

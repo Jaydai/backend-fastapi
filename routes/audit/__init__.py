@@ -1,20 +1,23 @@
 """
 Audit routes
 """
+
 from fastapi import APIRouter
 
 router = APIRouter()
 
 # Import route handlers to register them
-from . import organization_audit
-from . import quality
-from . import risk
-from . import usage
-from . import themes
-from . import intents
-from . import top_users
-from . import top_prompts
-from . import risky_prompts
+from . import (  # noqa: E402
+    intents,
+    organization_audit,
+    quality,
+    risk,
+    risky_prompts,
+    themes,
+    top_prompts,
+    top_users,
+    usage,
+)
 
 # Time-series endpoints
 from . import adoption_curve

@@ -2,25 +2,29 @@
 Enrichment Service - Business logic layer (REFACTORED with utilities)
 Orchestrates classification, risk assessment, and data persistence
 """
-import logging
-import asyncio
-from supabase import Client
-from typing import Optional
 
+import asyncio
+import logging
+
+from dtos.enrichment_dto import (
+    ChatEnrichmentRequestDTO,
+    ChatEnrichmentResponseDTO,
+    EnrichMessageRequestDTO,
+    EnrichMessageResponseDTO,
+    QualityMetricsDTO,
+    RatedChatDTO,
+    RiskCategoryDetailDTO,
+    RiskyMessageDTO,
+)
 from repositories.enrichment_repository import EnrichmentRepository
 from services.enrichment import classification_service, risk_assessment_service
-from dtos.enrichment_dto import (
-    ChatEnrichmentRequestDTO, ChatEnrichmentResponseDTO,
-    EnrichMessageRequestDTO, EnrichMessageResponseDTO,
-    RiskyMessageDTO, RatedChatDTO, QualityMetricsDTO,
-    RiskCategoryDetailDTO
-)
+from supabase import Client
 from utils.enrichment import (
-    truncate_message,
     classification_to_enriched_chat,
     classification_to_response_dto,
     risk_assessment_to_enriched_message,
-    risk_assessment_to_response_dto
+    risk_assessment_to_response_dto,
+    truncate_message,
 )
 
 logger = logging.getLogger(__name__)
@@ -61,10 +65,7 @@ class EnrichmentService:
         requests: list[ChatEnrichmentRequestDTO]
     ) -> list[dict]:
         """Enrich multiple chats in parallel"""
-        tasks = [
-            EnrichmentService._enrich_chat_async(client, user_id, req)
-            for req in requests
-        ]
+        tasks = [EnrichmentService._enrich_chat_async(client, user_id, req) for req in requests]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -74,7 +75,7 @@ class EnrichmentService:
                 "success": not isinstance(result, Exception),
                 "data": result if not isinstance(result, Exception) else None,
                 "error": str(result) if isinstance(result, Exception) else None,
-                "chat_provider_id": requests[i].chat_provider_id
+                "chat_provider_id": requests[i].chat_provider_id,
             }
             for i, result in enumerate(results)
         ]
@@ -83,11 +84,7 @@ class EnrichmentService:
     async def _enrich_chat_async(client: Client, user_id: Optional[str], request: ChatEnrichmentRequestDTO):
         """Async wrapper for enrich_chat"""
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
-            None,
-            EnrichmentService.enrich_chat,
-            client, user_id, request
-        )
+        return await loop.run_in_executor(None, EnrichmentService.enrich_chat, client, user_id, request)
 
     @staticmethod
     def enrich_message(
@@ -98,9 +95,7 @@ class EnrichmentService:
         """Enrich a single message with risk assessment"""
         # Call risk assessment service
         risk_result = risk_assessment_service.assess_message_risk(
-            content=request.content,
-            role=request.role,
-            context=request.context
+            content=request.content, role=request.role, context=request.context
         )
 
         # Use user_id from request payload if available, otherwise from auth
@@ -126,12 +121,9 @@ class EnrichmentService:
         for request in requests:
             try:
                 result = EnrichmentService.enrich_message(client, user_id, request)
-                results.append({
-                    "success": True,
-                    "data": result,
-                    "error": None,
-                    "message_provider_id": request.message_provider_id
-                })
+                results.append(
+                    {"success": True, "data": result, "error": None, "message_provider_id": request.message_provider_id}
+                )
             except Exception as e:
                 logger.error(f"Failed to enrich message {request.message_provider_id}: {e}")
                 logger.error(f"Exception type: {type(e).__name__}, Exception args: {e.args}")
@@ -148,16 +140,10 @@ class EnrichmentService:
 
     @staticmethod
     def get_risky_messages(
-        client: Client,
-        user_id: str,
-        days: int,
-        min_risk_level: str,
-        limit: int
+        client: Client, user_id: str, days: int, min_risk_level: str, limit: int
     ) -> list[RiskyMessageDTO]:
         """Get risky messages for a user"""
-        enriched_messages = EnrichmentRepository.get_risky_messages(
-            client, user_id, days, min_risk_level, limit
-        )
+        enriched_messages = EnrichmentRepository.get_risky_messages(client, user_id, days, min_risk_level, limit)
 
         # Transform to DTOs
         return [
@@ -167,17 +153,14 @@ class EnrichmentService:
                 risk_score=msg.overall_risk_score,
                 risk_categories={
                     name: RiskCategoryDetailDTO(
-                        level=cat.level,
-                        score=cat.score,
-                        detected=cat.detected,
-                        details=cat.details
+                        level=cat.level, score=cat.score, detected=cat.detected, details=cat.details
                     )
                     for name, cat in msg.risk_categories.items()
                 },
                 risk_summary=msg.risk_summary,
                 content_preview="[Content preview]",  # TODO: Join with messages table
                 created_at=msg.created_at,
-                user_whitelist=msg.user_whitelist
+                user_whitelist=msg.user_whitelist,
             )
             for msg in enriched_messages
         ]
@@ -187,10 +170,10 @@ class EnrichmentService:
         client: Client,
         user_id: str,
         days: int,
-        min_quality: Optional[float],
-        max_quality: Optional[float],
+        min_quality: float | None,
+        max_quality: float | None,
         order_by: str,
-        limit: int
+        limit: int,
     ) -> list[RatedChatDTO]:
         """Get rated chats for a user"""
         enriched_chats = EnrichmentRepository.get_rated_chats(
@@ -209,12 +192,12 @@ class EnrichmentService:
                     clarity_score=chat.quality_metrics.clarity_score if chat.quality_metrics else 0,
                     context_score=chat.quality_metrics.context_score if chat.quality_metrics else 0,
                     specificity_score=chat.quality_metrics.specificity_score if chat.quality_metrics else 0,
-                    actionability_score=chat.quality_metrics.actionability_score if chat.quality_metrics else 0
+                    actionability_score=chat.quality_metrics.actionability_score if chat.quality_metrics else 0,
                 ),
                 content_preview="[Content preview]",  # TODO: Join with messages table
                 created_at=chat.created_at,
                 user_override_quality=chat.user_override_quality,
-                user_quality_score=chat.user_quality_score
+                user_quality_score=chat.user_quality_score,
             )
             for chat in enriched_chats
         ]

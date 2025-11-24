@@ -1,34 +1,39 @@
 """
 DTOs for audit endpoints
 """
-from pydantic import BaseModel, Field
-from typing import Optional
+
 from datetime import datetime
 
+from pydantic import BaseModel, Field
 
 # Request DTOs
 
+
 class OrganizationAuditRequestDTO(BaseModel):
     """Request parameters for organization audit"""
-    start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
-    end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
+
+    start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
 
 
 # Response DTOs
 
+
 class QualityStatsDTO(BaseModel):
     """Quality statistics response"""
+
     average_score: float
-    median_score: Optional[float] = None
+    median_score: float | None = None
     distribution: dict[str, int]  # excellent, good, medium, poor
     total_rated: int
-    trend_change: Optional[float] = None
-    trend_7days: Optional[float] = None  # 7-day trend percentage change
+    trend_change: float | None = None
+    trend_7days: float | None = None  # 7-day trend percentage change
 
 
 class RiskStatsDTO(BaseModel):
     """Risk statistics response"""
+
     total_messages_assessed: int
     critical_count: int
     high_count: int
@@ -40,11 +45,12 @@ class RiskStatsDTO(BaseModel):
     sensitive_data_count: int
     average_risk_score: float
     risk_distribution: dict[str, int]
-    trend_7days: Optional[float] = None  # 7-day trend percentage change in average risk
+    trend_7days: float | None = None  # 7-day trend percentage change in average risk
 
 
 class UsageStatsDTO(BaseModel):
     """Usage statistics response"""
+
     total_prompts: int
     total_chats: int
     active_users: int
@@ -53,28 +59,31 @@ class UsageStatsDTO(BaseModel):
     work_percentage: float
     average_prompts_per_user: float
     average_quality_score: float
-    daily_average: Optional[float] = None  # Average prompts per day over the period
-    trend_7days: Optional[float] = None  # 7-day trend percentage change in daily prompts
+    daily_average: float | None = None  # Average prompts per day over the period
+    trend_7days: float | None = None  # 7-day trend percentage change in daily prompts
 
 
 class ThemeStatsDTO(BaseModel):
     """Theme distribution response"""
+
     top_themes: list[dict]  # [{"theme": str, "count": int, "percentage": float}]
     total_categorized: int
-    trend_change: Optional[dict[str, float]] = None
+    trend_change: dict[str, float] | None = None
 
 
 class IntentStatsDTO(BaseModel):
     """Intent distribution response"""
+
     top_intents: list[dict]  # [{"intent": str, "count": int, "percentage": float, "avg_quality": float}]
     total_categorized: int
 
 
 class TopUserDTO(BaseModel):
     """Top user response"""
+
     user_id: str
     email: str
-    name: Optional[str] = None
+    name: str | None = None
     total_prompts: int
     average_quality: float
     work_prompts: int
@@ -83,8 +92,9 @@ class TopUserDTO(BaseModel):
 
 class TopPromptDTO(BaseModel):
     """Top quality prompt response"""
+
     chat_provider_id: str
-    message_provider_id: Optional[str] = None
+    message_provider_id: str | None = None
     quality_score: int
     theme: str
     intent: str
@@ -94,6 +104,7 @@ class TopPromptDTO(BaseModel):
 
 class RiskyPromptDTO(BaseModel):
     """Risky prompt response"""
+
     message_provider_id: str
     risk_level: str
     risk_score: float
@@ -108,6 +119,7 @@ class RiskyPromptDTO(BaseModel):
 
 class OrganizationAuditResponseDTO(BaseModel):
     """Complete organization audit response"""
+
     organization_id: str
     organization_name: str
     date_range: dict[str, str]
@@ -124,8 +136,10 @@ class OrganizationAuditResponseDTO(BaseModel):
 
 # Individual endpoint response DTOs with context
 
+
 class QualityStatsWithContextDTO(BaseModel):
     """Quality statistics with context"""
+
     organization_id: str
     date_range: dict[str, str]
     data: QualityStatsDTO
@@ -134,6 +148,7 @@ class QualityStatsWithContextDTO(BaseModel):
 
 class RiskStatsWithContextDTO(BaseModel):
     """Risk statistics with context"""
+
     organization_id: str
     date_range: dict[str, str]
     data: RiskStatsDTO
@@ -142,6 +157,7 @@ class RiskStatsWithContextDTO(BaseModel):
 
 class UsageStatsWithContextDTO(BaseModel):
     """Usage statistics with context"""
+
     organization_id: str
     date_range: dict[str, str]
     data: UsageStatsDTO
@@ -150,6 +166,7 @@ class UsageStatsWithContextDTO(BaseModel):
 
 class ThemeStatsWithContextDTO(BaseModel):
     """Theme statistics with context"""
+
     organization_id: str
     date_range: dict[str, str]
     data: ThemeStatsDTO
@@ -158,6 +175,7 @@ class ThemeStatsWithContextDTO(BaseModel):
 
 class IntentStatsWithContextDTO(BaseModel):
     """Intent statistics with context"""
+
     organization_id: str
     date_range: dict[str, str]
     data: IntentStatsDTO
@@ -166,6 +184,7 @@ class IntentStatsWithContextDTO(BaseModel):
 
 class TopUsersWithContextDTO(BaseModel):
     """Top users with context"""
+
     organization_id: str
     date_range: dict[str, str]
     data: list[TopUserDTO]
@@ -174,6 +193,7 @@ class TopUsersWithContextDTO(BaseModel):
 
 class TopPromptsWithContextDTO(BaseModel):
     """Top prompts with context"""
+
     organization_id: str
     date_range: dict[str, str]
     data: list[TopPromptDTO]
@@ -182,6 +202,7 @@ class TopPromptsWithContextDTO(BaseModel):
 
 class RiskyPromptsWithContextDTO(BaseModel):
     """Risky prompts with context"""
+
     organization_id: str
     date_range: dict[str, str]
     data: list[RiskyPromptDTO]

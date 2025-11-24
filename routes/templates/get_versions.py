@@ -1,4 +1,3 @@
-from fastapi import HTTPException, Request, status
 import logging
 
 from . import router
@@ -28,6 +27,5 @@ async def get_template_versions(
     except Exception as e:
         logger.error(f"Error fetching template versions: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch template versions: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch template versions: {str(e)}"
         )

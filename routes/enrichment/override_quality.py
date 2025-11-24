@@ -1,9 +1,13 @@
 """Override quality score endpoint"""
+
+import logging
+
 from fastapi import HTTPException, Request
-from . import router
+
 from dtos.enrichment_dto import OverrideQualityRequestDTO
 from services.enrichment_service import EnrichmentService
-import logging
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +20,7 @@ async def override_chat_quality(request: Request, dto: OverrideQualityRequestDTO
     try:
         user_id = request.state.user_id
         success = EnrichmentService.override_chat_quality(
-            request.state.supabase_client,
-            user_id,
-            dto.chat_provider_id,
-            dto.quality_score
+            request.state.supabase_client, user_id, dto.chat_provider_id, dto.quality_score
         )
 
         if not success:

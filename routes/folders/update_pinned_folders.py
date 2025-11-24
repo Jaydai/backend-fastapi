@@ -1,16 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
-from services.folder_service import FolderService
+
+from fastapi import HTTPException, Request, status
+
 from dtos import UpdatePinnedFoldersDTO
+from services.folder_service import FolderService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.put("/pinned", status_code=status.HTTP_200_OK)
-async def update_pinned_folders(
-    request: Request,
-    data: UpdatePinnedFoldersDTO
-):
+async def update_pinned_folders(request: Request, data: UpdatePinnedFoldersDTO):
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

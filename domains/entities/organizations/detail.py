@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
-from .member import OrganizationMember
 
+from .member import OrganizationMember
 
 OrganizationType = Literal["company", "standard"]
 

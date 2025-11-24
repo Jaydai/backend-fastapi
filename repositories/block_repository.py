@@ -4,11 +4,7 @@ from domains.entities import Block, BlockTitle
 class BlockRepository:
     @staticmethod
     def _get_user_metadata(client: Client, user_id: str) -> dict:
-        response = client.table("users_metadata")\
-            .select("*")\
-            .eq("user_id", user_id)\
-            .single()\
-            .execute()
+        response = client.table("users_metadata").select("*").eq("user_id", user_id).single().execute()
 
         if not response.data:
             return {"organization_ids": [], "roles": {}}
@@ -23,7 +19,7 @@ class BlockRepository:
         workspace_type: str | None = None,
         organization_id: str | None = None,
         published: bool | None = None,
-        search_query: str | None = None
+        search_query: str | None = None,
     ) -> list[Block]:
         query = client.table("prompt_blocks").select("*")
 
@@ -69,20 +65,22 @@ class BlockRepository:
 
         blocks = []
         for data in response.data or []:
-            blocks.append(Block(
-                id=data["id"],
-                type=data["type"],
-                title=data.get("title", {}),
-                description=data.get("description"),
-                content=data.get("content", {}),
-                published=data.get("published", False),
-                user_id=data["user_id"],
-                organization_id=data.get("organization_id"),
-                workspace_type=data.get("workspace_type", "user"),
-                created_at=data["created_at"],
-                updated_at=data.get("updated_at"),
-                usage_count=data.get("usage_count", 0)
-            ))
+            blocks.append(
+                Block(
+                    id=data["id"],
+                    type=data["type"],
+                    title=data.get("title", {}),
+                    description=data.get("description"),
+                    content=data.get("content", {}),
+                    published=data.get("published", False),
+                    user_id=data["user_id"],
+                    organization_id=data.get("organization_id"),
+                    workspace_type=data.get("workspace_type", "user"),
+                    created_at=data["created_at"],
+                    updated_at=data.get("updated_at"),
+                    usage_count=data.get("usage_count", 0),
+                )
+            )
 
         return blocks
 
@@ -129,10 +127,7 @@ class BlockRepository:
 
     @staticmethod
     def get_block_by_id(client: Client, block_id: str) -> Block | None:
-        response = client.table("prompt_blocks")\
-            .select("*")\
-            .eq("id", block_id)\
-            .execute()
+        response = client.table("prompt_blocks").select("*").eq("id", block_id).execute()
 
         if not response.data:
             return None
@@ -150,7 +145,7 @@ class BlockRepository:
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
-            usage_count=data.get("usage_count", 0)
+            usage_count=data.get("usage_count", 0),
         )
 
     @staticmethod
@@ -163,7 +158,7 @@ class BlockRepository:
         content: dict[str, str],
         published: bool,
         organization_id: str | None,
-        workspace_type: str
+        workspace_type: str,
     ) -> Block:
         block_data = {
             "user_id": user_id,
@@ -173,7 +168,7 @@ class BlockRepository:
             "content": content,
             "published": published,
             "organization_id": organization_id,
-            "workspace_type": workspace_type
+            "workspace_type": workspace_type,
         }
 
         response = client.table("prompt_blocks").insert(block_data).execute()
@@ -191,7 +186,7 @@ class BlockRepository:
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
-            usage_count=data.get("usage_count", 0)
+            usage_count=data.get("usage_count", 0),
         )
 
     @staticmethod
@@ -202,7 +197,7 @@ class BlockRepository:
         title: dict[str, str] | None = None,
         description: dict[str, str] | None = None,
         content: dict[str, str] | None = None,
-        published: bool | None = None
+        published: bool | None = None,
     ) -> Block | None:
         update_data = {}
         if block_type is not None:
@@ -216,10 +211,7 @@ class BlockRepository:
         if published is not None:
             update_data["published"] = published
 
-        response = client.table("prompt_blocks")\
-            .update(update_data)\
-            .eq("id", block_id)\
-            .execute()
+        response = client.table("prompt_blocks").update(update_data).eq("id", block_id).execute()
 
         if not response.data:
             return None
@@ -237,7 +229,7 @@ class BlockRepository:
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
-            usage_count=data.get("usage_count", 0)
+            usage_count=data.get("usage_count", 0),
         )
 
     @staticmethod
@@ -247,11 +239,7 @@ class BlockRepository:
 
     @staticmethod
     def get_pinned_block_ids(client: Client, user_id: str) -> list[str]:
-        response = client.table("users_metadata")\
-            .select("pinned_block_ids")\
-            .eq("user_id", user_id)\
-            .single()\
-            .execute()
+        response = client.table("users_metadata").select("pinned_block_ids").eq("user_id", user_id).single().execute()
 
         if not response.data:
             return []
@@ -261,9 +249,6 @@ class BlockRepository:
 
     @staticmethod
     def update_pinned_blocks(client: Client, user_id: str, block_ids: list[str]) -> list[str]:
-        client.table("users_metadata")\
-            .update({"pinned_block_ids": block_ids})\
-            .eq("user_id", user_id)\
-            .execute()
+        client.table("users_metadata").update({"pinned_block_ids": block_ids}).eq("user_id", user_id).execute()
 
         return block_ids

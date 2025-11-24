@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/blocks", tags=["Blocks"])
 
-from . import (
+from . import (  # noqa: E402, I001
     get_block_types,
     get_blocks,
     create_block,

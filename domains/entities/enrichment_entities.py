@@ -1,14 +1,15 @@
 """
 Domain entities for enrichment functionality
 """
+
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 
 
 @dataclass
 class QualityMetrics:
     """Quality metrics for a chat enrichment"""
+
     quality_score: int  # 0-100
     clarity_score: int  # 0-5
     context_score: int  # 0-5
@@ -20,6 +21,7 @@ class QualityMetrics:
 @dataclass
 class FeedbackDetail:
     """Feedback details for chat quality"""
+
     summary: str
     strengths: list[str]
     improvements: list[str]
@@ -47,12 +49,13 @@ class ProductivityIndicators:
 @dataclass
 class EnrichedChat:
     """Domain entity for enriched chat data"""
-    id: Optional[int] = None
-    created_at: Optional[datetime] = None
-    user_id: Optional[str] = None
-    chat_id: Optional[int] = None
-    chat_provider_id: Optional[str] = None
-    message_provider_id: Optional[str] = None
+
+    id: int | None = None
+    created_at: datetime | None = None
+    user_id: str | None = None
+    chat_id: int | None = None
+    chat_provider_id: str | None = None
+    message_provider_id: str | None = None
     is_work_related: bool = False
     theme: Optional[str] = None
     intent: Optional[str] = None
@@ -65,21 +68,23 @@ class EnrichedChat:
     processing_time_ms: Optional[int] = None
     model_used: Optional[str] = None
     user_override_quality: bool = False
-    user_quality_score: Optional[int] = None
+    user_quality_score: int | None = None
 
 
 @dataclass
 class RiskIssue:
     """Individual risk issue detected in a message"""
+
     category: str
     severity: str  # low, medium, high, critical
     description: str
-    details: Optional[dict] = None
+    details: dict | None = None
 
 
 @dataclass
 class RiskCategory:
     """Risk assessment for a specific category"""
+
     level: str  # none, low, medium, high, critical
     score: float  # 0-100
     detected: bool
@@ -91,11 +96,12 @@ class RiskCategory:
 @dataclass
 class EnrichedMessage:
     """Domain entity for enriched message data"""
-    id: Optional[int] = None
-    created_at: Optional[datetime] = None
-    user_id: Optional[str] = None
-    message_id: Optional[int] = None
-    message_provider_id: Optional[str] = None
+
+    id: int | None = None
+    created_at: datetime | None = None
+    user_id: str | None = None
+    message_id: int | None = None
+    message_provider_id: str | None = None
     overall_risk_level: str = "none"
     overall_risk_score: float = 0.0
     overall_confidence: Optional[float] = None  # Average confidence across detected risks
@@ -104,8 +110,8 @@ class EnrichedMessage:
     risk_summary: list[str] = None
     detected_issues: list[RiskIssue] = None
     user_whitelist: bool = False
-    processing_time_ms: Optional[int] = None
-    model_used: Optional[str] = None
+    processing_time_ms: int | None = None
+    model_used: str | None = None
 
     def __post_init__(self):
         if self.risk_categories is None:

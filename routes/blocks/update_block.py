@@ -1,17 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
+
+from fastapi import HTTPException, Request, status
+
+from dtos import BlockResponseDTO, UpdateBlockDTO
 from services.block_service import BlockService
-from dtos import UpdateBlockDTO, BlockResponseDTO
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.patch("/{block_id}", response_model=BlockResponseDTO, status_code=status.HTTP_200_OK)
-async def update_block(
-    request: Request,
-    block_id: str,
-    data: UpdateBlockDTO
-) -> BlockResponseDTO:
+async def update_block(request: Request, block_id: str, data: UpdateBlockDTO) -> BlockResponseDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

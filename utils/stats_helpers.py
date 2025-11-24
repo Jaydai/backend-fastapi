@@ -1,6 +1,5 @@
 from datetime import datetime
 
-
 # Energy cost constants (in joules per token)
 ENERGY_COST_PER_INPUT_TOKEN = 0.0003
 ENERGY_COST_PER_OUTPUT_TOKEN = 0.0006
@@ -15,7 +14,7 @@ MODEL_COSTS = {
     "claude-3-opus": {"input": 0.015 / 1000, "output": 0.075 / 1000},
     "claude-3-sonnet": {"input": 0.003 / 1000, "output": 0.015 / 1000},
     "claude-3-haiku": {"input": 0.00025 / 1000, "output": 0.00125 / 1000},
-    "default": {"input": 0.002 / 1000, "output": 0.004 / 1000}
+    "default": {"input": 0.002 / 1000, "output": 0.004 / 1000},
 }
 
 
@@ -48,18 +47,18 @@ def parse_datetime_safe(timestamp_str: str) -> datetime:
     """Safely parse datetime string with various formats"""
     try:
         # Handle timezone info
-        timestamp = timestamp_str.replace('Z', '+00:00')
+        timestamp = timestamp_str.replace("Z", "+00:00")
 
         # If it has microseconds but incomplete (e.g., .44 instead of .440000)
-        if '.' in timestamp and '+' in timestamp:
-            parts = timestamp.split('+')
+        if "." in timestamp and "+" in timestamp:
+            parts = timestamp.split("+")
             datetime_part = parts[0]
-            timezone_part = '+' + parts[1]
+            timezone_part = "+" + parts[1]
 
-            if '.' in datetime_part:
-                date_part, microsecond_part = datetime_part.split('.')
+            if "." in datetime_part:
+                date_part, microsecond_part = datetime_part.split(".")
                 # Pad microseconds to 6 digits
-                microsecond_part = microsecond_part.ljust(6, '0')[:6]
+                microsecond_part = microsecond_part.ljust(6, "0")[:6]
                 timestamp = f"{date_part}.{microsecond_part}{timezone_part}"
 
         return datetime.fromisoformat(timestamp)
@@ -67,11 +66,11 @@ def parse_datetime_safe(timestamp_str: str) -> datetime:
         # Fallback: try to parse without microseconds
         try:
             # Remove microseconds entirely
-            base_timestamp = timestamp_str.split('.')[0]
-            if 'Z' in base_timestamp:
-                base_timestamp = base_timestamp.replace('Z', '+00:00')
-            elif not ('+' in base_timestamp or '-' in base_timestamp[-6:]):
-                base_timestamp += '+00:00'
+            base_timestamp = timestamp_str.split(".")[0]
+            if "Z" in base_timestamp:
+                base_timestamp = base_timestamp.replace("Z", "+00:00")
+            elif not ("+" in base_timestamp or "-" in base_timestamp[-6:]):
+                base_timestamp += "+00:00"
             return datetime.fromisoformat(base_timestamp)
         except Exception:
             # Last resort: use current time

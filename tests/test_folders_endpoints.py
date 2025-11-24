@@ -1,30 +1,30 @@
+import uuid
+
 import pytest
 from fastapi.testclient import TestClient
-import uuid
 
 
 class TestFoldersEndpoints:
-
     def request(self, method, *args, **kwargs):
         """Helper to automatically include cookies in all requests"""
-        if hasattr(self, 'cookies'):
-            kwargs.setdefault('cookies', self.cookies)
+        if hasattr(self, "cookies"):
+            kwargs.setdefault("cookies", self.cookies)
         return getattr(self.client, method)(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        return self.request('get', *args, **kwargs)
+        return self.request("get", *args, **kwargs)
 
     def post(self, *args, **kwargs):
-        return self.request('post', *args, **kwargs)
+        return self.request("post", *args, **kwargs)
 
     def patch(self, *args, **kwargs):
-        return self.request('patch', *args, **kwargs)
+        return self.request("patch", *args, **kwargs)
 
     def put(self, *args, **kwargs):
-        return self.request('put', *args, **kwargs)
+        return self.request("put", *args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        return self.request('delete', *args, **kwargs)
+        return self.request("delete", *args, **kwargs)
 
     @pytest.fixture(autouse=True)
     def setup(self, test_client, supabase_admin, create_test_user, create_test_organization, assign_role):
@@ -56,10 +56,7 @@ class TestFoldersEndpoints:
         assert isinstance(response.json(), list)
 
     def test_create_folder_success(self):
-        payload = {
-            "title": "Test Folder",
-            "description": "Test description"
-        }
+        payload = {"title": "Test Folder", "description": "Test description"}
         response = self.post("/folders", json=payload)
 
         assert response.status_code == 201
@@ -73,11 +70,7 @@ class TestFoldersEndpoints:
         self.folder_ids_to_cleanup.append(data["id"])
 
     def test_create_folder_organization(self):
-        payload = {
-            "title": "Org Folder",
-            "description": "Organization folder",
-            "organization_id": self.org_id
-        }
+        payload = {"title": "Org Folder", "description": "Organization folder", "organization_id": self.org_id}
         response = self.post("/folders", json=payload)
 
         # May fail due to RLS policies
@@ -100,10 +93,7 @@ class TestFoldersEndpoints:
         parent_id = parent_response.json()["id"]
         self.folder_ids_to_cleanup.append(parent_id)
 
-        child_payload = {
-            "title": "Child Folder",
-            "parent_folder_id": parent_id
-        }
+        child_payload = {"title": "Child Folder", "parent_folder_id": parent_id}
         child_response = self.post("/folders", json=child_payload)
 
         assert child_response.status_code == 201
@@ -116,10 +106,7 @@ class TestFoldersEndpoints:
         folder1 = self.post("/folders", json={"title": "User Folder"})
         self.folder_ids_to_cleanup.append(folder1.json()["id"])
 
-        folder2 = self.post(
-            "/folders",
-            json={"title": "Org Folder", "organization_id": self.org_id}
-        )
+        folder2 = self.post("/folders", json={"title": "Org Folder", "organization_id": self.org_id})
         if folder2.status_code == 201:
             self.folder_ids_to_cleanup.append(folder2.json()["id"])
 
@@ -130,10 +117,7 @@ class TestFoldersEndpoints:
         assert all(f["workspace_type"] == "user" for f in folders)
 
     def test_get_folder_by_id_success(self):
-        create_response = self.post(
-            "/folders",
-            json={"title": "Test Folder Detail"}
-        )
+        create_response = self.post("/folders", json={"title": "Test Folder Detail"})
         folder_id = create_response.json()["id"]
         self.folder_ids_to_cleanup.append(folder_id)
 
@@ -150,21 +134,12 @@ class TestFoldersEndpoints:
         assert response.status_code == 404
 
     def test_update_folder_success(self):
-        create_response = self.post(
-            "/folders",
-            json={"title": "Original Title", "description": "Original desc"}
-        )
+        create_response = self.post("/folders", json={"title": "Original Title", "description": "Original desc"})
         folder_id = create_response.json()["id"]
         self.folder_ids_to_cleanup.append(folder_id)
 
-        update_payload = {
-            "title": "Updated Title",
-            "description": "Updated desc"
-        }
-        response = self.patch(
-            f"/folders/{folder_id}",
-            json=update_payload
-        )
+        update_payload = {"title": "Updated Title", "description": "Updated desc"}
+        response = self.patch(f"/folders/{folder_id}", json=update_payload)
 
         assert response.status_code == 200
         data = response.json()
@@ -172,18 +147,12 @@ class TestFoldersEndpoints:
         assert data["description"] == "Updated desc"
 
     def test_update_folder_partial(self):
-        create_response = self.post(
-            "/folders",
-            json={"title": "Original", "description": "Original desc"}
-        )
+        create_response = self.post("/folders", json={"title": "Original", "description": "Original desc"})
         folder_id = create_response.json()["id"]
         self.folder_ids_to_cleanup.append(folder_id)
 
         update_payload = {"title": "Only Title Updated"}
-        response = self.patch(
-            f"/folders/{folder_id}",
-            json=update_payload
-        )
+        response = self.patch(f"/folders/{folder_id}", json=update_payload)
 
         assert response.status_code == 200
         data = response.json()
@@ -192,17 +161,11 @@ class TestFoldersEndpoints:
 
     def test_update_folder_not_found(self):
         fake_id = str(uuid.uuid4())
-        response = self.patch(
-            f"/folders/{fake_id}",
-            json={"title": "Update"}
-        )
+        response = self.patch(f"/folders/{fake_id}", json={"title": "Update"})
         assert response.status_code == 404
 
     def test_delete_folder_success(self):
-        create_response = self.post(
-            "/folders",
-            json={"title": "To Delete"}
-        )
+        create_response = self.post("/folders", json={"title": "To Delete"})
         folder_id = create_response.json()["id"]
 
         response = self.delete(f"/folders/{folder_id}")
@@ -217,38 +180,28 @@ class TestFoldersEndpoints:
         assert response.status_code == 404
 
     def test_pin_folder_success(self):
-        create_response = self.post(
-            "/folders",
-            json={"title": "To Pin"}
-        )
+        create_response = self.post("/folders", json={"title": "To Pin"})
         folder_id = create_response.json()["id"]
         self.folder_ids_to_cleanup.append(folder_id)
 
-        response = self.patch(
-            f"/folders/{folder_id}/pin?pinned=true"
-        )
+        response = self.patch(f"/folders/{folder_id}/pin?pinned=true")
 
         assert response.status_code == 200
         data = response.json()
-        assert data["pinned"] == True
+        assert data["pinned"] is True
 
     def test_unpin_folder_success(self):
-        create_response = self.post(
-            "/folders",
-            json={"title": "To Unpin"}
-        )
+        create_response = self.post("/folders", json={"title": "To Unpin"})
         folder_id = create_response.json()["id"]
         self.folder_ids_to_cleanup.append(folder_id)
 
         self.patch(f"/folders/{folder_id}/pin?pinned=true")
 
-        response = self.patch(
-            f"/folders/{folder_id}/pin?pinned=false"
-        )
+        response = self.patch(f"/folders/{folder_id}/pin?pinned=false")
 
         assert response.status_code == 200
         data = response.json()
-        assert data["pinned"] == False
+        assert data["pinned"] is False
 
     def test_get_pinned_folders(self):
         create_response1 = self.post("/folders", json={"title": "Pinned 1"})
@@ -303,10 +256,7 @@ class TestFoldersEndpoints:
         parent_id = parent_response.json()["id"]
         self.folder_ids_to_cleanup.append(parent_id)
 
-        child_response = self.post(
-            "/folders",
-            json={"title": "Child", "parent_folder_id": parent_id}
-        )
+        child_response = self.post("/folders", json={"title": "Child", "parent_folder_id": parent_id})
         self.folder_ids_to_cleanup.append(child_response.json()["id"])
 
         response = self.get(f"/folders/{parent_id}/items")

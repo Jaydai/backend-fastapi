@@ -1,15 +1,18 @@
 from pydantic import BaseModel
 
+
 class CreateFolderDTO(BaseModel):
     title: str
     description: str | None = None
     parent_folder_id: str | None = None
     organization_id: str | None = None
 
+
 class UpdateFolderDTO(BaseModel):
     title: str | None = None
     description: str | None = None
     parent_folder_id: str | None = None
+
 
 class FolderResponseDTO(BaseModel):
     id: str
@@ -22,11 +25,13 @@ class FolderResponseDTO(BaseModel):
     created_at: str
     updated_at: str | None = None
 
+
 class FolderWithItemsDTO(BaseModel):
     folders: list[FolderResponseDTO]
     templates: list
     total_count: int = 0
     has_more: bool = False
+
 
 class UpdatePinnedFoldersDTO(BaseModel):
     folder_ids: list[str]

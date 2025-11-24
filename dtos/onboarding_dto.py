@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class OnboardingStatusResponseDTO(BaseModel):
     has_completed_onboarding: bool
     job_type: str | None = None
@@ -15,6 +16,7 @@ class OnboardingStatusResponseDTO(BaseModel):
     first_template_used: bool = False
     first_block_created: bool = False
     keyboard_shortcut_used: bool = False
+
 
 class UpdateOnboardingDTO(BaseModel):
     job_type: str | None = None

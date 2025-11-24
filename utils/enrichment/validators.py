@@ -2,6 +2,7 @@
 Validation Utilities
 Validates and sanitizes enrichment data
 """
+
 from config.enrichment_config import enrichment_config
 
 
@@ -195,6 +196,7 @@ def sanitize_risk_assessment_result(result: dict) -> dict:
         Sanitized result with validated values
     """
     import logging
+
     logger = logging.getLogger(__name__)
 
     sanitized = validate_risk_scores(result)
@@ -207,7 +209,7 @@ def sanitize_risk_assessment_result(result: dict) -> dict:
             sanitized[category] = {
                 "risk_level": "none",
                 "risk_score": 0,
-                "description": f"No {category} assessment available"
+                "description": f"No {category} assessment available",
             }
         else:
             # Ensure category has all required fields
@@ -249,7 +251,7 @@ def get_risk_level_hierarchy(min_risk_level: str) -> list[str]:
         "critical": ["critical"],
         "high": ["critical", "high"],
         "medium": ["critical", "high", "medium"],
-        "low": ["critical", "high", "medium", "low"]
+        "low": ["critical", "high", "medium", "low"],
     }
 
     return hierarchy.get(min_risk_level, ["critical", "high", "medium"])

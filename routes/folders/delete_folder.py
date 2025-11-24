@@ -1,15 +1,16 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
+
+from fastapi import HTTPException, Request, status
+
 from services.folder_service import FolderService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.delete("/{folder_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_folder(
-    request: Request,
-    folder_id: str
-):
+async def delete_folder(request: Request, folder_id: str):
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

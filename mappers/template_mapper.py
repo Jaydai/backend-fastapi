@@ -1,5 +1,7 @@
 from domains.entities import Template, TemplateComment, TemplateCommentAuthor, VersionSummary, VersionContent
 from dtos import (
+    TemplateCommentAuthorDTO,
+    TemplateCommentDTO,
     TemplateListItemDTO,
     TemplateResponseDTO,
     TemplateCommentDTO,
@@ -7,6 +9,7 @@ from dtos import (
     TemplateVersionContentDTO,
 )
 from services.locale_service import LocaleService
+
 
 class TemplateMapper:
 
@@ -77,11 +80,7 @@ class TemplateMapper:
 
     @staticmethod
     def comment_author_entity_to_dto(author: TemplateCommentAuthor) -> TemplateCommentAuthorDTO:
-        return TemplateCommentAuthorDTO(
-            id=author.id,
-            name=author.name,
-            avatar=author.avatar
-        )
+        return TemplateCommentAuthorDTO(id=author.id, name=author.name, avatar=author.avatar)
 
     @staticmethod
     def comment_entity_to_dto(comment: TemplateComment) -> TemplateCommentDTO:
@@ -95,5 +94,5 @@ class TemplateMapper:
             created_at=comment.created_at,
             author=TemplateMapper.comment_author_entity_to_dto(comment.author),
             mentions=comment.mentions,
-            replies=replies_dtos
+            replies=replies_dtos,
         )

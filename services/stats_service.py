@@ -1,25 +1,45 @@
-from supabase import Client
-from datetime import datetime, timedelta, timezone
-from collections import defaultdict
 import calendar
+from collections import defaultdict
+from datetime import UTC, datetime, timedelta
 
-from repositories.stats_repository import StatsRepository
 from domains.entities.stats_entities import (
-    UserStats, TokenUsage, EnergyUsage, ThinkingTime, ModelUsageStats,
-    WeeklyConversationStats, DailyStats, MessageDistribution,
-    UsageOverview, UsagePeriod, UsageSummary, ChatStatistics,
-    UsageTimeline, TimelineDataPoint, UsagePatterns
+    ChatStatistics,
+    DailyStats,
+    EnergyUsage,
+    MessageDistribution,
+    ModelUsageStats,
+    ThinkingTime,
+    TimelineDataPoint,
+    TokenUsage,
+    UsageOverview,
+    UsagePatterns,
+    UsagePeriod,
+    UsageSummary,
+    UsageTimeline,
+    UserStats,
+    WeeklyConversationStats,
 )
 from dtos.stats_dto import (
-    UserStatsDTO, WeeklyConversationStatsDTO, MessageDistributionDTO,
-    UsageOverviewDTO, UsageTimelineDTO, UsagePatternsDTO
+    MessageDistributionDTO,
+    UsageOverviewDTO,
+    UsagePatternsDTO,
+    UsageTimelineDTO,
+    UserStatsDTO,
+    WeeklyConversationStatsDTO,
 )
 from mappers.stats_mapper import StatsMapper
+from repositories.stats_repository import StatsRepository
+from supabase import Client
 from utils.stats_helpers import (
-    estimate_tokens, calculate_cost, energy_to_equivalent,
-    parse_datetime_safe, fetch_all_paginated,
-    ENERGY_COST_PER_INPUT_TOKEN, ENERGY_COST_PER_OUTPUT_TOKEN,
-    JOULES_PER_WH, CO2_PER_KWH
+    CO2_PER_KWH,
+    ENERGY_COST_PER_INPUT_TOKEN,
+    ENERGY_COST_PER_OUTPUT_TOKEN,
+    JOULES_PER_WH,
+    calculate_cost,
+    energy_to_equivalent,
+    estimate_tokens,
+    fetch_all_paginated,
+    parse_datetime_safe,
 )
 
 
@@ -29,8 +49,7 @@ class StatsService:
         """Get comprehensive user statistics"""
         current_date = datetime.now()
         recent_date = current_date - timedelta(days=recent_days)
-        current_date_str = current_date.strftime('%Y-%m-%d')
-        recent_date_str = recent_date.strftime('%Y-%m-%d')
+        recent_date_str = recent_date.strftime("%Y-%m-%d")
 
         # Get chats
         chats = StatsRepository.get_user_chats(client, user_id)
@@ -70,8 +89,12 @@ class StatsService:
         all_tokens = all_input + all_output
         recent_tokens = recent_input + recent_output
 
-        all_energy_wh = (all_input * ENERGY_COST_PER_INPUT_TOKEN + all_output * ENERGY_COST_PER_OUTPUT_TOKEN) / JOULES_PER_WH
-        recent_energy_wh = (recent_input * ENERGY_COST_PER_INPUT_TOKEN + recent_output * ENERGY_COST_PER_OUTPUT_TOKEN) / JOULES_PER_WH
+        all_energy_wh = (
+            all_input * ENERGY_COST_PER_INPUT_TOKEN + all_output * ENERGY_COST_PER_OUTPUT_TOKEN
+        ) / JOULES_PER_WH
+        recent_energy_wh = (
+            recent_input * ENERGY_COST_PER_INPUT_TOKEN + recent_output * ENERGY_COST_PER_OUTPUT_TOKEN
+        ) / JOULES_PER_WH
 
         # Thinking time
         thinking_times = []
@@ -82,8 +105,8 @@ class StatsService:
                 parent_msg = msg_lookup.get(msg.parent_message_provider_id)
                 if parent_msg and parent_msg.created_at:
                     try:
-                        t1 = datetime.fromisoformat(msg.created_at.replace('Z', '+00:00'))
-                        t0 = datetime.fromisoformat(parent_msg.created_at.replace('Z', '+00:00'))
+                        t1 = datetime.fromisoformat(msg.created_at.replace("Z", "+00:00"))
+                        t0 = datetime.fromisoformat(parent_msg.created_at.replace("Z", "+00:00"))
                         diff = (t1 - t0).total_seconds()
                         if 0.1 <= diff <= 60:
                             thinking_times.append(diff)
@@ -91,13 +114,15 @@ class StatsService:
                         pass
 
         avg_thinking_time = round(sum(thinking_times) / len(thinking_times), 2) if thinking_times else 2.5
-        total_thinking_time = round(sum(thinking_times), 2) if thinking_times else round(avg_thinking_time * total_messages, 2)
+        total_thinking_time = (
+            round(sum(thinking_times), 2) if thinking_times else round(avg_thinking_time * total_messages, 2)
+        )
 
         # Message count per day (last N days)
-        messages_per_day = {(current_date - timedelta(days=i)).strftime('%Y-%m-%d'): 0 for i in range(recent_days)}
+        messages_per_day = {(current_date - timedelta(days=i)).strftime("%Y-%m-%d"): 0 for i in range(recent_days)}
         for msg in messages:
             if msg.created_at:
-                date = msg.created_at.split('T')[0]
+                date = msg.created_at.split("T")[0]
                 if date in messages_per_day:
                     messages_per_day[date] += 1
 
@@ -123,10 +148,10 @@ class StatsService:
                 model_usage[model]["output_tokens"] += tok
 
         # Chats per day
-        chats_per_day = {(current_date - timedelta(days=i)).strftime('%Y-%m-%d'): 0 for i in range(recent_days)}
+        chats_per_day = {(current_date - timedelta(days=i)).strftime("%Y-%m-%d"): 0 for i in range(recent_days)}
         for chat in chats:
             if chat.created_at:
-                date = chat.created_at.split('T')[0]
+                date = chat.created_at.split("T")[0]
                 if date in chats_per_day:
                     chats_per_day[date] += 1
 
@@ -134,9 +159,7 @@ class StatsService:
         chats_per_day = dict(sorted(chats_per_day.items()))
 
         # Build entity
-        model_usage_entities = {
-            k: ModelUsageStats(**v) for k, v in model_usage.items()
-        }
+        model_usage_entities = {k: ModelUsageStats(**v) for k, v in model_usage.items()}
 
         entity = UserStats(
             total_chats=total_chats,
@@ -151,20 +174,17 @@ class StatsService:
                 recent_output=recent_output,
                 total=all_tokens,
                 total_input=all_input,
-                total_output=all_output
+                total_output=all_output,
             ),
             energy_usage=EnergyUsage(
                 recent_wh=round(recent_energy_wh, 4),
                 total_wh=round(all_energy_wh, 4),
                 per_message_wh=round(all_energy_wh / total_messages, 6) if total_messages else 0,
-                equivalent=energy_to_equivalent(all_energy_wh)
+                equivalent=energy_to_equivalent(all_energy_wh),
             ),
-            thinking_time=ThinkingTime(
-                average=avg_thinking_time,
-                total=total_thinking_time
-            ),
+            thinking_time=ThinkingTime(average=avg_thinking_time, total=total_thinking_time),
             efficiency=efficiency_score,
-            model_usage=model_usage_entities
+            model_usage=model_usage_entities,
         )
 
         # Map entity to DTO
@@ -173,18 +193,14 @@ class StatsService:
     @staticmethod
     def get_weekly_conversation_stats(client: Client, user_id: str, days: int = 7) -> WeeklyConversationStatsDTO:
         """Get conversation statistics for the specified number of days"""
-        start_date = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+        start_date = (datetime.now(UTC) - timedelta(days=days)).isoformat()
 
         # Get chats from last N days
         chats = StatsRepository.get_user_chats(client, user_id, start_date)
         conversation_ids = [conv.chat_provider_id for conv in chats if conv.chat_provider_id]
 
         if not conversation_ids:
-            entity = WeeklyConversationStats(
-                total_conversations=0,
-                total_messages=0,
-                daily_breakdown=[]
-            )
+            entity = WeeklyConversationStats(total_conversations=0, total_messages=0, daily_breakdown=[])
             return StatsMapper.to_weekly_conversation_stats_dto(entity)
 
         # Get messages from those chats
@@ -193,7 +209,7 @@ class StatsService:
         # Calculate daily breakdown
         daily_stats = {}
         for i in range(days):
-            date = (datetime.now(timezone.utc) - timedelta(days=i)).date()
+            date = (datetime.now(UTC) - timedelta(days=i)).date()
             daily_stats[str(date)] = {"date": str(date), "conversations": 0, "messages": 0}
 
         # Count conversations per day
@@ -213,9 +229,7 @@ class StatsService:
         ]
 
         entity = WeeklyConversationStats(
-            total_conversations=len(chats),
-            total_messages=len(messages),
-            daily_breakdown=daily_list
+            total_conversations=len(chats), total_messages=len(messages), daily_breakdown=daily_list
         )
 
         # Map entity to DTO
@@ -227,11 +241,7 @@ class StatsService:
         messages = StatsRepository.get_user_messages(client, user_id)
 
         if not messages:
-            entity = MessageDistribution(
-                by_role={},
-                by_model={},
-                total_messages=0
-            )
+            entity = MessageDistribution(by_role={}, by_model={}, total_messages=0)
             return StatsMapper.to_message_distribution_dto(entity)
 
         # Calculate distribution by role
@@ -246,11 +256,7 @@ class StatsService:
             model = msg.model or "unknown"
             by_model[model] = by_model.get(model, 0) + 1
 
-        entity = MessageDistribution(
-            by_role=by_role,
-            by_model=by_model,
-            total_messages=len(messages)
-        )
+        entity = MessageDistribution(by_role=by_role, by_model=by_model, total_messages=len(messages))
 
         # Map entity to DTO
         return StatsMapper.to_message_distribution_dto(entity)
@@ -282,7 +288,9 @@ class StatsService:
         total_output_tokens = 0
         total_cost = 0.0
         model_usage = defaultdict(lambda: {"messages": 0, "input_tokens": 0, "output_tokens": 0, "cost": 0.0})
-        provider_usage = defaultdict(lambda: {"messages": 0, "chats": 0, "input_tokens": 0, "output_tokens": 0, "cost": 0.0})
+        provider_usage = defaultdict(
+            lambda: {"messages": 0, "chats": 0, "input_tokens": 0, "output_tokens": 0, "cost": 0.0}
+        )
 
         # Build chat provider mapping
         chat_providers = {}
@@ -325,7 +333,7 @@ class StatsService:
             provider_usage[provider]["cost"] += cost
 
         # Calculate avg messages per chat for each provider
-        for provider_name, stats in provider_usage.items():
+        for _, stats in provider_usage.items():
             if stats["chats"] > 0:
                 stats["avg_messages_per_chat"] = round(stats["messages"] / stats["chats"], 1)
             else:
@@ -333,9 +341,8 @@ class StatsService:
 
         # Energy and environmental impact
         total_energy_wh = (
-            (total_input_tokens * ENERGY_COST_PER_INPUT_TOKEN +
-             total_output_tokens * ENERGY_COST_PER_OUTPUT_TOKEN) / JOULES_PER_WH
-        )
+            total_input_tokens * ENERGY_COST_PER_INPUT_TOKEN + total_output_tokens * ENERGY_COST_PER_OUTPUT_TOKEN
+        ) / JOULES_PER_WH
         co2_emissions_kg = (total_energy_wh / 1000) * CO2_PER_KWH
 
         # Chat statistics
@@ -346,18 +353,10 @@ class StatsService:
         filtered_providers = {k: v for k, v in provider_usage.items() if k != "unknown"}
         sorted_providers = sorted(filtered_providers.items(), key=lambda x: x[1]["chats"], reverse=True)
         for i, (provider_name, stats) in enumerate(sorted_providers[:3]):
-            top_providers.append({
-                "name": provider_name,
-                "chats": stats["chats"],
-                "rank": i + 1
-            })
+            top_providers.append({"name": provider_name, "chats": stats["chats"], "rank": i + 1})
 
         entity = UsageOverview(
-            period=UsagePeriod(
-                days=days,
-                start_date=start_date.isoformat(),
-                end_date=end_date.isoformat()
-            ),
+            period=UsagePeriod(days=days, start_date=start_date.isoformat(), end_date=end_date.isoformat()),
             summary=UsageSummary(
                 total_messages=total_messages,
                 total_chats=total_chats,
@@ -369,11 +368,11 @@ class StatsService:
                 co2_emissions_kg=round(co2_emissions_kg, 6),
                 avg_messages_per_chat=round(total_messages / total_chats, 2) if total_chats > 0 else 0,
                 most_used_provider=top_providers[0]["name"] if top_providers else None,
-                top_providers=top_providers
+                top_providers=top_providers,
             ),
             model_breakdown=dict(model_usage),
             provider_breakdown=dict(provider_usage),
-            chat_statistics=chat_stats
+            chat_statistics=chat_stats,
         )
 
         # Map entity to DTO
@@ -388,7 +387,7 @@ class StatsService:
                 avg_messages_per_chat=0,
                 longest_chat=None,
                 chat_distribution_by_provider={},
-                recent_chats=[]
+                recent_chats=[],
             )
 
         # Count messages per chat
@@ -406,14 +405,16 @@ class StatsService:
             chat_provider_id = chat.chat_provider_id
             message_count = chat_message_counts.get(chat_provider_id, 0)
             if message_count > 0:
-                enriched_chats.append({
-                    "id": chat.id,
-                    "chat_provider_id": chat.chat_provider_id,
-                    "title": chat.title,
-                    "provider_name": chat.provider_name,
-                    "created_at": chat.created_at,
-                    "message_count": message_count
-                })
+                enriched_chats.append(
+                    {
+                        "id": chat.id,
+                        "chat_provider_id": chat.chat_provider_id,
+                        "title": chat.title,
+                        "provider_name": chat.provider_name,
+                        "created_at": chat.created_at,
+                        "message_count": message_count,
+                    }
+                )
 
         total_chats = len(enriched_chats)
         total_messages = sum(chat["message_count"] for chat in enriched_chats)
@@ -428,7 +429,7 @@ class StatsService:
                 "message_count": longest_chat["message_count"],
                 "provider_name": longest_chat.get("provider_name"),
                 "chat_provider_id": longest_chat.get("chat_provider_id"),
-                "created_at": longest_chat["created_at"]
+                "created_at": longest_chat["created_at"],
             }
 
         # Provider distribution
@@ -439,24 +440,29 @@ class StatsService:
 
         # Recent chats (top 10)
         recent_chats = sorted(enriched_chats, key=lambda x: x["created_at"], reverse=True)[:10]
-        recent_chats = [{
-            "id": str(chat["id"]),
-            "title": chat.get("title"),
-            "message_count": chat["message_count"],
-            "provider_name": chat.get("provider_name"),
-            "created_at": chat["created_at"]
-        } for chat in recent_chats]
+        recent_chats = [
+            {
+                "id": str(chat["id"]),
+                "title": chat.get("title"),
+                "message_count": chat["message_count"],
+                "provider_name": chat.get("provider_name"),
+                "created_at": chat["created_at"],
+            }
+            for chat in recent_chats
+        ]
 
         return ChatStatistics(
             total_chats=total_chats,
             avg_messages_per_chat=round(avg_messages_per_chat, 1),
             longest_chat=longest_chat,
             chat_distribution_by_provider=dict(provider_distribution),
-            recent_chats=recent_chats
+            recent_chats=recent_chats,
         )
 
     @staticmethod
-    def get_usage_timeline(client: Client, user_id: str, days: int = 30, granularity: str = "daily") -> UsageTimelineDTO:
+    def get_usage_timeline(
+        client: Client, user_id: str, days: int = 30, granularity: str = "daily"
+    ) -> UsageTimelineDTO:
         """Get usage timeline data"""
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
@@ -486,10 +492,9 @@ class StatsService:
             chats = [chat for chat in chats if chat_message_counts.get(chat.chat_provider_id, 0) > 0]
 
         # Group by time periods
-        timeline_data = defaultdict(lambda: {
-            "messages": 0, "chats": 0, "input_tokens": 0, "output_tokens": 0,
-            "cost": 0.0, "energy_wh": 0.0
-        })
+        timeline_data = defaultdict(
+            lambda: {"messages": 0, "chats": 0, "input_tokens": 0, "output_tokens": 0, "cost": 0.0, "energy_wh": 0.0}
+        )
 
         for msg in messages:
             created_at = parse_datetime_safe(msg.created_at)
@@ -540,25 +545,23 @@ class StatsService:
         timeline_list = []
         for time_key in sorted(timeline_data.keys()):
             data = timeline_data[time_key]
-            timeline_list.append(TimelineDataPoint(
-                timestamp=time_key,
-                messages=data["messages"],
-                chats=data["chats"],
-                input_tokens=data["input_tokens"],
-                output_tokens=data["output_tokens"],
-                total_tokens=data["input_tokens"] + data["output_tokens"],
-                cost_usd=round(data["cost"], 4),
-                energy_wh=round(data["energy_wh"], 4)
-            ))
+            timeline_list.append(
+                TimelineDataPoint(
+                    timestamp=time_key,
+                    messages=data["messages"],
+                    chats=data["chats"],
+                    input_tokens=data["input_tokens"],
+                    output_tokens=data["output_tokens"],
+                    total_tokens=data["input_tokens"] + data["output_tokens"],
+                    cost_usd=round(data["cost"], 4),
+                    energy_wh=round(data["energy_wh"], 4),
+                )
+            )
 
         entity = UsageTimeline(
             granularity=granularity,
-            period=UsagePeriod(
-                days=days,
-                start_date=start_date.isoformat(),
-                end_date=end_date.isoformat()
-            ),
-            timeline=timeline_list
+            period=UsagePeriod(days=days, start_date=start_date.isoformat(), end_date=end_date.isoformat()),
+            timeline=timeline_list,
         )
 
         # Map entity to DTO
@@ -592,15 +595,11 @@ class StatsService:
             daily_usage[day_name] += 1
 
         entity = UsagePatterns(
-            period=UsagePeriod(
-                days=days,
-                start_date=start_date.isoformat(),
-                end_date=end_date.isoformat()
-            ),
+            period=UsagePeriod(days=days, start_date=start_date.isoformat(), end_date=end_date.isoformat()),
             hourly_distribution=hourly_usage,
             daily_distribution=daily_usage,
             peak_hour=max(hourly_usage.items(), key=lambda x: x[1])[0] if any(hourly_usage.values()) else "0",
-            peak_day=max(daily_usage.items(), key=lambda x: x[1])[0] if any(daily_usage.values()) else "Monday"
+            peak_day=max(daily_usage.items(), key=lambda x: x[1])[0] if any(daily_usage.values()) else "Monday",
         )
 
         # Map entity to DTO

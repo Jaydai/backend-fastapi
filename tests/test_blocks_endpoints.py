@@ -1,30 +1,30 @@
+import uuid
+
 import pytest
 from fastapi.testclient import TestClient
-import uuid
 
 
 class TestBlocksEndpoints:
-
     def request(self, method, *args, **kwargs):
         """Helper to automatically include cookies in all requests"""
-        if hasattr(self, 'cookies'):
-            kwargs.setdefault('cookies', self.cookies)
+        if hasattr(self, "cookies"):
+            kwargs.setdefault("cookies", self.cookies)
         return getattr(self.client, method)(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        return self.request('get', *args, **kwargs)
+        return self.request("get", *args, **kwargs)
 
     def post(self, *args, **kwargs):
-        return self.request('post', *args, **kwargs)
+        return self.request("post", *args, **kwargs)
 
     def patch(self, *args, **kwargs):
-        return self.request('patch', *args, **kwargs)
+        return self.request("patch", *args, **kwargs)
 
     def put(self, *args, **kwargs):
-        return self.request('put', *args, **kwargs)
+        return self.request("put", *args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        return self.request('delete', *args, **kwargs)
+        return self.request("delete", *args, **kwargs)
 
     @pytest.fixture(autouse=True)
     def setup(self, test_client, supabase_admin, create_test_user, create_test_organization, assign_role):
@@ -78,7 +78,7 @@ class TestBlocksEndpoints:
             "title": "Professional Context",
             "description": "Sets a professional tone",
             "content": "You are a professional assistant",
-            "published": True
+            "published": True,
         }
         response = self.post("/blocks", json=payload)
 
@@ -88,7 +88,7 @@ class TestBlocksEndpoints:
         assert data["title"] == "Professional Context"
         assert data["description"] == "Sets a professional tone"
         assert data["content"] == "You are a professional assistant"
-        assert data["published"] == True
+        assert data["published"] is True
         assert "id" in data
         assert data["workspace_type"] == "user"
 
@@ -100,7 +100,7 @@ class TestBlocksEndpoints:
             "title": "Org Block",
             "content": "Organization block content",
             "published": True,
-            "organization_id": self.org_id
+            "organization_id": self.org_id,
         }
         response = self.post("/blocks", json=payload)
 
@@ -118,24 +118,29 @@ class TestBlocksEndpoints:
         assert response.status_code == 422
 
     def test_create_block_invalid_type(self):
-        payload = {
-            "type": "invalid_type",
-            "title": "Test",
-            "content": "Test content"
-        }
+        payload = {"type": "invalid_type", "title": "Test", "content": "Test content"}
         response = self.post("/blocks", json=payload)
         assert response.status_code == 422
 
     def test_create_block_all_types(self):
-        types = ["role", "context", "goal", "tone_style", "output_format",
-                 "audience", "example", "constraint", "custom"]
+        types = [
+            "role",
+            "context",
+            "goal",
+            "tone_style",
+            "output_format",
+            "audience",
+            "example",
+            "constraint",
+            "custom",
+        ]
 
         for block_type in types:
             payload = {
                 "type": block_type,
                 "title": f"Test {block_type}",
                 "content": f"Content for {block_type}",
-                "published": True
+                "published": True,
             }
             response = self.post("/blocks", json=payload)
             assert response.status_code == 201
@@ -145,12 +150,7 @@ class TestBlocksEndpoints:
 
     def test_get_block_by_id_success(self):
         create_response = self.post(
-            "/blocks",
-            json={
-                "type": "context",
-                "title": "Test Block Detail",
-                "content": "Test content"
-            }
+            "/blocks", json={"type": "context", "title": "Test Block Detail", "content": "Test content"}
         )
         block_id = create_response.json()["id"]
         self.block_ids_to_cleanup.append(block_id)
@@ -174,21 +174,14 @@ class TestBlocksEndpoints:
                 "type": "context",
                 "title": "Original Title",
                 "content": "Original content",
-                "description": "Original desc"
-            }
+                "description": "Original desc",
+            },
         )
         block_id = create_response.json()["id"]
         self.block_ids_to_cleanup.append(block_id)
 
-        update_payload = {
-            "title": "Updated Title",
-            "content": "Updated content",
-            "description": "Updated desc"
-        }
-        response = self.patch(
-            f"/blocks/{block_id}",
-            json=update_payload
-        )
+        update_payload = {"title": "Updated Title", "content": "Updated content", "description": "Updated desc"}
+        response = self.patch(f"/blocks/{block_id}", json=update_payload)
 
         assert response.status_code == 200
         data = response.json()
@@ -198,21 +191,13 @@ class TestBlocksEndpoints:
 
     def test_update_block_partial(self):
         create_response = self.post(
-            "/blocks",
-            json={
-                "type": "context",
-                "title": "Original",
-                "content": "Original content"
-            }
+            "/blocks", json={"type": "context", "title": "Original", "content": "Original content"}
         )
         block_id = create_response.json()["id"]
         self.block_ids_to_cleanup.append(block_id)
 
         update_payload = {"title": "Only Title Updated"}
-        response = self.patch(
-            f"/blocks/{block_id}",
-            json=update_payload
-        )
+        response = self.patch(f"/blocks/{block_id}", json=update_payload)
 
         assert response.status_code == 200
         data = response.json()
@@ -221,42 +206,23 @@ class TestBlocksEndpoints:
 
     def test_update_block_published_status(self):
         create_response = self.post(
-            "/blocks",
-            json={
-                "type": "context",
-                "title": "Test",
-                "content": "Content",
-                "published": True
-            }
+            "/blocks", json={"type": "context", "title": "Test", "content": "Content", "published": True}
         )
         block_id = create_response.json()["id"]
         self.block_ids_to_cleanup.append(block_id)
 
-        response = self.patch(
-            f"/blocks/{block_id}",
-            json={"published": False}
-        )
+        response = self.patch(f"/blocks/{block_id}", json={"published": False})
 
         assert response.status_code == 200
-        assert response.json()["published"] == False
+        assert response.json()["published"] is False
 
     def test_update_block_not_found(self):
         fake_id = str(uuid.uuid4())
-        response = self.patch(
-            f"/blocks/{fake_id}",
-            json={"title": "Update"}
-        )
+        response = self.patch(f"/blocks/{fake_id}", json={"title": "Update"})
         assert response.status_code == 404
 
     def test_delete_block_success(self):
-        create_response = self.post(
-            "/blocks",
-            json={
-                "type": "context",
-                "title": "To Delete",
-                "content": "Delete me"
-            }
-        )
+        create_response = self.post("/blocks", json={"type": "context", "title": "To Delete", "content": "Delete me"})
         block_id = create_response.json()["id"]
 
         response = self.delete(f"/blocks/{block_id}")
@@ -271,20 +237,15 @@ class TestBlocksEndpoints:
         assert response.status_code == 404
 
     def test_get_blocks_by_type(self):
-        self.post(
-            "/blocks",
-            json={"type": "context", "title": "Context 1", "content": "Content 1"}
-        )
-        block_id1 = self.post(
-            "/blocks",
-            json={"type": "context", "title": "Context 2", "content": "Content 2"}
-        ).json()["id"]
+        self.post("/blocks", json={"type": "context", "title": "Context 1", "content": "Content 1"})
+        block_id1 = self.post("/blocks", json={"type": "context", "title": "Context 2", "content": "Content 2"}).json()[
+            "id"
+        ]
         self.block_ids_to_cleanup.append(block_id1)
 
-        block_id2 = self.post(
-            "/blocks",
-            json={"type": "role", "title": "Role 1", "content": "Role content"}
-        ).json()["id"]
+        block_id2 = self.post("/blocks", json={"type": "role", "title": "Role 1", "content": "Role content"}).json()[
+            "id"
+        ]
         self.block_ids_to_cleanup.append(block_id2)
 
         response = self.get("/blocks/type/context")
@@ -295,20 +256,11 @@ class TestBlocksEndpoints:
         assert all(b["type"] == "context" for b in blocks)
 
     def test_get_blocks_with_filters(self):
-        block1 = self.post(
-            "/blocks",
-            json={"type": "context", "title": "User Block", "content": "Content"}
-        )
+        block1 = self.post("/blocks", json={"type": "context", "title": "User Block", "content": "Content"})
         self.block_ids_to_cleanup.append(block1.json()["id"])
 
         block2 = self.post(
-            "/blocks",
-            json={
-                "type": "role",
-                "title": "Org Block",
-                "content": "Content",
-                "organization_id": self.org_id
-            }
+            "/blocks", json={"type": "role", "title": "Org Block", "content": "Content", "organization_id": self.org_id}
         )
         if block2.status_code == 201:
             self.block_ids_to_cleanup.append(block2.json()["id"])
@@ -325,15 +277,11 @@ class TestBlocksEndpoints:
 
     def test_get_blocks_with_search(self):
         block1 = self.post(
-            "/blocks",
-            json={"type": "context", "title": "Professional Context", "content": "Professional"}
+            "/blocks", json={"type": "context", "title": "Professional Context", "content": "Professional"}
         )
         self.block_ids_to_cleanup.append(block1.json()["id"])
 
-        block2 = self.post(
-            "/blocks",
-            json={"type": "context", "title": "Casual Tone", "content": "Casual"}
-        )
+        block2 = self.post("/blocks", json={"type": "context", "title": "Casual Tone", "content": "Casual"})
         self.block_ids_to_cleanup.append(block2.json()["id"])
 
         response = self.get("/blocks?search=professional")
@@ -342,22 +290,13 @@ class TestBlocksEndpoints:
         assert any("professional" in b["title"].lower() for b in blocks)
 
     def test_get_pinned_blocks(self):
-        block1 = self.post(
-            "/blocks",
-            json={"type": "context", "title": "Pinned 1", "content": "Content 1"}
-        ).json()
+        block1 = self.post("/blocks", json={"type": "context", "title": "Pinned 1", "content": "Content 1"}).json()
         self.block_ids_to_cleanup.append(block1["id"])
 
-        block2 = self.post(
-            "/blocks",
-            json={"type": "role", "title": "Pinned 2", "content": "Content 2"}
-        ).json()
+        block2 = self.post("/blocks", json={"type": "role", "title": "Pinned 2", "content": "Content 2"}).json()
         self.block_ids_to_cleanup.append(block2["id"])
 
-        put_response = self.put(
-            "/blocks/pinned",
-            json={"block_ids": [block1["id"], block2["id"]]}
-        )
+        put_response = self.put("/blocks/pinned", json={"block_ids": [block1["id"], block2["id"]]})
 
         response = self.get("/blocks/pinned")
 
@@ -369,16 +308,10 @@ class TestBlocksEndpoints:
             assert len(pinned) >= 2
 
     def test_update_pinned_blocks(self):
-        block1 = self.post(
-            "/blocks",
-            json={"type": "context", "title": "Pin 1", "content": "Content"}
-        ).json()
+        block1 = self.post("/blocks", json={"type": "context", "title": "Pin 1", "content": "Content"}).json()
         self.block_ids_to_cleanup.append(block1["id"])
 
-        block2 = self.post(
-            "/blocks",
-            json={"type": "role", "title": "Pin 2", "content": "Content"}
-        ).json()
+        block2 = self.post("/blocks", json={"type": "role", "title": "Pin 2", "content": "Content"}).json()
         self.block_ids_to_cleanup.append(block2["id"])
 
         payload = {"block_ids": [block1["id"], block2["id"]]}
@@ -388,7 +321,7 @@ class TestBlocksEndpoints:
         assert response.status_code in [200, 500]
         if response.status_code == 200:
             data = response.json()
-            assert data["success"] == True
+            assert data["success"] is True
 
     def test_update_pinned_blocks_invalid_id(self):
         fake_id = str(uuid.uuid4())
@@ -415,7 +348,7 @@ class TestBlocksEndpoints:
         assert "constraint" in types
 
         for block in blocks:
-            assert block["published"] == True
+            assert block["published"] is True
             self.block_ids_to_cleanup.append(block["id"])
 
     def test_seed_sample_blocks_already_exists(self):
@@ -427,10 +360,7 @@ class TestBlocksEndpoints:
 
     def test_create_block_unauthorized(self):
         client_no_auth = TestClient(self.client.app)
-        response = client_no_auth.post(
-            "/blocks",
-            json={"type": "context", "title": "No Auth", "content": "Content"}
-        )
+        response = client_no_auth.post("/blocks", json={"type": "context", "title": "No Auth", "content": "Content"})
         assert response.status_code in [401, 403]
 
     def test_get_blocks_unauthorized(self):
@@ -439,10 +369,7 @@ class TestBlocksEndpoints:
         assert response.status_code in [401, 403]
 
     def test_blocks_usage_count(self):
-        create_response = self.post(
-            "/blocks",
-            json={"type": "context", "title": "Usage Test", "content": "Content"}
-        )
+        create_response = self.post("/blocks", json={"type": "context", "title": "Usage Test", "content": "Content"})
         block_id = create_response.json()["id"]
         self.block_ids_to_cleanup.append(block_id)
 

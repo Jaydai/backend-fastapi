@@ -1,15 +1,16 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
+
+from fastapi import HTTPException, Request, status
+
 from services.block_service import BlockService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.delete("/{block_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_block(
-    request: Request,
-    block_id: str
-):
+async def delete_block(request: Request, block_id: str):
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

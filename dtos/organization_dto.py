@@ -1,7 +1,8 @@
-from pydantic import BaseModel, field_validator
 from typing import Literal
-from domains.enums import RoleEnum
 
+from pydantic import BaseModel, field_validator
+
+from domains.enums import RoleEnum
 
 OrganizationType = Literal["company", "standard"]
 
@@ -42,7 +43,7 @@ class OrganizationDetailResponseDTO(BaseModel):
 class UpdateMemberRoleDTO(BaseModel):
     role: str
 
-    @field_validator('role')
+    @field_validator("role")
     @classmethod
     def validate_role(cls, v: str) -> str:
         valid_roles = [role.value for role in RoleEnum]
@@ -64,7 +65,7 @@ class InvitationResponseDTO(BaseModel):
 class UpdateInvitationStatusDTO(BaseModel):
     status: str
 
-    @field_validator('status')
+    @field_validator("status")
     @classmethod
     def validate_status(cls, v: str) -> str:
         valid_statuses = ["accepted", "declined"]

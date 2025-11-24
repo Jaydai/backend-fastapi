@@ -1,15 +1,17 @@
 """
 DTOs for enrichment endpoints
 """
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional
+
 from datetime import datetime
 
+from pydantic import BaseModel, Field
 
 # Request DTOs
 
+
 class ChatEnrichmentRequestDTO(BaseModel):
     """Request model for single chat enrichment"""
+
     user_message: str = Field(..., max_length=50000, description="User message content")
     assistant_response: Optional[str] = Field(None, description="Assistant response if available")
     chat_provider_id: Optional[str] = Field(None, description="External chat ID")
@@ -20,6 +22,7 @@ class ChatEnrichmentRequestDTO(BaseModel):
 
 class ChatEnrichmentBatchItemDTO(BaseModel):
     """Single item in a batch chat enrichment request"""
+
     user_message: str = Field(..., max_length=50000)
     assistant_response: Optional[str] = None
     chat_provider_id: Optional[str] = None
@@ -30,11 +33,13 @@ class ChatEnrichmentBatchItemDTO(BaseModel):
 
 class ChatEnrichmentBatchRequestDTO(BaseModel):
     """Request model for batch chat enrichment"""
+
     chats: list[ChatEnrichmentBatchItemDTO] = Field(..., min_length=1, max_length=50)
 
 
 class EnrichMessageRequestDTO(BaseModel):
     """Request model for single message enrichment"""
+
     content: str = Field(..., max_length=20000, description="Message content")
     role: str = Field(default="user", description="Message role")
     message_provider_id: Optional[str] = Field(None, description="External message ID")
@@ -45,16 +50,19 @@ class EnrichMessageRequestDTO(BaseModel):
 
 class EnrichMessageBatchRequestDTO(BaseModel):
     """Request model for batch message enrichment"""
+
     messages: list[EnrichMessageRequestDTO] = Field(..., min_length=1, max_length=100)
 
 
 class WhitelistMessageRequestDTO(BaseModel):
     """Request to whitelist a risky message"""
+
     message_provider_id: str = Field(..., description="Message provider ID to whitelist")
 
 
 class OverrideQualityRequestDTO(BaseModel):
     """Request to override chat quality score"""
+
     chat_provider_id: str = Field(..., description="Chat provider ID")
     quality_score: int = Field(..., ge=0, le=10, description="User quality score (0-10)")
 
@@ -80,6 +88,7 @@ class ProductivityIndicatorsDTO(BaseModel):
 
 class QualityMetricsDTO(BaseModel):
     """Quality metrics response"""
+
     quality_score: int = Field(..., ge=0, le=100)
     clarity_score: int = Field(..., ge=0, le=5)
     context_score: int = Field(..., ge=0, le=5)
@@ -90,6 +99,7 @@ class QualityMetricsDTO(BaseModel):
 
 class FeedbackDTO(BaseModel):
     """Feedback details response"""
+
     summary: str
     strengths: list[str]
     improvements: list[str]
@@ -99,6 +109,7 @@ class FeedbackDTO(BaseModel):
 
 class ChatEnrichmentResponseDTO(BaseModel):
     """Response model for chat enrichment"""
+
     is_work_related: bool
     theme: str
     intent: str
@@ -108,11 +119,12 @@ class ChatEnrichmentResponseDTO(BaseModel):
     feedback: Optional[FeedbackDTO] = None
     productivity_indicators: Optional[ProductivityIndicatorsDTO] = None
     raw: dict
-    processing_time_ms: Optional[int] = None
+    processing_time_ms: int | None = None
 
 
 class RiskCategoryDetailDTO(BaseModel):
     """Risk category detail response"""
+
     level: str  # none, low, medium, high, critical
     score: float = Field(..., ge=0.0, le=100.0)
     detected: bool
@@ -123,6 +135,7 @@ class RiskCategoryDetailDTO(BaseModel):
 
 class RiskIssueDTO(BaseModel):
     """Individual risk issue response"""
+
     category: str
     severity: str
     description: str
@@ -131,6 +144,7 @@ class RiskIssueDTO(BaseModel):
 
 class EnrichMessageResponseDTO(BaseModel):
     """Response model for message enrichment"""
+
     overall_risk_level: str
     overall_risk_score: float = Field(..., ge=0.0, le=100.0)
     overall_confidence: Optional[float] = Field(None, ge=0.0, le=100.0, description="Average confidence across detected risks")
@@ -138,11 +152,12 @@ class EnrichMessageResponseDTO(BaseModel):
     risk_categories: dict[str, RiskCategoryDetailDTO]
     risk_summary: list[str]
     detected_issues: list[RiskIssueDTO]
-    processing_time_ms: Optional[int] = None
+    processing_time_ms: int | None = None
 
 
 class RiskyMessageDTO(BaseModel):
     """Response model for a single risky message"""
+
     message_provider_id: str
     risk_level: str
     risk_score: float
@@ -155,6 +170,7 @@ class RiskyMessageDTO(BaseModel):
 
 class RatedChatDTO(BaseModel):
     """Response model for a single rated chat"""
+
     chat_provider_id: str
     quality_score: int
     theme: str
@@ -163,4 +179,4 @@ class RatedChatDTO(BaseModel):
     content_preview: str
     created_at: datetime
     user_override_quality: bool = False
-    user_quality_score: Optional[int] = None
+    user_quality_score: int | None = None

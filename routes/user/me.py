@@ -1,9 +1,12 @@
 """Me endpoint - get current authenticated user"""
-from fastapi import HTTPException, Response, Request
+
 import logging
 
-from . import router
+from fastapi import HTTPException, Request, Response
+
 from services import AuthService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -37,4 +40,3 @@ async def get_me(request: Request, response: Response):
             exc_info=True,
         )
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
-

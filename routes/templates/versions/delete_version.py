@@ -2,8 +2,10 @@
 Delete Template Version Route
 Allows deletion of a specific template version
 """
-from fastapi import HTTPException, Request, status
+
 import logging
+
+from fastapi import HTTPException, Request, status
 
 from . import router
 from core.supabase import supabase
@@ -13,15 +15,8 @@ from domains.enums import PermissionEnum
 logger = logging.getLogger(__name__)
 
 
-@router.delete(
-    "/{template_id}/versions/{version_id}",
-    status_code=status.HTTP_200_OK
-)
-async def delete_template_version(
-    request: Request,
-    template_id: str,
-    version_id: str
-) -> dict:
+@router.delete("/{template_id}/versions/{version_id}", status_code=status.HTTP_200_OK)
+async def delete_template_version(request: Request, template_id: str, version_id: str) -> dict:
     """
     Delete a specific version of a template
 
@@ -44,9 +39,7 @@ async def delete_template_version(
         user_id = request.state.user_id
         supabase_client = request.state.supabase_client
 
-        logger.info(
-            f"User {user_id} attempting to delete version {version_id} of template {template_id}"
-        )
+        logger.info(f"User {user_id} attempting to delete version {version_id} of template {template_id}")
 
         # First, check if the version exists and get its details
         version_response = (
@@ -59,10 +52,7 @@ async def delete_template_version(
         )
 
         if not version_response.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Template version not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template version not found")
 
         version = version_response.data
 
@@ -70,7 +60,7 @@ async def delete_template_version(
         if version.get("is_current"):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot delete the current version. Please set another version as current first."
+                detail="Cannot delete the current version. Please set another version as current first.",
             )
 
         # Check if user has permission (template owner or organization admin)
@@ -83,10 +73,7 @@ async def delete_template_version(
         )
 
         if not template_response.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Template not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
 
         template = template_response.data
 
@@ -105,7 +92,7 @@ async def delete_template_version(
         if not has_permission:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have permission to delete this template version"
+                detail="You don't have permission to delete this template version",
             )
 
         # Delete the version
@@ -131,11 +118,7 @@ async def delete_template_version(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Failed to delete version {version_id} of template {template_id}: {e}",
-            exc_info=True
-        )
+        logger.error(f"Failed to delete version {version_id} of template {template_id}: {e}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete template version: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to delete template version: {str(e)}"
         )

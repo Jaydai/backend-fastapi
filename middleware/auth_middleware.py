@@ -1,12 +1,13 @@
+import logging
+
 from fastapi import Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
+from core.supabase import SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL
 from services import AuthService
+from supabase import ClientOptions, create_client
 from utils.auth_helpers import ACCESS_COOKIE_KEY
-from core.supabase import SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
-from supabase import create_client, ClientOptions
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -70,32 +71,25 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
 
             if not access_token:
                 return JSONResponse(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    content={"detail": "Missing access_token cookie."}
+                    status_code=status.HTTP_401_UNAUTHORIZED, content={"detail": "Missing access_token cookie."}
                 )
             user_id = AuthService.get_current_user_id(access_token)
             if not user_id:
                 return JSONResponse(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    content={
-                        "detail": "Authentication required. Please provide a valid JWT token in cookies."
-                    }
+                    content={"detail": "Authentication required. Please provide a valid JWT token in cookies."},
                 )
 
             # Create an authenticated Supabase client for this request
             authenticated_client = create_client(
                 SUPABASE_URL,
                 SUPABASE_PUBLISHABLE_KEY,
-                options=ClientOptions(
-                    headers={
-                        "Authorization": f"Bearer {access_token}"
-                    }
-                )
+                options=ClientOptions(headers={"Authorization": f"Bearer {access_token}"}),
             )
 
             request.state.user_id = user_id
             request.state.supabase_client = authenticated_client
-            
+
         except Exception:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,

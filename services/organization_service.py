@@ -1,5 +1,10 @@
-from domains.entities import Organization, OrganizationMember, OrganizationDetail, OrganizationInvitation
-from dtos import OrganizationResponseDTO, OrganizationMemberResponseDTO, OrganizationDetailResponseDTO, InvitationResponseDTO
+from domains.entities import Organization, OrganizationDetail, OrganizationInvitation, OrganizationMember
+from dtos import (
+    InvitationResponseDTO,
+    OrganizationDetailResponseDTO,
+    OrganizationMemberResponseDTO,
+    OrganizationResponseDTO,
+)
 from repositories import OrganizationRepository
 from supabase import Client
 
@@ -16,17 +21,14 @@ class OrganizationService:
                 image_url=org.image_url,
                 banner_url=org.banner_url,
                 created_at=org.created_at,
-                website_url=org.website_url
+                website_url=org.website_url,
             )
             for org in organizations
         ]
 
     @staticmethod
     def get_organization_members(client: Client, organization_id: str) -> list[OrganizationMemberResponseDTO]:
-        members: list[OrganizationMember] = OrganizationRepository.get_organization_members(
-            client,
-            organization_id
-        )
+        members: list[OrganizationMember] = OrganizationRepository.get_organization_members(client, organization_id)
 
         return [
             OrganizationMemberResponseDTO(
@@ -34,19 +36,18 @@ class OrganizationService:
                 email=member.email,
                 role=member.role,
                 first_name=member.first_name,
-                last_name=member.last_name
+                last_name=member.last_name,
             )
             for member in members
         ]
 
     @staticmethod
-    def update_member_role(client: Client, organization_id: str, user_id: str, new_role: str) -> OrganizationMemberResponseDTO:
+    def update_member_role(
+        client: Client, organization_id: str, user_id: str, new_role: str
+    ) -> OrganizationMemberResponseDTO:
         # TODO: règles par rapport à "est ce que on peut ne plus avoir d'admin" ou "est ce qu'on peut se changer son propre role?"
         updated_member: OrganizationMember | None = OrganizationRepository.update_member_role(
-            client,
-            organization_id,
-            user_id,
-            new_role
+            client, organization_id, user_id, new_role
         )
 
         if not updated_member:
@@ -60,17 +61,13 @@ class OrganizationService:
             email=updated_member.email,
             role=updated_member.role,
             first_name=updated_member.first_name,
-            last_name=updated_member.last_name
+            last_name=updated_member.last_name,
         )
 
     @staticmethod
     def remove_member(client: Client, organization_id: str, user_id: str) -> None:
         # TODO: est ce qu'on peut se supprimer soi même? est ce qu'on peut supprimer le dernier admin?
-        success = OrganizationRepository.remove_member(
-            client,
-            organization_id,
-            user_id
-        )
+        success = OrganizationRepository.remove_member(client, organization_id, user_id)
 
         if not success:
             raise ValueError(
@@ -81,14 +78,11 @@ class OrganizationService:
     @staticmethod
     def get_organization_by_id(client: Client, organization_id: str) -> OrganizationDetailResponseDTO:
         organization_detail: OrganizationDetail | None = OrganizationRepository.get_organization_by_id(
-            client,
-            organization_id
+            client, organization_id
         )
 
         if not organization_detail:
-            raise ValueError(
-                f"Organization {organization_id} not found or you don't have permission to access it."
-            )
+            raise ValueError(f"Organization {organization_id} not found or you don't have permission to access it.")
 
         members_dto = [
             OrganizationMemberResponseDTO(
@@ -96,7 +90,7 @@ class OrganizationService:
                 email=member.email,
                 role=member.role,
                 first_name=member.first_name,
-                last_name=member.last_name
+                last_name=member.last_name,
             )
             for member in organization_detail.members
         ]
@@ -111,14 +105,13 @@ class OrganizationService:
             created_at=organization_detail.created_at,
             role=organization_detail.user_role,
             members_count=len(organization_detail.members),
-            members=members_dto
+            members=members_dto,
         )
 
     @staticmethod
     def get_organization_invitations(client: Client, organization_id: str) -> list[InvitationResponseDTO]:
         invitations: list[OrganizationInvitation] = OrganizationRepository.get_organization_invitations(
-            client,
-            organization_id
+            client, organization_id
         )
 
         return [
@@ -129,7 +122,7 @@ class OrganizationService:
                 status=invitation.status,
                 role=invitation.role,
                 organization_name=invitation.organization_name,
-                created_at=invitation.created_at
+                created_at=invitation.created_at,
             )
             for invitation in invitations
         ]

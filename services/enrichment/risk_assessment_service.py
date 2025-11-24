@@ -1,11 +1,13 @@
 """
 Improved Risk Assessment Service with better error handling and validation
 """
+
 import json
 import logging
 import time
+
 from openai import OpenAI
-from typing import Optional
+
 from config.enrichment_config import enrichment_config
 
 logger = logging.getLogger(__name__)
@@ -30,18 +32,13 @@ class RiskAssessmentService:
     def _load_prompt_template() -> str:
         """Load risk assessment prompt from file (legacy mode)"""
         try:
-            with open("prompts/risk_assessment.txt", "r") as f:
+            with open("prompts/risk_assessment.txt") as f:
                 return f.read()
         except FileNotFoundError:
             logger.error("Risk assessment prompt file not found")
             raise
 
-    def assess_message_risk(
-        self,
-        content: str,
-        role: str = "user",
-        context: Optional[dict] = None
-    ) -> dict:
+    def assess_message_risk(self, content: str, role: str = "user", context: dict | None = None) -> dict:
         """
         Assess risks in a message
 
@@ -53,6 +50,7 @@ class RiskAssessmentService:
 
         # Truncate content if needed
         from utils.enrichment import truncate_message
+
         content_truncated = truncate_message(content)
         logger.info(f"[RISK DEBUG] Content truncated to: {len(content_truncated)} chars")
 
@@ -100,16 +98,13 @@ class RiskAssessmentService:
                     messages=[
                         {
                             "role": "system",
-                            "content": "You are a security risk assessment expert. Respond only with valid JSON."
+                            "content": "You are a security risk assessment expert. Respond only with valid JSON.",
                         },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
+                        {"role": "user", "content": prompt},
                     ],
                     temperature=enrichment_config.RISK_ASSESSMENT_TEMPERATURE,
                     max_tokens=enrichment_config.RISK_ASSESSMENT_MAX_TOKENS,
-                    response_format={"type": "json_object"}
+                    response_format={"type": "json_object"},
                 )
 
                 content = response.choices[0].message.content
@@ -265,7 +260,7 @@ class RiskAssessmentService:
             "confidential": risk_data.get("confidential", {}).get("risk_score", 0),
             "misinformation": risk_data.get("misinformation", {}).get("risk_score", 0),
             "data_leakage": risk_data.get("data_leakage", {}).get("risk_score", 0),
-            "compliance": risk_data.get("compliance", {}).get("risk_score", 0)
+            "compliance": risk_data.get("compliance", {}).get("risk_score", 0),
         }
 
         # Apply weights
@@ -283,10 +278,7 @@ class RiskAssessmentService:
         # Determine level from score
         overall_level = enrichment_config.get_risk_level_from_score(overall_score)
 
-        return {
-            "score": round(overall_score, 2),
-            "level": overall_level
-        }
+        return {"score": round(overall_score, 2), "level": overall_level}
 
 
 # Singleton instance

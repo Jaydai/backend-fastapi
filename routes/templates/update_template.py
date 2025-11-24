@@ -1,9 +1,11 @@
-from fastapi import HTTPException, Request, status
 import logging
 
-from . import router
+from fastapi import HTTPException, Request, status
+
+from dtos import TemplateResponseDTO, UpdateTemplateDTO
 from services.template_service import TemplateService
-from dtos import UpdateTemplateDTO, TemplateResponseDTO
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +14,7 @@ logger = logging.getLogger(__name__)
 async def update_template(
     request: Request,
     template_id: str,  # UUID
-    data: UpdateTemplateDTO
+    data: UpdateTemplateDTO,
 ) -> TemplateResponseDTO:
     try:
         user_id = request.state.user_id
@@ -24,10 +26,7 @@ async def update_template(
         template = TemplateService.update_template(client, template_id, data, locale)
 
         if not template:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Template {template_id} not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Template {template_id} not found")
 
         logger.info(f"Template {template_id} updated successfully")
         return template
@@ -37,6 +36,5 @@ async def update_template(
     except Exception as e:
         logger.error(f"Error updating template: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update template: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update template: {str(e)}"
         )

@@ -1,9 +1,13 @@
 """Risky messages endpoints"""
-from fastapi import HTTPException, Request, Query
-from . import router
+
+import logging
+
+from fastapi import HTTPException, Query, Request
+
 from dtos.enrichment_dto import RiskyMessageDTO, WhitelistMessageRequestDTO
 from services.enrichment_service import EnrichmentService
-import logging
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +17,7 @@ async def get_risky_messages(
     request: Request,
     days: int = Query(default=30, ge=1, le=365),
     min_risk_level: str = Query(default="medium"),
-    limit: int = Query(default=50, ge=1, le=200)
+    limit: int = Query(default=50, ge=1, le=200),
 ):
     """
     Get risky messages for the authenticated user
@@ -21,11 +25,7 @@ async def get_risky_messages(
     try:
         user_id = request.state.user_id
         results = EnrichmentService.get_risky_messages(
-            request.state.supabase_client,
-            user_id,
-            days,
-            min_risk_level,
-            limit
+            request.state.supabase_client, user_id, days, min_risk_level, limit
         )
         return results
     except HTTPException:
@@ -42,11 +42,7 @@ async def whitelist_message(request: Request, dto: WhitelistMessageRequestDTO):
     """
     try:
         user_id = request.state.user_id
-        success = EnrichmentService.whitelist_message(
-            request.state.supabase_client,
-            user_id,
-            dto.message_provider_id
-        )
+        success = EnrichmentService.whitelist_message(request.state.supabase_client, user_id, dto.message_provider_id)
 
         if not success:
             raise HTTPException(status_code=404, detail="Message not found")

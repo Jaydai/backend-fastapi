@@ -1,11 +1,12 @@
-from supabase import Client
-from repositories.notification_repository import NotificationRepository
 from dtos.notification_dto import (
-    NotificationResponseDTO,
+    MarkAllReadResponseDTO,
     NotificationMetadataDTO,
+    NotificationResponseDTO,
     NotificationStatsResponseDTO,
-    MarkAllReadResponseDTO
 )
+from repositories.notification_repository import NotificationRepository
+from supabase import Client
+
 
 class NotificationService:
     @staticmethod
@@ -19,19 +20,21 @@ class NotificationService:
                 metadata_dto = NotificationMetadataDTO(
                     action_type=entity.metadata.action_type,
                     action_title_key=entity.metadata.action_title_key,
-                    action_url=entity.metadata.action_url
+                    action_url=entity.metadata.action_url,
                 )
 
-            notifications.append(NotificationResponseDTO(
-                id=entity.id,
-                user_id=entity.user_id,
-                type=entity.type,
-                title=entity.title,
-                body=entity.body,
-                created_at=entity.created_at,
-                read_at=entity.read_at,
-                metadata=metadata_dto
-            ))
+            notifications.append(
+                NotificationResponseDTO(
+                    id=entity.id,
+                    user_id=entity.user_id,
+                    type=entity.type,
+                    title=entity.title,
+                    body=entity.body,
+                    created_at=entity.created_at,
+                    read_at=entity.read_at,
+                    metadata=metadata_dto,
+                )
+            )
 
         return notifications
 
@@ -46,19 +49,21 @@ class NotificationService:
                 metadata_dto = NotificationMetadataDTO(
                     action_type=entity.metadata.action_type,
                     action_title_key=entity.metadata.action_title_key,
-                    action_url=entity.metadata.action_url
+                    action_url=entity.metadata.action_url,
                 )
 
-            notifications.append(NotificationResponseDTO(
-                id=entity.id,
-                user_id=entity.user_id,
-                type=entity.type,
-                title=entity.title,
-                body=entity.body,
-                created_at=entity.created_at,
-                read_at=entity.read_at,
-                metadata=metadata_dto
-            ))
+            notifications.append(
+                NotificationResponseDTO(
+                    id=entity.id,
+                    user_id=entity.user_id,
+                    type=entity.type,
+                    title=entity.title,
+                    body=entity.body,
+                    created_at=entity.created_at,
+                    read_at=entity.read_at,
+                    metadata=metadata_dto,
+                )
+            )
 
         return notifications
 
@@ -66,10 +71,7 @@ class NotificationService:
     def get_notification_stats(client: Client, user_id: str) -> NotificationStatsResponseDTO:
         total, unread = NotificationRepository.get_notification_counts(client, user_id)
 
-        return NotificationStatsResponseDTO(
-            total=total,
-            unread=unread
-        )
+        return NotificationStatsResponseDTO(total=total, unread=unread)
 
     @staticmethod
     def mark_notification_as_read(client: Client, notification_id: int, user_id: str) -> bool:

@@ -38,10 +38,22 @@ jobs:
       - name: Run Ruff linter
         run: |
           ruff check . --output-format=github
-          
+
       - name: Run Ruff formatter check
         run: |
           ruff format --check .
+
+      - name: Run pytest
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL_PROD }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY_PROD }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SECRET_KEY_PROD }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY_PROD }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL_PROD }}
+          ENVIRONMENT: test
+        run: |
+          python -m pytest tests/ -v --tb=short
+        continue-on-error: false
 
   docker-build:
     name: Docker Build Test

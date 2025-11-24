@@ -1,16 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
-from services.folder_service import FolderService
+
+from fastapi import HTTPException, Request, status
+
 from dtos import CreateFolderDTO, FolderResponseDTO
+from services.folder_service import FolderService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.post("", response_model=FolderResponseDTO, status_code=status.HTTP_201_CREATED)
-async def create_folder(
-    request: Request,
-    data: CreateFolderDTO
-) -> FolderResponseDTO:
+async def create_folder(request: Request, data: CreateFolderDTO) -> FolderResponseDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

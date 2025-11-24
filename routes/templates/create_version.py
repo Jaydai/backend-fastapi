@@ -1,4 +1,3 @@
-from fastapi import HTTPException, Request, status
 import logging
 
 from . import router
@@ -24,10 +23,7 @@ async def create_template_version(
         version = TemplateVersionService.create_version(client, template_id, user_id, data, locale)
 
         if not version:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Template or source version not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template or source version not found")
 
         logger.info(f"Version {version.id} created successfully for template {template_id}")
         return version
@@ -37,6 +33,5 @@ async def create_template_version(
     except Exception as e:
         logger.error(f"Error creating template version: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create template version: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create template version: {str(e)}"
         )

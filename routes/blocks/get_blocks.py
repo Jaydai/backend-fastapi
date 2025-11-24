@@ -1,4 +1,3 @@
-from fastapi import Request, Query, HTTPException, status
 import logging
 from . import router
 from services.block_service import BlockService
