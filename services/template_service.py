@@ -163,12 +163,9 @@ class TemplateService:
     @staticmethod
     def get_templates_counts(client: Client, user_id: str) -> TemplateCountsResponseDTO:
         user_counts = TemplateRepository.get_user_templates_count(client, user_id)
-        print("👀👀👀👀", user_counts)
         user_all_roles = PermissionRepository.get_user_all_roles(client, user_id)
-        print("😈😈😈😈", user_all_roles)
         organization_counts = {}
         for role in user_all_roles:
             if role.organization_id:
                 organization_counts[role.organization_id] = TemplateRepository.get_organization_templates_count(client, role.organization_id)
-        print(f"ORGANIZATION COUNTS==============={organization_counts}")
         return TemplateCountsResponseDTO(user_counts=user_counts, organization_counts=organization_counts)

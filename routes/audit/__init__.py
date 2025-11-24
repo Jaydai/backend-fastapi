@@ -23,4 +23,7 @@ from . import quality_timeline
 from . import theme_distribution
 from . import intent_distribution
 
+# Enhanced analytics endpoints
+from . import analytics
+
 __all__ = ["router"]

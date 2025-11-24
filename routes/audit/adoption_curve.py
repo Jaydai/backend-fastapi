@@ -17,10 +17,17 @@ async def get_adoption_curve(
     end_date: Optional[str] = Query(default=None, description="End date (YYYY-MM-DD)"),
     days: int = Query(default=30, ge=1, le=365, description="Number of days to look back"),
     team_ids: Optional[List[str]] = Query(default=None, description="Filter by team IDs"),
-    granularity: str = Query(default="day", pattern="^(day|week|month)$", description="Time granularity")
+    granularity: str = Query(default="day", pattern="^(day|week|month)$", description="Time granularity"),
+    view_mode: str = Query(default="chats", pattern="^(chats|messages|providers|models)$", description="View mode: chats, messages, providers, or models")
 ):
     """
     Get adoption curve showing usage over time with optional team breakdown
+
+    View modes:
+    - chats: Show chat counts over time
+    - messages: Show message counts over time
+    - providers: Show breakdown by provider (ChatGPT, Claude, etc.)
+    - models: Show breakdown by specific models
     """
     try:
         result = await AuditTimeSeriesService.get_adoption_curve(
@@ -30,7 +37,8 @@ async def get_adoption_curve(
             end_date,
             days,
             team_ids,
-            granularity
+            granularity,
+            view_mode
         )
 
         return result

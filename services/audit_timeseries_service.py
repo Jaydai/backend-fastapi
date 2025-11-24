@@ -12,6 +12,7 @@ from repositories.team_repository import TeamRepository
 from dtos.audit_dto import (
     AdoptionCurveResponseDTO,
     AdoptionCurveDataDTO,
+    ProviderDistributionDTO,
     RiskTimelineResponseDTO,
     RiskTimelineDataDTO,
     RiskTimelineDataPointDTO,
@@ -83,7 +84,8 @@ class AuditTimeSeriesService:
         end_date: Optional[str],
         days: int,
         team_ids: Optional[List[str]],
-        granularity: str
+        granularity: str,
+        view_mode: str = "chats"
     ) -> AdoptionCurveResponseDTO:
         """Get adoption curve (usage over time) with team breakdown"""
         start_dt, end_dt = _calculate_date_range(start_date, end_date, days)
@@ -95,39 +97,117 @@ class AuditTimeSeriesService:
                 date_range={"start_date": start_dt.isoformat(), "end_date": end_dt.isoformat()},
                 granularity=granularity,
                 team_filter=team_ids,
+                view_mode=view_mode,
                 data=AdoptionCurveDataDTO(
                     overall=[],
                     by_team={},
                     total_prompts=0,
                     total_chats=0,
-                    average_daily_prompts=0.0
+                    average_daily_prompts=0.0,
+                    average_messages_per_chat=0.0,
+                    provider_distribution=[],
+                    by_provider=None,
+                    by_model=None
                 ),
                 generated_at=datetime.now()
             )
 
-        # Fetch all enriched_chats for the organization within date range
-        overall_result = client.table("enriched_chats") \
-            .select("created_at, chat_id, user_id") \
+        # Fetch chats data with provider information
+        chats_result = client.table("chats") \
+            .select("id, created_at, user_id, provider_name, chat_provider_id") \
             .in_("user_id", user_ids) \
             .gte("created_at", start_dt.isoformat()) \
             .lte("created_at", end_dt.isoformat()) \
             .execute()
 
-        # Group by date based on granularity
+        # Fetch messages data for calculating average messages per chat
+        messages_result = client.table("messages") \
+            .select("id, chat_provider_id, created_at, user_id, model") \
+            .in_("user_id", user_ids) \
+            .gte("created_at", start_dt.isoformat()) \
+            .lte("created_at", end_dt.isoformat()) \
+            .execute()
+
+        # Calculate provider distribution
+        provider_counts = defaultdict(lambda: {"chats": 0, "messages": 0})
+
+        # Build mapping from chat_provider_id to provider_name
+        chat_provider_to_name = {}
+        for row in (chats_result.data or []):
+            provider_name = row.get("provider_name") or "Unknown"
+            chat_provider_id = row.get("chat_provider_id")
+            provider_counts[provider_name]["chats"] += 1
+            if chat_provider_id:
+                chat_provider_to_name[chat_provider_id] = provider_name
+
+        # Count messages per provider based on chat_provider_id
+        for row in (messages_result.data or []):
+            chat_provider_id = row.get("chat_provider_id")
+            if chat_provider_id and chat_provider_id in chat_provider_to_name:
+                provider = chat_provider_to_name[chat_provider_id]
+                provider_counts[provider]["messages"] += 1
+
+        # Calculate total chats for percentage
+        total_chats_for_percentage = sum(p["chats"] for p in provider_counts.values())
+
+        # Build provider distribution list
+        provider_distribution = [
+            ProviderDistributionDTO(
+                provider_name=provider,
+                chat_count=counts["chats"],
+                message_count=counts["messages"],
+                percentage=(counts["chats"] / total_chats_for_percentage * 100) if total_chats_for_percentage > 0 else 0.0
+            )
+            for provider, counts in sorted(provider_counts.items(), key=lambda x: x[1]["chats"], reverse=True)
+        ]
+
+        # Calculate average messages per chat
+        total_messages = len(messages_result.data or [])
+        total_chats = len(chats_result.data or [])
+        average_messages_per_chat = total_messages / total_chats if total_chats > 0 else 0.0
+
+        # Group by date based on granularity and view mode
         date_counts = defaultdict(int)
-        for row in (overall_result.data or []):
-            created_at = datetime.fromisoformat(row["created_at"].replace('Z', '+00:00'))
+        date_by_provider = defaultdict(lambda: defaultdict(int))
 
-            # Truncate date based on granularity
-            if granularity == "week":
-                # Get start of week (Monday)
-                date_key = (created_at - timedelta(days=created_at.weekday())).date()
-            elif granularity == "month":
-                date_key = created_at.replace(day=1).date()
-            else:  # day
-                date_key = created_at.date()
+        if view_mode == "messages":
+            # Count messages over time
+            for row in (messages_result.data or []):
+                created_at = datetime.fromisoformat(row["created_at"].replace('Z', '+00:00'))
 
-            date_counts[date_key] += 1
+                # Truncate date based on granularity
+                if granularity == "week":
+                    date_key = (created_at - timedelta(days=created_at.weekday())).date()
+                elif granularity == "month":
+                    date_key = created_at.replace(day=1).date()
+                else:  # day
+                    date_key = created_at.date()
+
+                date_counts[date_key] += 1
+
+                # Track by provider
+                chat_provider_id = row.get("chat_provider_id")
+                if chat_provider_id and chat_provider_id in chat_provider_to_name:
+                    provider = chat_provider_to_name[chat_provider_id]
+                    date_by_provider[provider][date_key] += 1
+        else:
+            # Count chats over time (default)
+            for row in (chats_result.data or []):
+                created_at = datetime.fromisoformat(row["created_at"].replace('Z', '+00:00'))
+
+                # Truncate date based on granularity
+                if granularity == "week":
+                    date_key = (created_at - timedelta(days=created_at.weekday())).date()
+                elif granularity == "month":
+                    date_key = created_at.replace(day=1).date()
+                else:  # day
+                    date_key = created_at.date()
+
+                date_counts[date_key] += 1
+
+                # Track by provider
+                provider_name = row.get("provider_name") or "Unknown"
+                date_by_provider[provider_name][date_key] += 1
 
         # Convert to sorted timeline
         overall_timeline = [
@@ -137,6 +217,27 @@ class AuditTimeSeriesService:
             )
             for date, count in sorted(date_counts.items())
         ]
+
+        # Build provider time series
+        by_provider = {}
+        if view_mode == "providers":
+            for provider, date_data in date_by_provider.items():
+                by_provider[provider] = [
+                    TimeSeriesDataPointDTO(
+                        date=str(date),
+                        value=float(count)
+                    )
+                    for date, count in sorted(date_data.items())
+                ]
+
+        # Build model distribution
+        by_model = None
+        if view_mode == "models":
+            model_counts = defaultdict(int)
+            for row in (messages_result.data or []):
+                model = row.get("model") or "Unknown"
+                model_counts[model] += 1
+            by_model = dict(model_counts)
 
         # Get by-team breakdown if teams specified
         by_team = {}
@@ -153,23 +254,40 @@ class AuditTimeSeriesService:
                 if not team_user_ids:
                     continue
 
-                # Filter data for this team
+                # Filter data for this team based on view mode
                 team_date_counts = defaultdict(int)
-                for row in (overall_result.data or []):
-                    if row["user_id"] not in team_user_ids:
-                        continue
+                if view_mode == "messages":
+                    for row in (messages_result.data or []):
+                        if row["user_id"] not in team_user_ids:
+                            continue
 
-                    created_at = datetime.fromisoformat(row["created_at"].replace('Z', '+00:00'))
+                        created_at = datetime.fromisoformat(row["created_at"].replace('Z', '+00:00'))
 
-                    # Truncate date based on granularity
-                    if granularity == "week":
-                        date_key = (created_at - timedelta(days=created_at.weekday())).date()
-                    elif granularity == "month":
-                        date_key = created_at.replace(day=1).date()
-                    else:  # day
-                        date_key = created_at.date()
+                        # Truncate date based on granularity
+                        if granularity == "week":
+                            date_key = (created_at - timedelta(days=created_at.weekday())).date()
+                        elif granularity == "month":
+                            date_key = created_at.replace(day=1).date()
+                        else:  # day
+                            date_key = created_at.date()
 
-                    team_date_counts[date_key] += 1
+                        team_date_counts[date_key] += 1
+                else:
+                    for row in (chats_result.data or []):
+                        if row["user_id"] not in team_user_ids:
+                            continue
+
+                        created_at = datetime.fromisoformat(row["created_at"].replace('Z', '+00:00'))
+
+                        # Truncate date based on granularity
+                        if granularity == "week":
+                            date_key = (created_at - timedelta(days=created_at.weekday())).date()
+                        elif granularity == "month":
+                            date_key = created_at.replace(day=1).date()
+                        else:  # day
+                            date_key = created_at.date()
+
+                        team_date_counts[date_key] += 1
 
                 by_team[team.name] = [
                     TimeSeriesDataPointDTO(
@@ -182,16 +300,6 @@ class AuditTimeSeriesService:
         # Calculate totals
         total_prompts = sum(point.value for point in overall_timeline)
 
-        # Get total chats
-        chats_result = client.table("enriched_chats") \
-            .select("chat_id", count="exact") \
-            .in_("user_id", user_ids) \
-            .gte("created_at", start_dt.isoformat()) \
-            .lte("created_at", end_dt.isoformat()) \
-            .execute()
-
-        total_chats = chats_result.count or 0
-
         days_in_period = (end_dt - start_dt).days + 1
         average_daily_prompts = total_prompts / days_in_period if days_in_period > 0 else 0.0
 
@@ -200,12 +308,17 @@ class AuditTimeSeriesService:
             date_range={"start_date": start_dt.isoformat(), "end_date": end_dt.isoformat()},
             granularity=granularity,
             team_filter=team_ids,
+            view_mode=view_mode,
             data=AdoptionCurveDataDTO(
                 overall=overall_timeline,
                 by_team=by_team,
-                total_prompts=int(total_prompts),
+                total_prompts=int(total_messages) if view_mode == "messages" else int(total_prompts),
                 total_chats=total_chats,
-                average_daily_prompts=average_daily_prompts
+                average_daily_prompts=average_daily_prompts,
+                average_messages_per_chat=average_messages_per_chat,
+                provider_distribution=provider_distribution,
+                by_provider=by_provider if by_provider else None,
+                by_model=by_model
             ),
             generated_at=datetime.now()
         )
