@@ -43,3 +43,8 @@ class BlockResponseDTO(BaseModel):
 
 class UpdatePinnedBlocksDTO(BaseModel):
     block_ids: list[str]
+
+class BlockTitleResponseDTO(BaseModel):
+    """Block title response (minimal data for list endpoints)"""
+    id: str
+    title: str  # Localized title

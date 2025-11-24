@@ -1,384 +1,74 @@
-from supabase import Client
-from domains.entities import Folder
+"""
+Folder Repository - Backward compatibility wrapper
+
+This file now re-exports functions from the folders/ subdirectory.
+For new code, import directly from repositories.folders.* modules.
+"""
+
+from repositories.folders import (
+    get_folder_by_id,
+    get_folders_titles,
+    create_folder,
+    update_folder,
+    delete_folder,
+    get_pinned_folder_ids,
+    pin_folder,
+    unpin_folder,
+    update_pinned_folders,
+)
+
 
 class FolderRepository:
-    @staticmethod
-    def _get_user_metadata(client: Client, user_id: str) -> dict:
-        response = client.table("users_metadata")\
-            .select("*")\
-            .eq("user_id", user_id)\
-            .single()\
-            .execute()
-
-        if not response.data:
-            return {"organization_ids": [], "roles": {}}
-
-        return response.data
+    """Folder repository class for backward compatibility"""
 
     @staticmethod
-    def get_folders(
-        client: Client,
-        user_id: str,
-        workspace_type: str | None = None,
-        organization_id: str | None = None,
-        parent_folder_id: str | None = None
-    ) -> list[Folder]:
-        query = client.table("prompt_folders").select("*")
-
-        if workspace_type == "all" or (not workspace_type and not organization_id):
-            user_metadata = FolderRepository._get_user_metadata(client, user_id)
-            conditions = [f"user_id.eq.{user_id}"]
-
-            roles = user_metadata.get("roles") or {}
-            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
-            if org_roles:
-                for org_id in org_roles.keys():
-                    conditions.append(f"organization_id.eq.{org_id}")
-
-            query = query.or_(",".join(conditions))
-        elif workspace_type == "user":
-            query = query.eq("user_id", user_id).is_("organization_id", "null")
-        elif workspace_type == "organization":
-            user_metadata = FolderRepository._get_user_metadata(client, user_id)
-            roles = user_metadata.get("roles") or {}
-            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
-
-            if organization_id:
-                if organization_id not in org_roles:
-                    return []
-                query = query.eq("organization_id", organization_id)
-            else:
-                if not org_roles:
-                    return []
-                query = query.in_("organization_id", list(org_roles.keys()))
-
-        if parent_folder_id is not None:
-            if parent_folder_id == "root":
-                query = query.is_("parent_folder_id", "null")
-            else:
-                query = query.eq("parent_folder_id", parent_folder_id)
-
-        query = query.order("created_at", desc=True)
-
-        response = query.execute()
-
-        folders = []
-        for data in response.data or []:
-            folders.append(Folder(
-                id=data["id"],
-                title=data.get("title", {}),
-                description=data.get("description"),
-                user_id=data.get("user_id"),
-                organization_id=data.get("organization_id"),
-                parent_folder_id=data.get("parent_folder_id"),
-                workspace_type=data["workspace_type"],
-                created_at=data["created_at"],
-                updated_at=data.get("updated_at")
-            ))
-
-        return folders
-
-    @staticmethod
-    def get_folder_by_id(client: Client, folder_id: str) -> Folder | None:
-        response = client.table("prompt_folders")\
-            .select("*")\
-            .eq("id", folder_id)\
-            .execute()
-
-        if not response.data:
-            return None
-
-        data = response.data[0]
-        return Folder(
-            id=data["id"],
-            title=data.get("title", {}),
-            description=data.get("description"),
-            user_id=data.get("user_id"),
-            organization_id=data.get("organization_id"),
-            parent_folder_id=data.get("parent_folder_id"),
-            workspace_type=data["workspace_type"],
-            created_at=data["created_at"],
-            updated_at=data.get("updated_at")
+    def get_folders_titles(client, user_id=None, organization_id=None, parent_folder_id=None, limit=100, offset=0):
+        """Get folder titles"""
+        return get_folders_titles(
+            client,
+            user_id=user_id,
+            organization_id=organization_id,
+            parent_folder_id=parent_folder_id,
+            limit=limit,
+            offset=offset
         )
 
     @staticmethod
-    def create_folder(
-        client: Client,
-        user_id: str,
-        title: dict[str, str],
-        description: dict[str, str] | None,
-        parent_folder_id: str | None,
-        organization_id: str | None,
-        workspace_type: str
-    ) -> Folder:
-        folder_data = {
-            "user_id": user_id,
-            "title": title,
-            "description": description,
-            "parent_folder_id": parent_folder_id,
-            "organization_id": organization_id,
-            "workspace_type": workspace_type
-        }
-
-        response = client.table("prompt_folders").insert(folder_data).execute()
-
-        data = response.data[0]
-        return Folder(
-            id=data["id"],
-            title=data.get("title", {}),
-            description=data.get("description"),
-            user_id=data.get("user_id"),
-            organization_id=data.get("organization_id"),
-            parent_folder_id=data.get("parent_folder_id"),
-            workspace_type=data["workspace_type"],
-            created_at=data["created_at"],
-            updated_at=data.get("updated_at")
-        )
+    def get_folder_by_id(client, folder_id: str):
+        """Get folder by ID"""
+        return get_folder_by_id(client, folder_id)
 
     @staticmethod
-    def update_folder(
-        client: Client,
-        folder_id: str,
-        title: dict[str, str] | None = None,
-        description: dict[str, str] | None = None,
-        parent_folder_id: str | None = None
-    ) -> Folder | None:
-        update_data = {}
-        if title is not None:
-            update_data["title"] = title
-        if description is not None:
-            update_data["description"] = description
-        if parent_folder_id is not None:
-            update_data["parent_folder_id"] = parent_folder_id
-
-        response = client.table("prompt_folders")\
-            .update(update_data)\
-            .eq("id", folder_id)\
-            .execute()
-
-        if not response.data:
-            return None
-
-        data = response.data[0]
-        return Folder(
-            id=data["id"],
-            title=data.get("title", {}),
-            description=data.get("description"),
-            user_id=data.get("user_id"),
-            organization_id=data.get("organization_id"),
-            parent_folder_id=data.get("parent_folder_id"),
-            workspace_type=data["workspace_type"],
-            created_at=data["created_at"],
-            updated_at=data.get("updated_at")
-        )
+    def create_folder(client, user_id: str, title, description, parent_folder_id, organization_id, workspace_type):
+        """Create a new folder"""
+        return create_folder(client, user_id, title, description, parent_folder_id, organization_id, workspace_type)
 
     @staticmethod
-    def delete_folder(client: Client, folder_id: str) -> bool:
-        response = client.table("prompt_folders").delete().eq("id", folder_id).execute()
-        return len(response.data or []) > 0
+    def update_folder(client, folder_id: str, title=None, description=None, parent_folder_id=None):
+        """Update folder"""
+        return update_folder(client, folder_id, title, description, parent_folder_id)
 
     @staticmethod
-    def get_pinned_folder_ids(client: Client, user_id: str) -> list[str]:
-        response = client.table("users_metadata")\
-            .select("pinned_folder_ids")\
-            .eq("user_id", user_id)\
-            .single()\
-            .execute()
-
-        if not response.data:
-            return []
-
-        pinned_ids = response.data.get("pinned_folder_ids") or []
-        return [str(fid) for fid in pinned_ids]
+    def delete_folder(client, folder_id: str) -> bool:
+        """Delete folder"""
+        return delete_folder(client, folder_id)
 
     @staticmethod
-    def pin_folder(client: Client, user_id: str, folder_id: str) -> list[str]:
-        current_pinned = FolderRepository.get_pinned_folder_ids(client, user_id)
-
-        if folder_id not in current_pinned:
-            current_pinned.append(folder_id)
-
-        client.table("users_metadata")\
-            .update({"pinned_folder_ids": current_pinned})\
-            .eq("user_id", user_id)\
-            .execute()
-
-        return current_pinned
+    def get_pinned_folder_ids(client, user_id: str):
+        """Get pinned folder IDs"""
+        return get_pinned_folder_ids(client, user_id)
 
     @staticmethod
-    def unpin_folder(client: Client, user_id: str, folder_id: str) -> list[str]:
-        current_pinned = FolderRepository.get_pinned_folder_ids(client, user_id)
-
-        if folder_id in current_pinned:
-            current_pinned.remove(folder_id)
-
-        client.table("users_metadata")\
-            .update({"pinned_folder_ids": current_pinned})\
-            .eq("user_id", user_id)\
-            .execute()
-
-        return current_pinned
+    def pin_folder(client, user_id: str, folder_id: str):
+        """Pin a folder"""
+        return pin_folder(client, user_id, folder_id)
 
     @staticmethod
-    def update_pinned_folders(client: Client, user_id: str, folder_ids: list[str]) -> list[str]:
-        client.table("users_metadata")\
-            .update({"pinned_folder_ids": folder_ids})\
-            .eq("user_id", user_id)\
-            .execute()
-
-        return folder_ids
+    def unpin_folder(client, user_id: str, folder_id: str):
+        """Unpin a folder"""
+        return unpin_folder(client, user_id, folder_id)
 
     @staticmethod
-    def get_root_items(
-        client: Client,
-        user_id: str,
-        workspace_type: str | None = None,
-        organization_id: str | None = None
-    ) -> dict:
-        from repositories.template_repository import TemplateRepository
-
-        folders = FolderRepository.get_folders(
-            client, user_id, workspace_type, organization_id, "root"
-        )
-
-        templates_query = client.table("prompt_templates")\
-            .select("*")\
-            .is_("folder_id", "null")
-
-        if workspace_type == "all" or (not workspace_type and not organization_id):
-            user_metadata = FolderRepository._get_user_metadata(client, user_id)
-            conditions = [f"user_id.eq.{user_id}"]
-
-            roles = user_metadata.get("roles") or {}
-            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
-            if org_roles:
-                for org_id in org_roles.keys():
-                    conditions.append(f"organization_id.eq.{org_id}")
-
-            templates_query = templates_query.or_(",".join(conditions))
-        elif workspace_type == "user":
-            templates_query = templates_query.eq("user_id", user_id)\
-                .is_("organization_id", "null")
-        elif workspace_type == "organization":
-            user_metadata = FolderRepository._get_user_metadata(client, user_id)
-            roles = user_metadata.get("roles") or {}
-            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
-
-            if organization_id:
-                if organization_id not in org_roles:
-                    templates_query = templates_query.eq("id", "impossible-id")
-                else:
-                    templates_query = templates_query.eq("organization_id", organization_id)
-            else:
-                if org_roles:
-                    templates_query = templates_query.in_("organization_id", list(org_roles.keys()))
-                else:
-                    templates_query = templates_query.eq("id", "impossible-id")
-
-        templates_query = templates_query.order("created_at", desc=True)
-        templates_response = templates_query.execute()
-
-        templates = []
-        for data in templates_response.data or []:
-            from domains.entities import Template
-            templates.append(Template(
-                id=data["id"],
-                title=data.get("title", {}),
-                description=data.get("description"),
-                folder_id=data.get("folder_id"),
-                organization_id=data.get("organization_id"),
-                user_id=data["user_id"],
-                workspace_type=data["workspace_type"],
-                created_at=data["created_at"],
-                updated_at=data.get("updated_at"),
-                tags=data.get("tags"),
-                usage_count=data.get("usage_count", 0),
-                last_used_at=data.get("last_used_at"),
-                current_version_id=data.get("current_version_id"),
-                is_free=data.get("is_free", True),
-                is_published=data.get("is_published", False)
-            ))
-
-        return {"folders": folders, "templates": templates}
-
-    @staticmethod
-    def get_folder_items(
-        client: Client,
-        folder_id: str,
-        limit: int | None = None,
-        offset: int = 0
-    ) -> dict:
-        # Build folders query
-        folders_query = client.table("prompt_folders")\
-            .select("*", count="exact")\
-            .eq("parent_folder_id", folder_id)\
-            .order("created_at", desc=True)
-
-        # Apply pagination if limit is specified
-        if limit is not None:
-            folders_query = folders_query.range(offset, offset + limit - 1)
-
-        folders_response = folders_query.execute()
-
-        folders = []
-        for data in folders_response.data or []:
-            folders.append(Folder(
-                id=data["id"],
-                title=data.get("title", {}),
-                description=data.get("description"),
-                user_id=data.get("user_id"),
-                organization_id=data.get("organization_id"),
-                parent_folder_id=data.get("parent_folder_id"),
-                workspace_type=data["workspace_type"],
-                created_at=data["created_at"],
-                updated_at=data.get("updated_at")
-            ))
-
-        # Build templates query
-        templates_query = client.table("prompt_templates")\
-            .select("*", count="exact")\
-            .eq("folder_id", folder_id)\
-            .order("created_at", desc=True)
-
-        # Apply pagination if limit is specified
-        if limit is not None:
-            templates_query = templates_query.range(offset, offset + limit - 1)
-
-        templates_response = templates_query.execute()
-
-        templates = []
-        for data in templates_response.data or []:
-            from domains.entities import Template
-            templates.append(Template(
-                id=data["id"],
-                title=data.get("title", {}),
-                description=data.get("description"),
-                folder_id=data.get("folder_id"),
-                organization_id=data.get("organization_id"),
-                user_id=data["user_id"],
-                workspace_type=data["workspace_type"],
-                created_at=data["created_at"],
-                updated_at=data.get("updated_at"),
-                tags=data.get("tags"),
-                usage_count=data.get("usage_count", 0),
-                last_used_at=data.get("last_used_at"),
-                current_version_id=data.get("current_version_id"),
-                is_free=data.get("is_free", True),
-                is_published=data.get("is_published", False)
-            ))
-
-        # Calculate total count and has_more
-        folders_count = folders_response.count or 0
-        templates_count = templates_response.count or 0
-        total_count = folders_count + templates_count
-
-        has_more = False
-        if limit is not None:
-            has_more = (offset + limit) < total_count
-
-        return {
-            "folders": folders,
-            "templates": templates,
-            "total_count": total_count,
-            "has_more": has_more
-        }
+    def update_pinned_folders(client, user_id: str, folder_ids):
+        """Update pinned folders"""
+        return update_pinned_folders(client, user_id, folder_ids)

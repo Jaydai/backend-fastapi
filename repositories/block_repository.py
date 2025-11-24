@@ -1,5 +1,5 @@
 from supabase import Client
-from domains.entities import Block
+from domains.entities import Block, BlockTitle
 
 class BlockRepository:
     @staticmethod
@@ -84,6 +84,47 @@ class BlockRepository:
                 usage_count=data.get("usage_count", 0)
             ))
 
+        return blocks
+
+    @staticmethod
+    def get_blocks_titles(
+        client: Client,
+        organization_id: str | None = None,
+        types: list[str] | None = None,
+        published: bool | None = None,
+        limit: int = 100,
+        offset: int = 0
+    ) -> list[BlockTitle]:
+        """
+        Get block titles (id, title) with optional filtering.
+
+        Args:
+            client: Supabase client
+            organization_id: Filter by organization ID
+            types: Filter by block types (None = all types)
+            published: Filter by published status
+            limit: Max number of results
+            offset: Pagination offset
+
+        Returns:
+            List of BlockTitle entities
+        """
+        query = client.table("prompt_blocks").select("id, title")
+
+        if organization_id:
+            query = query.eq("organization_id", organization_id)
+
+        if types is not None and len(types) > 0:
+            query = query.in_("type", types)
+
+        if published is not None:
+            query = query.eq("published", published)
+
+        query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
+        response = query.execute()
+        blocks_data = response.data or []
+
+        blocks = [BlockTitle(**item) for item in blocks_data]
         return blocks
 
     @staticmethod

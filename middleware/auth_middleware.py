@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 class AuthenticationMiddleware(BaseHTTPMiddleware):
     PUBLIC_PATHS_WITHOUT_AUTH = [
         "/",
+        "/enrichment",
+        "/enrichment/enrich-message-batch",
+        "/enrichment/enrich-chat-batch",
         "/docs", # TODO: désactiver en prod
         "/redoc",
         "/auth/sign_in",
@@ -31,6 +34,10 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         if self._is_public_route(request):
+            # For public routes, still provide an unauthenticated Supabase client
+            from core.supabase import supabase
+            request.state.supabase_client = supabase
+            request.state.user_id = None
             return await call_next(request)
 
         try:

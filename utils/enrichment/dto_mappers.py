@@ -4,7 +4,8 @@ Transforms between domain entities and DTOs for cleaner code
 """
 from domains.entities.enrichment_entities import (
     EnrichedChat, EnrichedMessage, QualityMetrics,
-    FeedbackDetail, RiskCategory, RiskIssue
+    FeedbackDetail, RiskCategory, RiskIssue,
+    DomainExpertise, ProductivityIndicators
 )
 from domains.entities.audit_entities import (
     QualityStats, RiskStats, UsageStats, ThemeStats, IntentStats,
@@ -13,7 +14,8 @@ from domains.entities.audit_entities import (
 from dtos.enrichment_dto import (
     ChatEnrichmentRequestDTO, ChatEnrichmentResponseDTO,
     QualityMetricsDTO, FeedbackDTO,
-    RiskCategoryDetailDTO, RiskIssueDTO
+    RiskCategoryDetailDTO, RiskIssueDTO,
+    DomainExpertiseDTO, ProductivityIndicatorsDTO
 )
 from dtos.audit_dto import (
     QualityStatsDTO, RiskStatsDTO, UsageStatsDTO,
@@ -28,6 +30,8 @@ def classification_to_enriched_chat(classification_result: dict, request: ChatEn
     """Transform classification result to EnrichedChat entity"""
     quality_metrics = _extract_quality_metrics(classification_result)
     feedback = _extract_feedback(classification_result)
+    domain_expertise = _extract_domain_expertise(classification_result)
+    productivity_indicators = _extract_productivity_indicators(classification_result)
 
     return EnrichedChat(
         chat_id=request.chat_id,
@@ -36,8 +40,11 @@ def classification_to_enriched_chat(classification_result: dict, request: ChatEn
         is_work_related=classification_result.get("is_work_related", False),
         theme=classification_result.get("theme"),
         intent=classification_result.get("intent"),
+        skill_level=classification_result.get("skill_level"),
+        domain_expertise=domain_expertise,
         quality_metrics=quality_metrics,
         feedback=feedback,
+        productivity_indicators=productivity_indicators,
         raw_response=classification_result,
         processing_time_ms=classification_result.get("processing_time_ms"),
         model_used=classification_result.get("model_used")
@@ -48,13 +55,18 @@ def classification_to_response_dto(classification_result: dict) -> ChatEnrichmen
     """Transform classification result to response DTO"""
     quality_dto = _quality_metrics_to_dto(classification_result.get("quality"))
     feedback_dto = _feedback_to_dto(classification_result.get("feedback"))
+    domain_expertise_dto = _domain_expertise_to_dto(classification_result.get("domain_expertise"))
+    productivity_dto = _productivity_indicators_to_dto(classification_result.get("productivity_indicators"))
 
     return ChatEnrichmentResponseDTO(
         is_work_related=classification_result.get("is_work_related", False),
         theme=classification_result.get("theme", "unknown"),
         intent=classification_result.get("intent", "unknown"),
+        skill_level=classification_result.get("skill_level"),
+        domain_expertise=domain_expertise_dto,
         quality=quality_dto,
         feedback=feedback_dto,
+        productivity_indicators=productivity_dto,
         raw=classification_result,
         processing_time_ms=classification_result.get("processing_time_ms")
     )
@@ -70,6 +82,8 @@ def risk_assessment_to_enriched_message(risk_result: dict, request) -> EnrichedM
         message_id=request.message_id,
         overall_risk_level=risk_result.get("overall_risk_level", "none"),
         overall_risk_score=risk_result.get("overall_risk_score", 0.0),
+        overall_confidence=risk_result.get("overall_confidence"),
+        suggested_action=risk_result.get("suggested_action"),
         risk_categories=risk_categories,
         risk_summary=risk_result.get("risk_summary", []),
         detected_issues=detected_issues,
@@ -88,7 +102,9 @@ def risk_assessment_to_response_dto(risk_result: dict):
                 level=cat_data.get("risk_level", "none"),
                 score=cat_data.get("risk_score", 0.0),
                 detected=cat_data.get("risk_level") not in ["none", None],
-                details=cat_data.get("description")
+                details=cat_data.get("description"),
+                confidence=cat_data.get("confidence"),
+                suggested_redaction=cat_data.get("suggested_redaction")
             )
 
     detected_issues_dto = []
@@ -106,6 +122,8 @@ def risk_assessment_to_response_dto(risk_result: dict):
     return EnrichMessageResponseDTO(
         overall_risk_level=risk_result.get("overall_risk_level", "none"),
         overall_risk_score=risk_result.get("overall_risk_score", 0.0),
+        overall_confidence=risk_result.get("overall_confidence"),
+        suggested_action=risk_result.get("suggested_action"),
         risk_categories=risk_categories_dto,
         risk_summary=risk_result.get("risk_summary", []),
         detected_issues=detected_issues_dto,
@@ -168,7 +186,8 @@ def _extract_quality_metrics(classification_result: dict) -> QualityMetrics | No
         clarity_score=q.get("clarity", 0),
         context_score=q.get("context", 0),
         specificity_score=q.get("specificity", 0),
-        actionability_score=q.get("actionability", 0)
+        actionability_score=q.get("actionability", 0),
+        complexity_score=q.get("complexity")
     )
 
 
@@ -182,7 +201,8 @@ def _extract_feedback(classification_result: dict) -> FeedbackDetail | None:
         summary=f.get("summary", ""),
         strengths=f.get("strengths", []),
         improvements=f.get("improvements", []),
-        improved_prompt_example=f.get("improved_prompt_example")
+        improved_prompt_example=f.get("improved_prompt_example"),
+        personalized_tip=f.get("personalized_tip")
     )
 
 
@@ -196,7 +216,8 @@ def _quality_metrics_to_dto(quality_data: dict | None) -> QualityMetricsDTO | No
         clarity_score=quality_data.get("clarity", 0),
         context_score=quality_data.get("context", 0),
         specificity_score=quality_data.get("specificity", 0),
-        actionability_score=quality_data.get("actionability", 0)
+        actionability_score=quality_data.get("actionability", 0),
+        complexity_score=quality_data.get("complexity")
     )
 
 
@@ -209,7 +230,8 @@ def _feedback_to_dto(feedback_data: dict | None) -> FeedbackDTO | None:
         summary=feedback_data.get("summary", ""),
         strengths=feedback_data.get("strengths", []),
         improvements=feedback_data.get("improvements", []),
-        improved_prompt_example=feedback_data.get("improved_prompt_example")
+        improved_prompt_example=feedback_data.get("improved_prompt_example"),
+        personalized_tip=feedback_data.get("personalized_tip")
     )
 
 
@@ -223,7 +245,9 @@ def _extract_risk_categories(risk_result: dict) -> dict[str, RiskCategory]:
                 level=cat_data.get("risk_level", "none"),
                 score=cat_data.get("risk_score", 0.0),
                 detected=cat_data.get("risk_level") not in ["none", None],
-                details=cat_data.get("description")
+                details=cat_data.get("description"),
+                confidence=cat_data.get("confidence"),
+                suggested_redaction=cat_data.get("suggested_redaction")
             )
     return risk_categories
 
@@ -241,3 +265,55 @@ def _extract_detected_issues(risk_result: dict) -> list[RiskIssue]:
                     details=cat_data.get("description")
                 ))
     return detected_issues
+
+
+def _extract_domain_expertise(classification_result: dict) -> DomainExpertise | None:
+    """Extract domain expertise from classification result"""
+    if "domain_expertise" not in classification_result:
+        return None
+
+    de = classification_result["domain_expertise"]
+    return DomainExpertise(
+        theme_area=de.get("theme_area", ""),
+        sub_specialties=de.get("sub_specialties", []),
+        tech_stack=de.get("tech_stack", []),
+        experience_level=de.get("experience_level", "beginner")
+    )
+
+
+def _extract_productivity_indicators(classification_result: dict) -> ProductivityIndicators | None:
+    """Extract productivity indicators from classification result"""
+    if "productivity_indicators" not in classification_result:
+        return None
+
+    pi = classification_result["productivity_indicators"]
+    return ProductivityIndicators(
+        estimated_complexity=pi.get("estimated_complexity", "simple"),
+        collaboration_signals=pi.get("collaboration_signals", []),
+        reusability_score=pi.get("reusability_score", 0)
+    )
+
+
+def _domain_expertise_to_dto(domain_data: dict | None) -> DomainExpertiseDTO | None:
+    """Convert domain expertise data to DTO"""
+    if not domain_data:
+        return None
+
+    return DomainExpertiseDTO(
+        theme_area=domain_data.get("theme_area", ""),
+        sub_specialties=domain_data.get("sub_specialties", []),
+        tech_stack=domain_data.get("tech_stack", []),
+        experience_level=domain_data.get("experience_level", "beginner")
+    )
+
+
+def _productivity_indicators_to_dto(productivity_data: dict | None) -> ProductivityIndicatorsDTO | None:
+    """Convert productivity indicators data to DTO"""
+    if not productivity_data:
+        return None
+
+    return ProductivityIndicatorsDTO(
+        estimated_complexity=productivity_data.get("estimated_complexity", "simple"),
+        collaboration_signals=productivity_data.get("collaboration_signals", []),
+        reusability_score=productivity_data.get("reusability_score", 0)
+    )

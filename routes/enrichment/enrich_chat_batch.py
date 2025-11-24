@@ -13,9 +13,12 @@ async def enrich_chat_batch(request: Request, dto: ChatEnrichmentBatchRequestDTO
     """
     Enrich multiple chats in parallel (1-50 chats)
     Returns list of results with success/error indicators
+
+    This endpoint can be called without authentication for batch processing scripts.
     """
     try:
-        user_id = request.state.user_id
+        # Allow unauthenticated access for scripts - user_id will be None
+        user_id = getattr(request.state, 'user_id', None)
         results = await EnrichmentService.enrich_chat_batch(
             request.state.supabase_client,
             user_id,

@@ -15,4 +15,7 @@ from . import rated_chats
 from . import whitelist_message
 from . import override_quality
 
+# Import internal routes (no auth required)
+from .internal import import_message_rows
+
 __all__ = ["router"]

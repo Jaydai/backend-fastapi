@@ -2,40 +2,52 @@ from fastapi import Request, Query, HTTPException, status
 import logging
 from . import router
 from services.block_service import BlockService
-from dtos import BlockResponseDTO
+from dtos import BlockTitleResponseDTO
 
 logger = logging.getLogger(__name__)
 
-@router.get("", response_model=list[BlockResponseDTO], status_code=status.HTTP_200_OK)
+@router.get("", response_model=list[BlockTitleResponseDTO], status_code=status.HTTP_200_OK)
 async def get_blocks(
     request: Request,
-    block_type: str | None = Query(None, alias="type"),
-    workspace_type: str | None = Query(None),
     organization_id: str | None = None,
+    types: str | None = Query(None, description="Comma-separated block types to filter"),
     published: bool | None = None,
-    q: str | None = None
-) -> list[BlockResponseDTO]:
+    limit: int = Query(100, le=500),
+    offset: int = Query(0, ge=0)
+) -> list[BlockTitleResponseDTO]:
+    """
+    Get block titles (id, title) with optional filtering.
+    Returns minimal data for list endpoints.
+
+    Filters:
+    - types: comma-separated block types
+    - published: filter by published status
+    """
     try:
-        user_id = request.state.user_id
         client = request.state.supabase_client
         locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
 
-        logger.info(f"User {user_id} getting blocks")
+        logger.info(f"Fetching block titles with types={types}, published={published}")
 
-        blocks = BlockService.get_blocks(
+        # Parse types
+        type_list: list[str] | None = None
+        if types is not None:
+            type_list = [t.strip() for t in types.split(",") if t.strip()]
+
+        blocks = BlockService.get_blocks_titles(
             client,
-            user_id,
             locale,
-            block_type,
-            workspace_type,
             organization_id,
+            type_list,
             published,
-            q
+            limit,
+            offset
         )
 
+        logger.info(f"Returning {len(blocks)} block titles")
         return blocks
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error getting blocks: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get blocks: {str(e)}")
+        logger.error(f"Error getting block titles: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get block titles: {str(e)}")

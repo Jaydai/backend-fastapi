@@ -309,34 +309,43 @@ class AuditRepository:
         loop = asyncio.get_event_loop()
 
         def _fetch():
-            # Get top risk messages
+            # Get top risk messages (including low risks)
             risks_response = client.table("enriched_messages") \
-                .select("message_provider_id, overall_risk_level, overall_risk_score, risk_categories, created_at, user_whitelist") \
+                .select("message_provider_id, overall_risk_level, overall_risk_score, risk_categories, created_at, user_whitelist, user_id") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
-                .in_("overall_risk_level", ["medium", "high", "critical"]) \
+                .in_("overall_risk_level", ["low", "medium", "high", "critical"]) \
                 .order("overall_risk_score", desc=True) \
                 .limit(limit) \
                 .execute()
 
-            # Get message content
+            # Get message content and user info
             if risks_response.data:
                 message_ids = [risk["message_provider_id"] for risk in risks_response.data]
+                risk_user_ids = list(set([risk["user_id"] for risk in risks_response.data]))
 
                 messages_response = client.table("messages") \
                     .select("message_provider_id, content") \
                     .in_("message_provider_id", message_ids) \
                     .execute()
 
+                # Get user metadata
+                users_response = client.table("users_metadata") \
+                    .select("user_id, email, name") \
+                    .in_("user_id", risk_user_ids) \
+                    .execute()
+
                 return {
                     "risks": risks_response.data,
-                    "messages": messages_response.data
+                    "messages": messages_response.data,
+                    "users": users_response.data or []
                 }
 
             return {
                 "risks": risks_response.data,
-                "messages": []
+                "messages": [],
+                "users": []
             }
 
         with ThreadPoolExecutor() as executor:

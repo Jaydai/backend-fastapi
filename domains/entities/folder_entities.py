@@ -16,3 +16,9 @@ class Folder:
 class FolderWithItems:
     folders: list
     templates: list
+
+@dataclass
+class FolderTitle:
+    id: str
+    title: dict[str, str]
+    parent_folder_id: str | None = None

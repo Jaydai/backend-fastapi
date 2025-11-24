@@ -32,7 +32,7 @@ class EnrichmentService:
     @staticmethod
     def enrich_chat(
         client: Client,
-        user_id: str,
+        user_id: Optional[str],
         request: ChatEnrichmentRequestDTO
     ) -> ChatEnrichmentResponseDTO:
         """Enrich a single chat with classification and quality assessment"""
@@ -43,9 +43,13 @@ class EnrichmentService:
         # Call classification service
         classification_result = classification_service.classify_chat(user_message, assistant_response)
 
-        # Convert to entity and save
-        enriched_chat = classification_to_enriched_chat(classification_result, request)
-        EnrichmentRepository.save_enriched_chat(client, user_id, enriched_chat)
+        # Use user_id from request payload if available (ChatEnrichmentBatchItemDTO), otherwise from auth
+        effective_user_id = getattr(request, 'user_id', None) or user_id
+
+        # Convert to entity and save (only if user_id is provided)
+        if effective_user_id:
+            enriched_chat = classification_to_enriched_chat(classification_result, request)
+            EnrichmentRepository.save_enriched_chat(client, effective_user_id, enriched_chat)
 
         # Return response DTO
         return classification_to_response_dto(classification_result)
@@ -53,7 +57,7 @@ class EnrichmentService:
     @staticmethod
     async def enrich_chat_batch(
         client: Client,
-        user_id: str,
+        user_id: Optional[str],
         requests: list[ChatEnrichmentRequestDTO]
     ) -> list[dict]:
         """Enrich multiple chats in parallel"""
@@ -76,7 +80,7 @@ class EnrichmentService:
         ]
 
     @staticmethod
-    async def _enrich_chat_async(client: Client, user_id: str, request: ChatEnrichmentRequestDTO):
+    async def _enrich_chat_async(client: Client, user_id: Optional[str], request: ChatEnrichmentRequestDTO):
         """Async wrapper for enrich_chat"""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
@@ -88,7 +92,7 @@ class EnrichmentService:
     @staticmethod
     def enrich_message(
         client: Client,
-        user_id: str,
+        user_id: Optional[str],
         request: EnrichMessageRequestDTO
     ) -> EnrichMessageResponseDTO:
         """Enrich a single message with risk assessment"""
@@ -99,9 +103,13 @@ class EnrichmentService:
             context=request.context
         )
 
-        # Convert to entity and save
-        enriched_message = risk_assessment_to_enriched_message(risk_result, request)
-        EnrichmentRepository.save_enriched_message(client, user_id, enriched_message)
+        # Use user_id from request payload if available, otherwise from auth
+        effective_user_id = request.user_id or user_id
+
+        # Convert to entity and save (only if user_id is provided)
+        if effective_user_id:
+            enriched_message = risk_assessment_to_enriched_message(risk_result, request)
+            EnrichmentRepository.save_enriched_message(client, effective_user_id, enriched_message)
 
         # Return response DTO
         return risk_assessment_to_response_dto(risk_result)
@@ -109,7 +117,7 @@ class EnrichmentService:
     @staticmethod
     def enrich_message_batch(
         client: Client,
-        user_id: str,
+        user_id: Optional[str],
         requests: list[EnrichMessageRequestDTO]
     ) -> list[dict]:
         """Enrich multiple messages sequentially"""
@@ -126,6 +134,9 @@ class EnrichmentService:
                 })
             except Exception as e:
                 logger.error(f"Failed to enrich message {request.message_provider_id}: {e}")
+                logger.error(f"Exception type: {type(e).__name__}, Exception args: {e.args}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
                 results.append({
                     "success": False,
                     "data": None,

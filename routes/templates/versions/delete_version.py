@@ -7,6 +7,8 @@ import logging
 
 from . import router
 from core.supabase import supabase
+from services import PermissionService
+from domains.enums import PermissionEnum
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +50,8 @@ async def delete_template_version(
 
         # First, check if the version exists and get its details
         version_response = (
-            supabase_client.table("prompt_template_versions")
-            .select("id, template_id, version_number, is_current")
+            supabase_client.table("prompt_templates_versions")
+            .select("id, template_id, name, is_current")
             .eq("id", version_id)
             .eq("template_id", template_id)
             .single()
@@ -91,21 +93,14 @@ async def delete_template_version(
         # Check if user is the template owner
         has_permission = template.get("user_id") == user_id
 
-        # If template belongs to an organization, check organization permissions
+        # If template belongs to an organization, check organization permissions using new system
         if not has_permission and template.get("organization_id"):
-            org_member_response = (
-                supabase_client.table("organizations_users")
-                .select("role")
-                .eq("organization_id", template["organization_id"])
-                .eq("user_id", user_id)
-                .single()
-                .execute()
+            has_permission = PermissionService.user_has_permission_in_organization(
+                supabase_client,
+                user_id,
+                PermissionEnum.TEMPLATE_DELETE,
+                template["organization_id"]
             )
-
-            if org_member_response.data:
-                # Allow admin and owner roles to delete versions
-                member_role = org_member_response.data.get("role")
-                has_permission = member_role in ["admin", "owner"]
 
         if not has_permission:
             raise HTTPException(
@@ -115,7 +110,7 @@ async def delete_template_version(
 
         # Delete the version
         delete_response = (
-            supabase_client.table("prompt_template_versions")
+            supabase_client.table("prompt_templates_versions")
             .delete()
             .eq("id", version_id)
             .eq("template_id", template_id)
@@ -123,13 +118,13 @@ async def delete_template_version(
         )
 
         logger.info(
-            f"Successfully deleted version {version_id} (v{version['version_number']}) "
+            f"Successfully deleted version {version_id} (v{version['name']}) "
             f"of template {template_id} by user {user_id}"
         )
 
         return {
             "success": True,
-            "message": f"Version {version['version_number']} deleted successfully",
+            "message": f"Version {version['name']} deleted successfully",
             "deleted_version_id": version_id
         }
 

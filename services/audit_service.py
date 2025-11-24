@@ -17,7 +17,20 @@ from dtos.audit_dto import (
     IntentStatsWithContextDTO,
     TopUsersWithContextDTO,
     TopPromptsWithContextDTO,
-    RiskyPromptsWithContextDTO
+    RiskyPromptsWithContextDTO,
+    AdoptionCurveResponseDTO,
+    AdoptionCurveDataDTO,
+    RiskTimelineResponseDTO,
+    RiskTimelineDataDTO,
+    RiskTimelineDataPointDTO,
+    QualityTimelineResponseDTO,
+    QualityTimelineDataDTO,
+    QualityTimelineDataPointDTO,
+    TimeSeriesDataPointDTO,
+    ThemeTimelineResponseDTO,
+    ThemeDistributionDTO,
+    IntentTimelineResponseDTO,
+    IntentDistributionDTO
 )
 from utils.enrichment import (
     aggregate_quality_stats,
@@ -218,7 +231,6 @@ class AuditService:
 
         usage_data = await AuditRepository.get_usage_stats_async(client, user_ids, start_dt, end_dt)
         usage_stats = aggregate_usage_stats(usage_data)
-        print(f"🔥🔥🔥🔥🔥🔥usage_stats: {usage_stats}")
 
         return UsageStatsWithContextDTO(
             organization_id=organization_id,
@@ -376,7 +388,7 @@ class AuditService:
                 generated_at=datetime.now()
             )
 
-        risky_prompts_data = await AuditRepository.get_riskiest_prompts_async(client, user_ids, start_dt, end_dt)
+        risky_prompts_data = await AuditRepository.get_riskiest_prompts_async(client, user_ids, start_dt, end_dt, limit=100)
         risky_prompts = aggregate_risky_prompts(risky_prompts_data)
 
         return RiskyPromptsWithContextDTO(

@@ -15,7 +15,11 @@ class EnrichmentModels(str, Enum):
 class EnrichmentConfig:
     """Configuration settings for enrichment services"""
 
-    # Model Configuration
+    # Assistant IDs (for OpenAI Assistants API)
+    MESSAGE_ENRICHMENT_ASSISTANT_ID = os.getenv("MESSAGE_ENRICHMENT_ASSISTANT_ID", None)
+    CHAT_CLASSIFICATION_ASSISTANT_ID = os.getenv("CHAT_CLASSIFICATION_ASSISTANT_ID", None)
+
+    # Model Configuration (fallback for direct chat completions)
     DEFAULT_CLASSIFICATION_MODEL = os.getenv("CLASSIFICATION_MODEL", EnrichmentModels.GPT_4_NANO)
     DEFAULT_RISK_ASSESSMENT_MODEL = os.getenv("RISK_ASSESSMENT_MODEL", EnrichmentModels.GPT_4_NANO)
 

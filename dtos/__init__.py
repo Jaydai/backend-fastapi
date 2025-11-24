@@ -16,6 +16,11 @@ from .template_dto import (
     TemplateCommentDTO,
     UsageResponseDTO,
     TemplateTitleResponseDTO,
+    OrganizationTemplateTitleDTO,
+    VersionSummary,
+    VersionContentDTO,
+    TemplateMetadataDTO,
+    TemplateCountsResponseDTO
 )
 from .user_dto import UserProfileResponseDTO, UpdateUserProfileDTO, UpdateDataCollectionDTO
 from .organization_dto import (
@@ -53,6 +58,8 @@ from .folder_dto import (
     FolderResponseDTO,
     FolderWithItemsDTO,
     UpdatePinnedFoldersDTO,
+    FolderTitleResponseDTO,
+    OrganizationFolderTitleDTO,
 )
 from .block_dto import (
     BlockType,
@@ -60,6 +67,7 @@ from .block_dto import (
     UpdateBlockDTO,
     BlockResponseDTO,
     UpdatePinnedBlocksDTO,
+    BlockTitleResponseDTO,
 )
 
 __all__ = [
@@ -82,6 +90,11 @@ __all__ = [
     "TemplateCommentDTO",
     "UsageResponseDTO",
     "TemplateTitleResponseDTO",
+    "OrganizationTemplateTitleDTO",
+    "VersionSummary",
+    "VersionContentDTO",
+    "TemplateMetadataDTO",
+    "TemplateCountsResponseDTO",
     "UserProfileResponseDTO",
     "UpdateUserProfileDTO",
     "UpdateDataCollectionDTO",
@@ -111,9 +124,12 @@ __all__ = [
     "FolderResponseDTO",
     "FolderWithItemsDTO",
     "UpdatePinnedFoldersDTO",
+    "FolderTitleResponseDTO",
+    "OrganizationFolderTitleDTO",
     "BlockType",
     "CreateBlockDTO",
     "UpdateBlockDTO",
     "BlockResponseDTO",
     "UpdatePinnedBlocksDTO",
+    "BlockTitleResponseDTO",
 ]
