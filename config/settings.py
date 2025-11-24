@@ -25,7 +25,7 @@ class BaseSettings:
     SUPABASE_JWT_SECRET: str = os.getenv("SUPABASE_JWT_SECRET", "")
 
     # App
-    APP_VERSION: str = "2.0.0"
+    APP_VERSION: str = "2.0.1"
     
     # Environment
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", Environment.LOCAL)
