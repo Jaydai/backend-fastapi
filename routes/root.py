@@ -9,5 +9,6 @@ async def root():
         "message": "Welcome to Jaydai API",
         "version": settings.APP_VERSION,
         "status": "running",
-        "environment": os.getenv("ENVIRONMENT")
+        "environment": os.getenv("ENVIRONMENT"),
+        "supabase_url": os.getenv("SUPABASE_URL")
     }
