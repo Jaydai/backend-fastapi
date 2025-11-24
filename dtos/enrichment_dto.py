@@ -15,6 +15,7 @@ class ChatEnrichmentRequestDTO(BaseModel):
     chat_provider_id: Optional[str] = Field(None, description="External chat ID")
     message_provider_id: Optional[str] = Field(None, description="External message ID")
     chat_id: Optional[int] = Field(None, description="Internal chat ID")
+    user_id: Optional[str] = Field(None, description="User ID for unauthenticated batch processing")
 
 
 class ChatEnrichmentBatchItemDTO(BaseModel):

@@ -273,11 +273,18 @@ def _extract_domain_expertise(classification_result: dict) -> DomainExpertise | 
         return None
 
     de = classification_result["domain_expertise"]
+
+    # Check if we have the required fields with valid values
+    theme_area = de.get("theme_area")
+    if not theme_area or theme_area is None:
+        # Don't return domain expertise if we don't have a valid theme
+        return None
+
     return DomainExpertise(
-        theme_area=de.get("theme_area", ""),
+        theme_area=theme_area,
         sub_specialties=de.get("sub_specialties", []),
         tech_stack=de.get("tech_stack", []),
-        experience_level=de.get("experience_level", "beginner")
+        experience_level=de.get("experience_level") or "beginner"
     )
 
 
@@ -287,10 +294,16 @@ def _extract_productivity_indicators(classification_result: dict) -> Productivit
         return None
 
     pi = classification_result["productivity_indicators"]
+
+    # Check if we have valid data
+    estimated_complexity = pi.get("estimated_complexity")
+    if not estimated_complexity or estimated_complexity is None:
+        return None
+
     return ProductivityIndicators(
-        estimated_complexity=pi.get("estimated_complexity", "simple"),
+        estimated_complexity=estimated_complexity,
         collaboration_signals=pi.get("collaboration_signals", []),
-        reusability_score=pi.get("reusability_score", 0)
+        reusability_score=pi.get("reusability_score") or 0
     )
 
 
@@ -299,11 +312,17 @@ def _domain_expertise_to_dto(domain_data: dict | None) -> DomainExpertiseDTO | N
     if not domain_data:
         return None
 
+    # Check if we have the required fields with valid values
+    theme_area = domain_data.get("theme_area")
+    if not theme_area or theme_area is None:
+        # Don't return domain expertise if we don't have a valid theme
+        return None
+
     return DomainExpertiseDTO(
-        theme_area=domain_data.get("theme_area", ""),
+        theme_area=theme_area,
         sub_specialties=domain_data.get("sub_specialties", []),
         tech_stack=domain_data.get("tech_stack", []),
-        experience_level=domain_data.get("experience_level", "beginner")
+        experience_level=domain_data.get("experience_level") or "beginner"
     )
 
 
@@ -312,8 +331,13 @@ def _productivity_indicators_to_dto(productivity_data: dict | None) -> Productiv
     if not productivity_data:
         return None
 
+    # Check if we have valid data
+    estimated_complexity = productivity_data.get("estimated_complexity")
+    if not estimated_complexity or estimated_complexity is None:
+        return None
+
     return ProductivityIndicatorsDTO(
-        estimated_complexity=productivity_data.get("estimated_complexity", "simple"),
+        estimated_complexity=estimated_complexity,
         collaboration_signals=productivity_data.get("collaboration_signals", []),
-        reusability_score=productivity_data.get("reusability_score", 0)
+        reusability_score=productivity_data.get("reusability_score") or 0
     )
