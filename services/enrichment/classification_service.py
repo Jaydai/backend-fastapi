@@ -39,7 +39,7 @@ class ClassificationService:
     def classify_chat(
         self,
         user_message: str,
-        assistant_response: Optional[str] = None
+        assistant_response: str | None = None
     ) -> dict:
         """
         Classify a chat and evaluate its quality

@@ -20,6 +20,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/redoc",
         "/auth/sign_in",
         "/auth/sign_up",
+        "/auth/sign_out",
         "/auth/oauth_sign_in",
         "/auth/refresh",
         "/auth/verify",

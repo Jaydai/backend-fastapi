@@ -2,7 +2,7 @@ from fastapi import HTTPException, Request, Query, status, Path
 import logging
 
 from . import router
-from services.templates import get_version_content as service_get_version_content
+from services.template_service import TemplateService
 from dtos import VersionContentDTO
 from routes.dependencies import require_permission_in_organization
 from domains.enums import PermissionEnum
@@ -34,11 +34,11 @@ async def get_organization_template_version(
     (e.g., "Version 2.0" → "v1-version-2-0").
     """
     try:
-        version = service_get_version_content(
+        version = TemplateService.get_version_by_slug(
             client=request.state.supabase_client,
-            locale=locale,
             template_id=template_id,
-            slug=slug
+            slug=slug,
+            locale=locale
         )
 
         if not version:

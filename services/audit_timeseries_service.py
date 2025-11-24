@@ -28,7 +28,7 @@ from dtos.audit_dto import (
 logger = logging.getLogger(__name__)
 
 
-def _calculate_date_range(start_date: Optional[str], end_date: Optional[str], days: int):
+def _calculate_date_range(start_date: str | None, end_date: str | None, days: int):
     """Calculate start and end datetime from parameters"""
     if end_date:
         end_dt = datetime.fromisoformat(end_date)
@@ -53,7 +53,7 @@ def _get_date_trunc_sql(granularity: str) -> str:
         return "DATE_TRUNC('day', created_at)"
 
 
-def _get_user_ids_for_teams(client: Client, organization_id: str, team_ids: Optional[List[str]]) -> List[str]:
+def _get_user_ids_for_teams(client: Client, organization_id: str, team_ids: List[str] | None) -> List[str]:
     """Get user IDs filtered by teams, or all organization members if no teams specified"""
     if not team_ids or len(team_ids) == 0:
         # Get all organization members
@@ -79,10 +79,10 @@ class AuditTimeSeriesService:
     async def get_adoption_curve(
         client: Client,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int,
-        team_ids: Optional[List[str]],
+        team_ids: List[str] | None,
         granularity: str
     ) -> AdoptionCurveResponseDTO:
         """Get adoption curve (usage over time) with team breakdown"""
@@ -214,10 +214,10 @@ class AuditTimeSeriesService:
     async def get_risk_timeline(
         client: Client,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int,
-        team_ids: Optional[List[str]],
+        team_ids: List[str] | None,
         granularity: str
     ) -> RiskTimelineResponseDTO:
         """Get risk timeline with breakdown by risk level and type"""
@@ -307,10 +307,10 @@ class AuditTimeSeriesService:
     async def get_quality_timeline(
         client: Client,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int,
-        team_ids: Optional[List[str]],
+        team_ids: List[str] | None,
         granularity: str
     ) -> QualityTimelineResponseDTO:
         """Get quality score evolution over time"""
@@ -423,10 +423,10 @@ class AuditTimeSeriesService:
     async def get_theme_distribution(
         client: Client,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int,
-        team_ids: Optional[List[str]],
+        team_ids: List[str] | None,
         top_n: int
     ) -> ThemeTimelineResponseDTO:
         """Get theme distribution for the period"""
@@ -480,10 +480,10 @@ class AuditTimeSeriesService:
     async def get_intent_distribution(
         client: Client,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int,
-        team_ids: Optional[List[str]],
+        team_ids: List[str] | None,
         top_n: int
     ) -> IntentTimelineResponseDTO:
         """Get intent distribution for the period"""

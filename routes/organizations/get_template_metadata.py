@@ -2,7 +2,7 @@ from fastapi import HTTPException, Request, Query, status
 import logging
 
 from . import router
-from services.templates import get_template_metadata as service_get_template_metadata
+from services.template_service import TemplateService
 from dtos import TemplateMetadataDTO
 from routes.dependencies import require_permission_in_organization
 from domains.enums import PermissionEnum
@@ -33,10 +33,10 @@ async def get_organization_template_metadata(
     using the version slug endpoint.
     """
     try:
-        metadata = service_get_template_metadata(
+        metadata = TemplateService.get_template_metadata(
             client=request.state.supabase_client,
-            locale=locale,
-            template_id=template_id
+            template_id=template_id,
+            locale=locale
         )
 
         if not metadata:

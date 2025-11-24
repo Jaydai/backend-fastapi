@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 async def get_organization_audit(
     request: Request,
     organization_id: str,
-    start_date: Optional[str] = Query(default=None, description="Start date (YYYY-MM-DD)"),
-    end_date: Optional[str] = Query(default=None, description="End date (YYYY-MM-DD)"),
+    start_date: str | None = Query(default=None, description="Start date (YYYY-MM-DD)"),
+    end_date: str | None = Query(default=None, description="End date (YYYY-MM-DD)"),
     days: int = Query(default=30, ge=1, le=365, description="Number of days to look back")
 ):
     """

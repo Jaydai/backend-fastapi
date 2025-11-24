@@ -40,7 +40,7 @@ class RiskAssessmentService:
         self,
         content: str,
         role: str = "user",
-        context: Optional[dict] = None
+        context: dict | None = None
     ) -> dict:
         """
         Assess risks in a message

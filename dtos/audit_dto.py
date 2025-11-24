@@ -10,8 +10,8 @@ from datetime import datetime
 
 class OrganizationAuditRequestDTO(BaseModel):
     """Request parameters for organization audit"""
-    start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
-    end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
+    start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
 
 
@@ -20,11 +20,11 @@ class OrganizationAuditRequestDTO(BaseModel):
 class QualityStatsDTO(BaseModel):
     """Quality statistics response"""
     average_score: float
-    median_score: Optional[float] = None
+    median_score: float | None = None
     distribution: dict[str, int]  # excellent, good, medium, poor
     total_rated: int
-    trend_change: Optional[float] = None
-    trend_7days: Optional[float] = None  # 7-day trend percentage change
+    trend_change: float | None = None
+    trend_7days: float | None = None  # 7-day trend percentage change
 
 
 class RiskStatsDTO(BaseModel):
@@ -40,7 +40,7 @@ class RiskStatsDTO(BaseModel):
     sensitive_data_count: int
     average_risk_score: float
     risk_distribution: dict[str, int]
-    trend_7days: Optional[float] = None  # 7-day trend percentage change in average risk
+    trend_7days: float | None = None  # 7-day trend percentage change in average risk
 
 
 class UsageStatsDTO(BaseModel):
@@ -53,15 +53,15 @@ class UsageStatsDTO(BaseModel):
     work_percentage: float
     average_prompts_per_user: float
     average_quality_score: float
-    daily_average: Optional[float] = None  # Average prompts per day over the period
-    trend_7days: Optional[float] = None  # 7-day trend percentage change in daily prompts
+    daily_average: float | None = None  # Average prompts per day over the period
+    trend_7days: float | None = None  # 7-day trend percentage change in daily prompts
 
 
 class ThemeStatsDTO(BaseModel):
     """Theme distribution response"""
     top_themes: list[dict]  # [{"theme": str, "count": int, "percentage": float}]
     total_categorized: int
-    trend_change: Optional[dict[str, float]] = None
+    trend_change: dict[str, float] | None = None
 
 
 class IntentStatsDTO(BaseModel):
@@ -74,7 +74,7 @@ class TopUserDTO(BaseModel):
     """Top user response"""
     user_id: str
     email: str
-    name: Optional[str] = None
+    name: str | None = None
     total_prompts: int
     average_quality: float
     work_prompts: int
@@ -84,7 +84,7 @@ class TopUserDTO(BaseModel):
 class TopPromptDTO(BaseModel):
     """Top quality prompt response"""
     chat_provider_id: str
-    message_provider_id: Optional[str] = None
+    message_provider_id: str | None = None
     quality_score: int
     theme: str
     intent: str
@@ -102,8 +102,8 @@ class RiskyPromptDTO(BaseModel):
     content_full: str
     created_at: datetime
     user_whitelist: bool = False
-    user_email: Optional[str] = None
-    user_name: Optional[str] = None
+    user_email: str | None = None
+    user_name: str | None = None
 
 
 class OrganizationAuditResponseDTO(BaseModel):
@@ -194,7 +194,7 @@ class TimeSeriesDataPointDTO(BaseModel):
     """Single data point in a time series"""
     date: str  # YYYY-MM-DD format
     value: float
-    label: Optional[str] = None  # For categorical breakdowns
+    label: str | None = None  # For categorical breakdowns
 
 
 class MultiSeriesDataPointDTO(BaseModel):
@@ -205,10 +205,10 @@ class MultiSeriesDataPointDTO(BaseModel):
 
 class AdoptionCurveRequestDTO(BaseModel):
     """Request parameters for adoption curve"""
-    start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
-    end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
+    start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs (empty = all teams)")
+    team_ids: list[str] | None = Field(None, description="Filter by team IDs (empty = all teams)")
     granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
 
 
@@ -226,17 +226,17 @@ class AdoptionCurveResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: Optional[list[str]] = None
+    team_filter: list[str] | None = None
     data: AdoptionCurveDataDTO
     generated_at: datetime
 
 
 class RiskTimelineRequestDTO(BaseModel):
     """Request parameters for risk timeline"""
-    start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
-    end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
+    start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
+    team_ids: list[str] | None = Field(None, description="Filter by team IDs")
     granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
 
 
@@ -261,17 +261,17 @@ class RiskTimelineResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: Optional[list[str]] = None
+    team_filter: list[str] | None = None
     data: RiskTimelineDataDTO
     generated_at: datetime
 
 
 class QualityTimelineRequestDTO(BaseModel):
     """Request parameters for quality timeline"""
-    start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
-    end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
+    start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
+    team_ids: list[str] | None = Field(None, description="Filter by team IDs")
     granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
 
 
@@ -279,7 +279,7 @@ class QualityTimelineDataPointDTO(BaseModel):
     """Quality timeline data point"""
     date: str  # YYYY-MM-DD
     average_score: float
-    median_score: Optional[float] = None
+    median_score: float | None = None
     total_rated: int
 
 
@@ -296,17 +296,17 @@ class QualityTimelineResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: Optional[list[str]] = None
+    team_filter: list[str] | None = None
     data: QualityTimelineDataDTO
     generated_at: datetime
 
 
 class ThemeTimelineRequestDTO(BaseModel):
     """Request parameters for theme distribution over time"""
-    start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
-    end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
+    start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
+    team_ids: list[str] | None = Field(None, description="Filter by team IDs")
     top_n: int = Field(default=10, ge=1, le=50, description="Number of top themes to track")
 
 
@@ -320,7 +320,7 @@ class ThemeTimelineResponseDTO(BaseModel):
     """Theme timeline response"""
     organization_id: str
     date_range: dict[str, str]
-    team_filter: Optional[list[str]] = None
+    team_filter: list[str] | None = None
     top_themes: list[str]  # Top N themes being tracked
     current_distribution: ThemeDistributionDTO
     generated_at: datetime
@@ -328,10 +328,10 @@ class ThemeTimelineResponseDTO(BaseModel):
 
 class IntentTimelineRequestDTO(BaseModel):
     """Request parameters for intent distribution over time"""
-    start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
-    end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
+    start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
-    team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
+    team_ids: list[str] | None = Field(None, description="Filter by team IDs")
     top_n: int = Field(default=10, ge=1, le=50, description="Number of top intents to track")
 
 
@@ -345,7 +345,7 @@ class IntentTimelineResponseDTO(BaseModel):
     """Intent timeline response"""
     organization_id: str
     date_range: dict[str, str]
-    team_filter: Optional[list[str]] = None
+    team_filter: list[str] | None = None
     top_intents: list[str]  # Top N intents being tracked
     current_distribution: IntentDistributionDTO
     generated_at: datetime

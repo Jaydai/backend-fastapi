@@ -11,17 +11,17 @@ from datetime import datetime
 class CreateTeamRequestDTO(BaseModel):
     """Request to create a new team"""
     name: str = Field(..., min_length=1, max_length=100, description="Team name")
-    description: Optional[str] = Field(None, max_length=500, description="Team description")
-    parent_team_id: Optional[str] = Field(None, description="Parent team ID (UUID)")
+    description: str | None = Field(None, max_length=500, description="Team description")
+    parent_team_id: str | None = Field(None, description="Parent team ID (UUID)")
     color: str = Field(default='#3B82F6', pattern=r'^#[0-9A-Fa-f]{6}$', description="Hex color code")
 
 
 class UpdateTeamRequestDTO(BaseModel):
     """Request to update an existing team"""
-    name: Optional[str] = Field(None, min_length=1, max_length=100, description="Team name")
-    description: Optional[str] = Field(None, max_length=500, description="Team description")
-    parent_team_id: Optional[str] = Field(None, description="Parent team ID (UUID)")
-    color: Optional[str] = Field(None, pattern=r'^#[0-9A-Fa-f]{6}$', description="Hex color code")
+    name: str | None = Field(None, min_length=1, max_length=100, description="Team name")
+    description: str | None = Field(None, max_length=500, description="Team description")
+    parent_team_id: str | None = Field(None, description="Parent team ID (UUID)")
+    color: str | None = Field(None, pattern=r'^#[0-9A-Fa-f]{6}$', description="Hex color code")
 
 
 class AddTeamMemberRequestDTO(BaseModel):
@@ -43,8 +43,8 @@ class TeamMemberDTO(BaseModel):
     team_id: str
     role: str
     email: str
-    name: Optional[str] = None
-    joined_at: Optional[datetime] = None
+    name: str | None = None
+    joined_at: datetime | None = None
 
 
 class TeamDTO(BaseModel):
@@ -52,12 +52,12 @@ class TeamDTO(BaseModel):
     id: str
     organization_id: str
     name: str
-    description: Optional[str] = None
-    parent_team_id: Optional[str] = None
+    description: str | None = None
+    parent_team_id: str | None = None
     color: str
     created_at: datetime
     updated_at: datetime
-    member_count: Optional[int] = 0
+    member_count: int | None = 0
 
 
 class TeamWithMembersDTO(BaseModel):
@@ -65,13 +65,13 @@ class TeamWithMembersDTO(BaseModel):
     id: str
     organization_id: str
     name: str
-    description: Optional[str] = None
-    parent_team_id: Optional[str] = None
+    description: str | None = None
+    parent_team_id: str | None = None
     color: str
     created_at: datetime
     updated_at: datetime
     members: list[TeamMemberDTO]
-    children: Optional[list['TeamWithMembersDTO']] = []
+    children: list['TeamWithMembersDTO'] | None = []
 
 
 class TeamTreeNodeDTO(BaseModel):
@@ -79,8 +79,8 @@ class TeamTreeNodeDTO(BaseModel):
     id: str
     organization_id: str
     name: str
-    description: Optional[str] = None
-    parent_team_id: Optional[str] = None
+    description: str | None = None
+    parent_team_id: str | None = None
     color: str
     member_count: int = 0
     depth: int = 0

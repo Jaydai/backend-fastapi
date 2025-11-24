@@ -13,24 +13,16 @@ async def get_all_templates(
     request: Request,
     organization_id: str | None = None,
     folder_ids: str | None = Query(None, description="Comma-separated folder IDs to filter templates. Empty for root only."),
-    published: bool | None = None,
+    published_only: bool | None = None,
     limit: int = Query(100, le=500),
     offset: int = Query(0, ge=0)
 ) -> list[TemplateTitleResponseDTO]:
-    """
-    Get template titles (id, title) with optional filtering.
-    Returns minimal data for list endpoints.
-
-    Filters:
-    - folder_ids: comma-separated IDs, empty string for root only, omit for all
-    - published: filter by published status
-    """
     try:
         client = request.state.supabase_client
         user_id = request.state.user_id
         locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
 
-        logger.info(f"Fetching template titles with folder_ids={folder_ids}, published={published}, organization_id={organization_id}")
+        logger.info(f"Fetching template titles with folder_ids={folder_ids}, published_only={published_only}, organization_id={organization_id}")
 
         # Parse folder_ids
         folder_id_list: list[str] | None = None
@@ -46,7 +38,7 @@ async def get_all_templates(
             user_id,           # Pass user_id for personal templates
             organization_id,   # Pass organization_id for org templates
             folder_id_list,
-            published,
+            published_only,
             limit,
             offset
         )

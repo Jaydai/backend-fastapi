@@ -62,7 +62,7 @@ class TeamService:
         )
 
     @staticmethod
-    def get_team_by_id(client: Client, team_id: str) -> Optional[TeamDTO]:
+    def get_team_by_id(client: Client, team_id: str) -> TeamDTO | None:
         """Get a specific team by ID"""
         team = TeamRepository.get_team_by_id(client, team_id)
         if not team:
@@ -87,8 +87,8 @@ class TeamService:
         client: Client,
         organization_id: str,
         name: str,
-        description: Optional[str] = None,
-        parent_team_id: Optional[str] = None,
+        description: str | None = None,
+        parent_team_id: str | None = None,
         color: str = "#3B82F6"
     ) -> TeamDTO:
         """Create a new team"""
@@ -125,10 +125,10 @@ class TeamService:
     def update_team(
         client: Client,
         team_id: str,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        parent_team_id: Optional[str] = None,
-        color: Optional[str] = None
+        name: str | None = None,
+        description: str | None = None,
+        parent_team_id: str | None = None,
+        color: str | None = None
     ) -> TeamDTO:
         """Update an existing team"""
         # Validate team exists

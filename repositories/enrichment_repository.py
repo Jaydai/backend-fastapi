@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class EnrichmentRepository:
 
     @staticmethod
-    def save_enriched_chat(client: Client, user_id: str, enriched_chat: EnrichedChat) -> Optional[EnrichedChat]:
+    def save_enriched_chat(client: Client, user_id: str, enriched_chat: EnrichedChat) -> EnrichedChat | None:
         """
         Save enriched chat to database
         Returns None if chat already exists (duplicate), otherwise returns the saved chat
@@ -72,7 +72,7 @@ class EnrichmentRepository:
         return EnrichmentRepository._map_chat_row_to_entity(row)
 
     @staticmethod
-    def save_enriched_message(client: Client, user_id: str, enriched_message: EnrichedMessage) -> Optional[EnrichedMessage]:
+    def save_enriched_message(client: Client, user_id: str, enriched_message: EnrichedMessage) -> EnrichedMessage | None:
         """
         Save enriched message to database
         Returns None if message already exists (duplicate), otherwise returns the saved message
@@ -128,7 +128,7 @@ class EnrichmentRepository:
         return EnrichmentRepository._map_message_row_to_entity(row)
 
     @staticmethod
-    def get_enriched_chat(client: Client, user_id: str, chat_provider_id: str) -> Optional[EnrichedChat]:
+    def get_enriched_chat(client: Client, user_id: str, chat_provider_id: str) -> EnrichedChat | None:
         """Retrieve enriched chat by chat_provider_id"""
         response = client.table("enriched_chats") \
             .select("*") \
@@ -142,7 +142,7 @@ class EnrichmentRepository:
         return EnrichmentRepository._map_chat_row_to_entity(response.data[0])
 
     @staticmethod
-    def get_enriched_message(client: Client, user_id: str, message_provider_id: str) -> Optional[EnrichedMessage]:
+    def get_enriched_message(client: Client, user_id: str, message_provider_id: str) -> EnrichedMessage | None:
         """Retrieve enriched message by message_provider_id"""
         response = client.table("enriched_messages") \
             .select("*") \
@@ -198,8 +198,8 @@ class EnrichmentRepository:
         client: Client,
         user_id: str,
         days: int,
-        min_quality: Optional[float],
-        max_quality: Optional[float],
+        min_quality: float | None,
+        max_quality: float | None,
         order_by: str,
         limit: int
     ) -> list[EnrichedChat]:

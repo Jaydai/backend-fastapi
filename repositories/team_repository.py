@@ -43,7 +43,7 @@ class TeamRepository:
         return teams
 
     @staticmethod
-    def get_team_by_id(client: Client, team_id: str) -> Optional[Team]:
+    def get_team_by_id(client: Client, team_id: str) -> Team | None:
         """Get a specific team by ID"""
         response = client.table("teams") \
             .select("*") \
@@ -71,8 +71,8 @@ class TeamRepository:
         client: Client,
         organization_id: str,
         name: str,
-        description: Optional[str] = None,
-        parent_team_id: Optional[str] = None,
+        description: str | None = None,
+        parent_team_id: str | None = None,
         color: str = "#3B82F6"
     ) -> Team:
         """Create a new team"""
@@ -100,10 +100,10 @@ class TeamRepository:
     def update_team(
         client: Client,
         team_id: str,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        parent_team_id: Optional[str] = None,
-        color: Optional[str] = None
+        name: str | None = None,
+        description: str | None = None,
+        parent_team_id: str | None = None,
+        color: str | None = None
     ) -> Team:
         """Update an existing team"""
         update_data = {}
@@ -185,7 +185,7 @@ class TeamRepository:
         return members
 
     @staticmethod
-    def get_user_teams(client: Client, user_id: str, organization_id: Optional[str] = None) -> list[Team]:
+    def get_user_teams(client: Client, user_id: str, organization_id: str | None = None) -> list[Team]:
         """Get all teams a user belongs to"""
         query = client.table("user_team_permissions") \
             .select("*, teams(*)") \

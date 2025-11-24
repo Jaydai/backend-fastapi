@@ -92,6 +92,8 @@ class BlockRepository:
         organization_id: str | None = None,
         types: list[str] | None = None,
         published: bool | None = None,
+        user_id: str | None = None,
+        or_conditions: list[str] | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[BlockTitle]:
@@ -111,8 +113,12 @@ class BlockRepository:
         """
         query = client.table("prompt_blocks").select("id, title")
 
-        if organization_id:
+        if or_conditions:
+            query = query.or_(",".join(or_conditions))
+        elif organization_id:
             query = query.eq("organization_id", organization_id)
+        elif user_id:
+            query = query.eq("user_id", user_id).is_("organization_id", "null")
 
         if types is not None and len(types) > 0:
             query = query.in_("type", types)

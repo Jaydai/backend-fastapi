@@ -62,8 +62,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> OrganizationAuditResponseDTO:
         """
@@ -118,8 +118,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> QualityStatsWithContextDTO:
         """Get quality statistics for organization"""
@@ -156,8 +156,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> RiskStatsWithContextDTO:
         """Get risk statistics for organization"""
@@ -201,8 +201,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> UsageStatsWithContextDTO:
         """Get usage statistics for organization"""
@@ -244,8 +244,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> ThemeStatsWithContextDTO:
         """Get theme statistics for organization"""
@@ -277,8 +277,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> IntentStatsWithContextDTO:
         """Get intent statistics for organization"""
@@ -310,8 +310,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> TopUsersWithContextDTO:
         """Get top users for organization"""
@@ -341,8 +341,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> TopPromptsWithContextDTO:
         """Get top prompts for organization"""
@@ -372,8 +372,8 @@ class AuditService:
         client: Client,
         user_id: str,
         organization_id: str,
-        start_date: Optional[str],
-        end_date: Optional[str],
+        start_date: str | None,
+        end_date: str | None,
         days: int
     ) -> RiskyPromptsWithContextDTO:
         """Get risky prompts for organization"""
@@ -402,8 +402,8 @@ class AuditService:
 # ==================== PRIVATE HELPER FUNCTIONS ====================
 
 def _calculate_date_range(
-    start_date: Optional[str],
-    end_date: Optional[str],
+    start_date: str | None,
+    end_date: str | None,
     days: int
 ) -> tuple[datetime, datetime]:
     """Calculate date range for audit"""

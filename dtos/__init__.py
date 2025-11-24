@@ -20,7 +20,8 @@ from .template_dto import (
     VersionSummary,
     VersionContentDTO,
     TemplateMetadataDTO,
-    TemplateCountsResponseDTO
+    TemplateCountsResponseDTO,
+    VersionDTO,
 )
 from .user_dto import UserProfileResponseDTO, UpdateUserProfileDTO, UpdateDataCollectionDTO
 from .organization_dto import (
@@ -45,6 +46,7 @@ from .onboarding_dto import (
     OnboardingStatusResponseDTO,
     UpdateOnboardingDTO,
 )
+from .workspace_root_dto import WorkspaceRootResponseDTO
 from .notification_dto import (
     NotificationResponseDTO,
     NotificationMetadataDTO,
@@ -95,6 +97,7 @@ __all__ = [
     "VersionContentDTO",
     "TemplateMetadataDTO",
     "TemplateCountsResponseDTO",
+    "VersionDTO",
     "UserProfileResponseDTO",
     "UpdateUserProfileDTO",
     "UpdateDataCollectionDTO",

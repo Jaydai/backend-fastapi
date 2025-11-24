@@ -10,10 +10,10 @@ from typing import Optional
 class QualityStats:
     """Quality statistics aggregation"""
     average_score: float
-    median_score: Optional[float] = None
-    distribution: Optional[dict[str, int]] = None  # excellent, good, medium, poor
+    median_score: float | None = None
+    distribution: dict[str, int] | None = None  # excellent, good, medium, poor
     total_rated: int = 0
-    trend_change: Optional[float] = None  # Percentage change vs previous period
+    trend_change: float | None = None  # Percentage change vs previous period
 
     def __post_init__(self):
         if self.distribution is None:
@@ -38,7 +38,7 @@ class RiskStats:
     credentials_detected_count: int = 0
     sensitive_data_count: int = 0
     average_risk_score: float = 0.0
-    risk_distribution: Optional[dict[str, int]] = None
+    risk_distribution: dict[str, int] | None = None
 
     def __post_init__(self):
         if self.risk_distribution is None:
@@ -69,7 +69,7 @@ class ThemeStats:
     """Theme distribution statistics"""
     top_themes: list[dict[str, any]] = None  # [{"theme": str, "count": int, "percentage": float}]
     total_categorized: int = 0
-    trend_change: Optional[dict[str, float]] = None  # Per-theme percentage changes
+    trend_change: dict[str, float] | None = None  # Per-theme percentage changes
 
     def __post_init__(self):
         if self.top_themes is None:
@@ -98,7 +98,7 @@ class TopUser:
     average_quality: float
     work_prompts: int
     high_risk_messages: int
-    name: Optional[str] = None
+    name: str | None = None
 
 
 @dataclass
@@ -110,7 +110,7 @@ class TopPrompt:
     intent: str
     content_preview: str  # First 200 chars
     created_at: datetime
-    message_provider_id: Optional[str] = None
+    message_provider_id: str | None = None
 
 
 @dataclass
@@ -124,8 +124,8 @@ class RiskyPrompt:
     content_full: str  # Full content
     created_at: datetime
     user_whitelist: bool = False
-    user_email: Optional[str] = None
-    user_name: Optional[str] = None
+    user_email: str | None = None
+    user_name: str | None = None
 
 
 @dataclass

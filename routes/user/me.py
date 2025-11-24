@@ -33,7 +33,7 @@ async def get_me(request: Request, response: Response):
         raise
     except Exception as e:
         logger.error(
-            f"[USERS] Unexpected error in /users/me endpoint: {str(e)}",
+            f"[USERS] Unexpected error in /user/me endpoint: {str(e)}",
             exc_info=True,
         )
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")

@@ -19,6 +19,7 @@ from . import (
     get_templates_counts,
     get_templates,
     get_folders,
+    get_templates_root,
 )
 
 # Not implemented yet (501)

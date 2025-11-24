@@ -32,7 +32,7 @@ class EnrichmentService:
     @staticmethod
     def enrich_chat(
         client: Client,
-        user_id: Optional[str],
+        user_id: str | None,
         request: ChatEnrichmentRequestDTO
     ) -> ChatEnrichmentResponseDTO:
         """Enrich a single chat with classification and quality assessment"""
@@ -57,7 +57,7 @@ class EnrichmentService:
     @staticmethod
     async def enrich_chat_batch(
         client: Client,
-        user_id: Optional[str],
+        user_id: str | None,
         requests: list[ChatEnrichmentRequestDTO]
     ) -> list[dict]:
         """Enrich multiple chats in parallel"""
@@ -80,7 +80,7 @@ class EnrichmentService:
         ]
 
     @staticmethod
-    async def _enrich_chat_async(client: Client, user_id: Optional[str], request: ChatEnrichmentRequestDTO):
+    async def _enrich_chat_async(client: Client, user_id: str | None, request: ChatEnrichmentRequestDTO):
         """Async wrapper for enrich_chat"""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
@@ -92,7 +92,7 @@ class EnrichmentService:
     @staticmethod
     def enrich_message(
         client: Client,
-        user_id: Optional[str],
+        user_id: str | None,
         request: EnrichMessageRequestDTO
     ) -> EnrichMessageResponseDTO:
         """Enrich a single message with risk assessment"""
@@ -117,7 +117,7 @@ class EnrichmentService:
     @staticmethod
     def enrich_message_batch(
         client: Client,
-        user_id: Optional[str],
+        user_id: str | None,
         requests: list[EnrichMessageRequestDTO]
     ) -> list[dict]:
         """Enrich multiple messages sequentially"""
@@ -187,8 +187,8 @@ class EnrichmentService:
         client: Client,
         user_id: str,
         days: int,
-        min_quality: Optional[float],
-        max_quality: Optional[float],
+        min_quality: float | None,
+        max_quality: float | None,
         order_by: str,
         limit: int
     ) -> list[RatedChatDTO]:

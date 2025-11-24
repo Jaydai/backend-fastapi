@@ -12,15 +12,15 @@ class Team:
     id: str  # UUID
     organization_id: str  # UUID
     name: str
-    description: Optional[str] = None
-    parent_team_id: Optional[str] = None  # UUID
+    description: str | None = None
+    parent_team_id: str | None = None  # UUID
     color: str = '#3B82F6'
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     # Computed fields (not from database)
-    member_count: Optional[int] = None
-    children: Optional[list['Team']] = None
+    member_count: int | None = None
+    children: list['Team'] | None = None
 
     def __post_init__(self):
         if self.children is None:
@@ -34,12 +34,12 @@ class UserTeamPermission:
     user_id: str  # UUID
     team_id: str  # UUID
     role: str  # 'member', 'lead', 'admin'
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     # Optional user details (for joined queries)
-    user_email: Optional[str] = None
-    user_name: Optional[str] = None
+    user_email: str | None = None
+    user_name: str | None = None
 
 
 @dataclass
@@ -49,8 +49,8 @@ class TeamMember:
     team_id: str  # UUID
     role: str
     email: str
-    name: Optional[str] = None
-    joined_at: Optional[datetime] = None
+    name: str | None = None
+    joined_at: datetime | None = None
 
 
 @dataclass
@@ -59,13 +59,13 @@ class TeamWithMembers:
     id: str  # UUID
     organization_id: str  # UUID
     name: str
-    description: Optional[str] = None
-    parent_team_id: Optional[str] = None  # UUID
+    description: str | None = None
+    parent_team_id: str | None = None  # UUID
     color: str = '#3B82F6'
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
     members: list[TeamMember] = None
-    children: Optional[list['TeamWithMembers']] = None
+    children: list['TeamWithMembers'] | None = None
 
     def __post_init__(self):
         if self.members is None:
@@ -80,8 +80,8 @@ class TeamTreeNode:
     id: str  # UUID
     organization_id: str  # UUID
     name: str
-    description: Optional[str] = None
-    parent_team_id: Optional[str] = None  # UUID
+    description: str | None = None
+    parent_team_id: str | None = None  # UUID
     color: str = '#3B82F6'
     member_count: int = 0
     depth: int = 0

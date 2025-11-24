@@ -9,7 +9,7 @@ class Session:
 @dataclass
 class User:
     """User entity from Supabase auth"""
-    user_id: Optional[str] = None
-    name: Optional[str] = None
+    user_id: str | None = None
+    name: str | None = None
     data_collection: bool = True
-    profile_picture_url: Optional[str] = None
+    profile_picture_url: str | None = None

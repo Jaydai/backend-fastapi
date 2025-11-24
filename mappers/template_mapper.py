@@ -1,10 +1,11 @@
-from domains.entities import Template, TemplateVersion, TemplateComment, TemplateCommentAuthor, VersionSummary
+from domains.entities import Template, TemplateVersion, TemplateComment, TemplateCommentAuthor
 from dtos import (
     TemplateListItemDTO,
     TemplateResponseDTO,
     TemplateVersionResponseDTO,
     TemplateCommentDTO,
     TemplateCommentAuthorDTO,
+    VersionDTO,
 )
 
 class TemplateMapper:
@@ -48,10 +49,15 @@ class TemplateMapper:
     @staticmethod
     def entity_to_response_dto(
         template: Template,
-        versions_summary: list[VersionSummary],
+        versions: list[TemplateVersion],
         locale: str = "en"
     ) -> TemplateResponseDTO:
-        version_dtos = [VersionSummary(v.id, TemplateMapper.localize_string(v.name, locale), v.slug, v.is_current) for v in versions_summary]
+        version_dtos = [
+            TemplateMapper.version_entity_to_version_dto(v, locale)
+            for v in versions
+        ]
+        current_version = next((v for v in versions if v.is_current), versions[0] if versions else None)
+        current_content = TemplateMapper.localize_string(current_version.content, locale) if current_version else None
 
         return TemplateResponseDTO(
             id=template.id,
@@ -64,10 +70,11 @@ class TemplateMapper:
             updated_at=template.updated_at,
             last_used_at=template.last_used_at,
             usage_count=template.usage_count,
-            current_version_id=template.current_version_id,
+            current_version_id=current_version.id if current_version else None,
             is_published=template.is_published,
+            content=current_content,
             versions=version_dtos
-            )
+        )
 
     @staticmethod
     def version_entity_to_dto(version: TemplateVersion, locale: str = "en") -> TemplateVersionResponseDTO:
@@ -86,6 +93,26 @@ class TemplateMapper:
             usage_count=version.usage_count,
             parent_version_id=version.parent_version_id,
             optimized_for=version.optimized_for
+        )
+
+    @staticmethod
+    def version_entity_to_version_dto(version: TemplateVersion, locale: str = "en") -> VersionDTO:
+        return VersionDTO(
+            id=version.id,
+            template_id=version.template_id,
+            name=TemplateMapper.localize_string(version.name, locale),
+            slug=version.slug,
+            content=TemplateMapper.localize_string(version.content, locale),
+            change_notes=TemplateMapper.localize_string(version.change_notes, locale) if version.change_notes else None,
+            author_id=version.author_id,
+            created_at=version.created_at,
+            updated_at=version.updated_at,
+            status=version.status,
+            is_current=version.is_current,
+            is_published=version.is_published,
+            usage_count=version.usage_count,
+            parent_version_id=version.parent_version_id,
+            optimized_for=version.optimized_for,
         )
 
     @staticmethod

@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 async def get_adoption_curve(
     request: Request,
     organization_id: str,
-    start_date: Optional[str] = Query(default=None, description="Start date (YYYY-MM-DD)"),
-    end_date: Optional[str] = Query(default=None, description="End date (YYYY-MM-DD)"),
+    start_date: str | None = Query(default=None, description="Start date (YYYY-MM-DD)"),
+    end_date: str | None = Query(default=None, description="End date (YYYY-MM-DD)"),
     days: int = Query(default=30, ge=1, le=365, description="Number of days to look back"),
-    team_ids: Optional[List[str]] = Query(default=None, description="Filter by team IDs"),
+    team_ids: List[str] | None = Query(default=None, description="Filter by team IDs"),
     granularity: str = Query(default="day", pattern="^(day|week|month)$", description="Time granularity")
 ):
     """

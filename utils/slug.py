@@ -4,7 +4,7 @@ import re
 from typing import Optional
 
 
-def generate_version_slug(version_name: str, version_number: Optional[int] = None) -> str:
+def generate_version_slug(version_name: str, version_number: int | None = None) -> str:
     """
     Generate a URL-friendly slug from a version name.
 

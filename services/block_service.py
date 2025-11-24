@@ -9,6 +9,8 @@ from dtos import (
 )
 from repositories.block_repository import BlockRepository
 from mappers.block_mapper import BlockMapper
+from services.permissions import UserPermissionsService
+from utils import localize_object
 
 class BlockService:
     @staticmethod
@@ -41,6 +43,8 @@ class BlockService:
         organization_id: str | None = None,
         types: list[str] | None = None,
         published: bool | None = None,
+        user_id: str | None = None,
+        workspace_type: str | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[BlockTitleResponseDTO]:
@@ -48,16 +52,49 @@ class BlockService:
         Get block titles (id, title) with optional filtering.
         Returns minimal data for list endpoints.
         """
-        from services.blocks import BlockTitleService
-        return BlockTitleService.get_titles(
+        or_conditions = None
+        target_org = organization_id
+        target_user = user_id if workspace_type in (None, "user") else None
+
+        if user_id and workspace_type:
+            filter_result = UserPermissionsService.build_workspace_filter_conditions(
+                client, user_id, workspace_type, organization_id
+            )
+
+            filter_type = filter_result.get("type")
+            if filter_type == "none":
+                return []
+            elif filter_type == "or":
+                or_conditions = filter_result.get("conditions") or []
+                target_org = None
+                target_user = None
+            elif filter_type == "organization":
+                target_org = filter_result.get("org_id")
+                target_user = None
+            elif filter_type == "organizations":
+                org_ids = filter_result.get("org_ids") or []
+                or_conditions = [f"organization_id.eq.{org_id}" for org_id in org_ids]
+                target_org = None
+                target_user = None
+            elif filter_type == "user":
+                target_org = None
+                target_user = user_id
+
+        blocks = BlockRepository.get_blocks_titles(
             client,
-            locale=locale,
-            organization_id=organization_id,
+            organization_id=target_org,
             types=types,
             published=published,
+            user_id=target_user,
+            or_conditions=or_conditions,
             limit=limit,
             offset=offset
         )
+
+        return [
+            BlockTitleResponseDTO(**localize_object(block.__dict__, locale, ["title"]))
+            for block in blocks
+        ]
 
     @staticmethod
     def get_block_by_id(
