@@ -39,8 +39,8 @@ jobs:
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
-            echo "SERVICE_NAME=api-layers" >> $GITHUB_ENV
-            echo "CUSTOM_DOMAIN=api.dev.jayd.ai" >> $GITHUB_ENV
+            echo "SERVICE_NAME=api-staging" >> $GITHUB_ENV
+            echo "CUSTOM_DOMAIN=api.staging.jayd.ai" >> $GITHUB_ENV
             echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PROD }}" >> $GITHUB_ENV
             echo "SUPABASE_SECRET_KEY=${{ secrets.SUPABASE_SECRET_KEY_PROD }}" >> $GITHUB_ENV
             echo "SUPABASE_PUBLISHABLE_KEY=${{ secrets.SUPABASE_PUBLISHABLE_KEY_PROD }}" >> $GITHUB_ENV
