@@ -21,9 +21,9 @@ class AuditRepository:
     @staticmethod
     def get_organization_member_ids(client: Client, organization_id: str) -> list[str]:
         """Get all user IDs for organization members"""
-        response = client.table("users_metadata") \
+        response = client.table("user_organization_roles") \
             .select("user_id") \
-            .contains("organization_ids", [organization_id]) \
+            .eq("organization_id", organization_id) \
             .execute()
 
         if not response.data:
