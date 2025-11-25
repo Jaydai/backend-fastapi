@@ -381,6 +381,6 @@ def _extract_risk_category_names(risk_categories: dict) -> list[str]:
     """Extract names of detected risk categories"""
     detected = []
     for cat_name, cat_data in risk_categories.items():
-        if isinstance(cat_data, dict) and cat_data.get("risk_level") not in ["none", None]:
+        if isinstance(cat_data, dict) and cat_data.get("detected") is True:
             detected.append(cat_name)
     return detected
