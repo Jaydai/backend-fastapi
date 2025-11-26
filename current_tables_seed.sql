@@ -1,4 +1,759 @@
+SET session_replication_role = replica;
 
+--
+-- PostgreSQL database dump
+--
+
+-- \restrict EKwjdeA0cneSFUq59TtkdLNACU7LtSkgtRqUfykGz61cyj8cPYmGGdT1Wf7oDo2
+
+-- Dumped from database version 17.6
+-- Dumped by pg_dump version 17.6
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Data for Name: audit_log_entries; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."audit_log_entries" ("instance_id", "id", "payload", "created_at", "ip_address") VALUES
+	('00000000-0000-0000-0000-000000000000', 'ddba1bc0-8efc-4493-aefb-ff3d4bf52fbc', '{"action":"user_confirmation_requested","actor_id":"77c7f38a-84ae-4eb8-a8e5-22eccfcda790","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"user","traits":{"provider":"email"}}', '2025-10-26 13:00:42.665487+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e261e118-2ab2-468e-9743-a4294ca84866', '{"action":"user_deleted","actor_id":"00000000-0000-0000-0000-000000000000","actor_username":"service_role","actor_via_sso":false,"log_type":"team","traits":{"user_email":"test@jayd.ai","user_id":"77c7f38a-84ae-4eb8-a8e5-22eccfcda790","user_phone":""}}', '2025-10-26 13:03:58.737676+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e218a916-a04f-4e61-a730-f8ca14e5ae1c', '{"action":"user_signedup","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"team","traits":{"provider":"email"}}', '2025-10-27 09:20:24.305665+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f0f09b30-8efd-4a31-8946-d6b5de7cebf1', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 09:20:24.314399+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3cb19ebd-d31e-465c-9c5a-d3c8274923d2', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 09:28:57.752625+00', ''),
+	('00000000-0000-0000-0000-000000000000', '74f6f0e4-f187-4941-bafb-b8e09b439778', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 09:32:01.955865+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8fee7b5a-da87-4be5-90c1-8c91b8a688d4', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 09:32:37.287314+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b55a5ee2-df9d-4121-87f8-5effb5d9dc90', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 09:34:02.187192+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'adf24f2a-31fa-40f9-8a72-b59d87721c6c', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 09:37:07.273718+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a82728ab-9cec-4f0e-8d37-ccac69f912e1', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 09:41:01.805583+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8f0b1650-9518-4e97-8a3f-b3b876ef454d', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 11:44:31.999207+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd2e7c0a9-4488-439e-a1be-3e8cf9ceb7c4', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 11:46:16.909836+00', ''),
+	('00000000-0000-0000-0000-000000000000', '26e389f4-ece2-4d21-b433-9a128b81c891', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 16:25:37.918545+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8e47b8d4-b56d-4bbd-a65b-2ba4ede92165', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 16:25:50.658565+00', ''),
+	('00000000-0000-0000-0000-000000000000', '574cd7d7-4f1e-4d5d-997d-bd127d211a40', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 17:50:53.941139+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd08b9e08-f9d0-499c-a45c-0c04eff8f086', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 17:52:06.659002+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6f0fb93e-6f0e-45dd-93f0-e9986c4a26c0', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 17:56:34.832433+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b3d1eddd-ae3b-40de-96c6-19e167b35b3d', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 17:57:17.297957+00', ''),
+	('00000000-0000-0000-0000-000000000000', '359fd2a9-055d-49dd-a8c1-959dc2a489a7', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 18:00:49.771028+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9fd32cba-73f0-4df5-9e2b-da295fcacd5d', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 19:18:42.206774+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5d5de28d-b7db-407f-a19f-91683a97c09a', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 19:19:01.607567+00', ''),
+	('00000000-0000-0000-0000-000000000000', '943f9a94-5111-42a4-8416-5e815dbb18a1', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 19:19:30.85723+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8a1b17d7-2488-4570-b1e1-42b680363cb8', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 20:45:55.964368+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a3a5f4a1-a50e-49c6-98be-b13d5906c7a5', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 20:46:30.241345+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1a5978dc-ddcd-4948-a275-0918eafbfe3f', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 20:47:01.515165+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e820dc2e-9ff3-4a9e-8dce-b5c3cdb929ca', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 22:33:48.350151+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e82b53d7-c144-4386-a5c9-acc060b1ba7b', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 22:35:14.071944+00', ''),
+	('00000000-0000-0000-0000-000000000000', '966e7800-b2a7-4704-87f3-91d62bc2426e', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-27 22:36:03.941399+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4035d295-d166-48de-9909-1ee177ab599b', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-10-28 14:09:09.37567+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e6da2841-cc75-4874-9709-2eacb99148d3', '{"action":"token_refreshed","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-10-28 16:36:43.417983+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9d845960-f27d-40d2-8225-1c3d1e380ab2', '{"action":"token_revoked","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-10-28 16:36:43.444835+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cb55b849-a875-4f66-9c55-d3bb15ceea93', '{"action":"token_refreshed","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-10-28 16:36:43.639851+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b6bbcfce-59d6-4c4f-a52f-243072b5f898', '{"action":"login","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-05 09:15:31.308377+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e9c42db1-5126-421d-b161-cb920a823ae6', '{"action":"token_refreshed","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-05 13:59:31.341843+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4de37056-fb4e-4a25-9cab-86480d162c1d', '{"action":"token_revoked","actor_id":"51eee0a1-8f20-4403-b5f1-0566375db20b","actor_username":"test@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-05 13:59:31.351347+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2604a51e-c384-4573-8daf-6977d3c0ba34', '{"action":"user_signedup","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"team","traits":{"provider":"email"}}', '2025-11-05 15:08:36.626008+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'baa682e3-499c-40d0-b82e-65338ee0d3af', '{"action":"login","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-05 15:08:36.647112+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f4dabe3c-1c29-4c97-83a8-3218f7c0fb6e', '{"action":"login","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-05 16:16:59.711764+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4fb4b2ae-79b5-45b5-b256-a4635eb7ac52', '{"action":"login","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-05 16:29:15.7499+00', ''),
+	('00000000-0000-0000-0000-000000000000', '11a4dbfc-a2a1-4e54-b618-0cb3a66e9881', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-05 22:12:23.470907+00', ''),
+	('00000000-0000-0000-0000-000000000000', '73a7448c-c54a-40fe-b7b2-a2a74e4ca957', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-05 22:12:23.491246+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b7c34684-d23a-4947-bd9d-e7294a587c3e', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-05 22:12:23.736303+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c3915ec1-5ba7-46d6-8973-d1b387338bad', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-05 22:12:23.819482+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'defa3474-6d1d-48bb-a20f-01c31740a923', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 08:01:45.659748+00', ''),
+	('00000000-0000-0000-0000-000000000000', '99da73d2-3efb-4f47-bd0c-1664b6184cc8', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 08:01:45.68374+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dc634dc1-ffbb-4565-9ccc-abd6afb08886', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 08:01:46.013223+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2cdc2f93-c6b1-4104-81a7-2e02c60669d3', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 08:01:46.10454+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5c37f193-0c24-4e42-af08-272ef41264d3', '{"action":"login","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-06 08:46:26.172515+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ba514e20-c9b5-41cc-a1d5-890a371f41e3', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 09:24:34.812363+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bef83a12-f64b-4cbd-a700-546752131d4e', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 09:24:34.832554+00', ''),
+	('00000000-0000-0000-0000-000000000000', '25ce50b6-b816-44b3-afb2-97593c85bc8b', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 09:24:35.289548+00', ''),
+	('00000000-0000-0000-0000-000000000000', '68cdc889-a9a3-4c48-95da-916cb102bd6f', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 09:24:35.367461+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7bf8ef9d-dea7-477f-b877-6bc4327189db', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 09:41:27.619698+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c8688d81-875d-46bb-aa74-d98ac51ad235', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 09:41:27.642857+00', ''),
+	('00000000-0000-0000-0000-000000000000', '23b629c5-9f19-4f4b-90b0-a3425040f224', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 10:22:27.624543+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6caf0e80-7f02-463c-8c52-80d541b65d5d', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 10:22:27.639609+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3f8c2be2-0ed6-41e2-83bf-335ea1bace8f', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 10:36:28.637535+00', ''),
+	('00000000-0000-0000-0000-000000000000', '748d3db0-1ded-4750-a49b-3d269c8cab14', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 10:36:28.64977+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a56bd507-de39-438a-938f-0e4220d24f7d', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 12:28:34.564645+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5395f9b8-5eb6-4e72-a7df-cd8a269b5b02', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 12:28:34.590847+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b6dc9c4d-c3ec-43f5-ad89-061ad59912bb', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 12:29:20.777083+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b381c989-baed-496b-a8df-6db6e5bd5f60', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 12:29:20.778445+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6e637c21-82e0-42a6-9fee-ec9f5c2a0c01', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 12:29:20.872072+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cbeef933-a853-44ad-8e06-04a66495f9ff', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 12:29:21.643879+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cc6eec74-e395-460a-9d4b-d40e2e2e8e2a', '{"action":"login","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-06 12:51:57.323066+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd3ec5e4f-d138-4fb0-a824-ff166364c407', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 13:46:59.039969+00', ''),
+	('00000000-0000-0000-0000-000000000000', '51b675fb-df07-405a-91d3-f68f027fee9e', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 13:46:59.062841+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6b51f673-f518-48b2-a8db-431d59e8abbc', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 14:16:33.305418+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ff8293a2-6e2f-4024-b61d-cbf985d39ef4', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 14:16:33.323864+00', ''),
+	('00000000-0000-0000-0000-000000000000', '64d08a22-19ce-46df-b6dd-fb2b0a2fc8c5', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 14:16:33.437516+00', ''),
+	('00000000-0000-0000-0000-000000000000', '34cf7256-f3a8-4bf1-a262-080b318e6947', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 14:16:34.233334+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1861aaee-2b94-46ac-a1c6-cebab6ffe25a', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 14:42:00.73329+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6129edf7-0805-4ecf-b9f3-5f9d37a48c52', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 14:42:00.755979+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f6f94d4f-545d-4026-8f7d-5802cd4dd80e', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 15:19:59.924732+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5169972b-a912-433d-bccf-56f266c860f3', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 15:19:59.95017+00', ''),
+	('00000000-0000-0000-0000-000000000000', '48e751b1-4219-4c23-a48b-c4d82d1cd71a', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 15:20:00.099711+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dc41fab8-8459-415b-ba86-b3b42114131d', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 15:37:01.756211+00', ''),
+	('00000000-0000-0000-0000-000000000000', '69d8518b-eed4-420c-a4a7-13d318bd76e6', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 15:37:01.765852+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a26800d9-0f0d-4d83-a567-ce94e737ed27', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 16:24:19.356576+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6680b7c1-4edf-4fa8-a0d8-1d16ee3aa45f', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 16:24:19.380798+00', ''),
+	('00000000-0000-0000-0000-000000000000', '94bd0bd7-03e0-4ff5-89db-47c0cb33aeaf', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 16:24:20.280049+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6ddd1c63-7559-402c-b56e-ddc6a6421297', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 16:32:02.794689+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2763a8c3-9363-48ff-9c2a-5915570947c6', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 16:32:02.796852+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b44e8e23-c0b5-4120-8dad-baa3e9719b4a', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 17:19:24.479309+00', ''),
+	('00000000-0000-0000-0000-000000000000', '37e77a72-083b-46b0-b8b6-738664fb5827', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 17:19:24.496889+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4d72ea47-6dcd-4de0-8462-735d8612d16a', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 17:27:08.123732+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c38070c8-0a03-44f8-ac78-b6c00f45ae78', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 17:27:08.13994+00', ''),
+	('00000000-0000-0000-0000-000000000000', '69bcb129-d6f5-4291-ae8e-96725c756a59', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 21:17:05.837205+00', ''),
+	('00000000-0000-0000-0000-000000000000', '836686dc-6515-4891-b9c5-62ed0e17a5f4', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-06 21:17:05.856384+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3e1e2e5e-4864-47fa-bf44-a160b31b0a78', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-07 08:02:09.881008+00', ''),
+	('00000000-0000-0000-0000-000000000000', '79c6e274-1dca-451c-a920-686d1cd07c14', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-07 08:02:09.902671+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'de83c184-3640-4d72-be2b-491dfe6b4e66', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-07 08:25:47.2665+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a44e1bf6-6779-4805-b0f7-d0c995724edd', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-07 08:25:47.292458+00', ''),
+	('00000000-0000-0000-0000-000000000000', '83a00f4f-17b9-4e93-836a-b5b5ed377d05', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-07 08:25:47.428921+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ed5df914-02e5-448c-9a83-a111d05e5f9f', '{"action":"user_signedup","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"team","traits":{"provider":"email"}}', '2025-11-09 22:29:52.278643+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e761a212-13ac-4c74-94e5-23af78d3e3e1', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-09 22:29:52.297382+00', ''),
+	('00000000-0000-0000-0000-000000000000', '198829d8-ea04-49d6-825b-8c4178e5b1ba', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 09:08:13.406685+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5b657f10-1348-453a-af9f-75f23ab163dc', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 09:08:13.431888+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8e5e00cd-13ee-40f9-8a0a-d0a43228ef8d', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 10:03:13.775314+00', ''),
+	('00000000-0000-0000-0000-000000000000', '237b9a86-8bee-4e04-bbf1-297e5fa7d78a', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 10:03:13.788699+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f04006e6-d85b-4575-8b3a-659646d04781', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 11:10:25.012826+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e6d50b65-2098-4dcb-ae7e-3e60db3ab075', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 11:10:25.024571+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8d41a564-5582-45e0-b842-cc0cdb1c4746', '{"action":"user_repeated_signup","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"user","traits":{"provider":"email"}}', '2025-11-10 11:32:08.095158+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a77cfb54-ccb4-45ad-862a-685d1da4d794', '{"action":"login","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-10 11:32:57.666347+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cf61f62f-cd4d-4151-8c41-04be2e0d0b1f', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 12:09:29.793929+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'eab310b5-d616-40e1-a10c-3510d821e28d', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 12:09:29.825201+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7586f8ca-2344-4f4b-9b6f-668380dc89ec', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 12:13:37.351706+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ec5577a6-ee65-4180-a0b1-2479bfb9aada', '{"action":"token_revoked","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 12:13:37.356004+00', ''),
+	('00000000-0000-0000-0000-000000000000', '750bb96d-340f-4565-97ab-c9efa9c54636', '{"action":"token_refreshed","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 12:13:37.470576+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1b4d819a-db74-4a38-8dab-ed16113ad757', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 13:09:01.936534+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4f602864-e985-4be9-9ff0-5576c58190e1', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-10 13:09:01.942902+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd2dcc30e-f09b-4e20-891b-2d7557e82bb4', '{"action":"user_repeated_signup","actor_id":"478b7491-ff6c-490b-982c-a4dc866dcefc","actor_username":"vincent@jayd.ai","actor_via_sso":false,"log_type":"user","traits":{"provider":"email"}}', '2025-11-10 13:09:21.874416+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'da39ee72-8e92-48b2-848f-8fb212450a41', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 10:39:48.697399+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2e8e6d5c-b457-4a29-9677-65177fa23e9d', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 10:39:55.145507+00', ''),
+	('00000000-0000-0000-0000-000000000000', '32e3f4ca-9930-41d0-8b7c-001043cdee61', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 10:44:37.630303+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bb38ecb2-6e87-4a34-a581-d00d6457b9a3', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 10:49:20.787715+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c2019bda-6af0-4e93-a7fe-6c55a693dc5a', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 10:50:42.296994+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1d17b307-5076-4b87-b23d-64e173802907', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 10:51:26.066112+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a5126ed8-6de1-4b5b-86ed-cc5b409d9a9d', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 10:54:03.276802+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b343edfc-e460-47f9-a683-5cd82054ba64', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 10:55:27.288486+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6a96fd32-a13b-4860-850e-74053b60cd4e', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:00:00.338711+00', ''),
+	('00000000-0000-0000-0000-000000000000', '473f538f-43f1-4481-9112-04e381f85088', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:03:03.853429+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd87e9eb8-3e94-4122-9516-bfbdaa2fbee1', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:05:23.813073+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bc3ec80c-9816-4788-9d30-db54b0c972c7', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:06:30.076793+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4450f5db-ce94-45b4-afaa-fee0c8e08208', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:11:07.879491+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8ad97b49-6b96-4ae8-b0d1-05cea78d731e', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:19:43.880831+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4a058008-ff5a-47cb-a74e-ca6b49983f7a', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:24:50.878557+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e112ef5e-43ea-4c77-90e7-23c6af347012', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:47:51.352234+00', ''),
+	('00000000-0000-0000-0000-000000000000', '82356e71-116c-44c6-bc4c-4a4661b361a3', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:51:34.96971+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5eed8283-cb28-497c-8020-905e2403d2e6', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:54:43.231092+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bb655d47-a5f2-4ad1-ac9f-4792eb3fad22', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:57:05.213421+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7b1f600d-e5f3-46d0-99ce-8515f695a6bb', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:58:24.480118+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8a8d0a41-f242-45c0-83cc-1c5aebeaeb49', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 11:58:33.042927+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8fe2c376-5c5a-4175-ab42-f3fe5bce18da', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 12:16:48.454065+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b3c3b9ff-e5c2-4b9d-a1d8-289120dd3306', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 12:27:27.893837+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b7678963-06be-4e40-9aa4-19ef1a14b99b', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:22:17.990699+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2430f8f1-c445-4f37-bef4-edab25d56e46', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:23:33.690982+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ec246d2c-a3ea-49bc-8f09-270e9ab9f90b', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:24:57.61211+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9aea8c2d-2dcb-40b3-8c9d-6122e301247c', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:26:26.854052+00', ''),
+	('00000000-0000-0000-0000-000000000000', '10bafd51-8db0-4afe-ae2b-e1b67860a33f', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:30:16.834386+00', ''),
+	('00000000-0000-0000-0000-000000000000', '85de3529-ffac-4ab3-8a22-27caa0028369', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:32:13.620487+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9552bd14-8220-46b7-af52-465804bc4744', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:33:10.320078+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3bf57ec3-685d-4fff-a656-3d6bb55a715c', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:34:41.329809+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6a02044e-da74-4a06-a3b0-fb0796a0b772', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-19 17:34:50.248852+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c4620d90-6334-4e57-8178-acd6d91a9b2a', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-20 09:23:18.662224+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8e36e2a5-0518-4a57-abe0-e6b7cd55955f', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-20 09:50:51.019694+00', ''),
+	('00000000-0000-0000-0000-000000000000', '16d3cf1a-8c9d-4e05-a74f-b760a3a3c79d', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-20 09:54:35.916227+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c1da766b-4107-4732-bd17-3df2d17c049d', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-20 10:54:24.898252+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'da3327a2-79b0-443a-a2c4-5039ff80e530', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-20 10:54:24.899008+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1a63a941-800a-472b-9ea6-1700c4a9035a', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-20 10:54:24.911229+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e9db0f60-cec8-4372-8540-526fdf56d3a3', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-20 10:54:24.911778+00', ''),
+	('00000000-0000-0000-0000-000000000000', '021adcb3-2e91-49f2-8c4a-e1b1628534b6', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-20 16:03:25.678216+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e54e6166-4072-468d-8d51-b5a9280900a1', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 02:33:35.93674+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8c06e2df-5d02-4e5f-bfcd-02980f995eaa', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 02:37:44.402854+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ee98ef90-0f25-4285-be18-e0fe43944777', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 03:34:48.952136+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ec592e04-9838-4e1a-bbe7-b3e47cfde69c', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 03:38:29.418334+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5b368ac5-883d-48b8-aef0-a9e61a7fce48', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 03:39:25.395024+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd430eda9-430b-4c0c-9103-ec93f17b4684', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 04:22:52.146493+00', ''),
+	('00000000-0000-0000-0000-000000000000', '644b346f-05a2-4d51-9ae9-dabb47c7acb4', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 04:51:07.708885+00', ''),
+	('00000000-0000-0000-0000-000000000000', '124b891b-8960-4312-bf7b-b2de10089182', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 05:50:56.595476+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fe8b2394-cdcf-4137-8e6d-fc00cff7507b', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 05:50:56.596348+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b1a60a29-2602-4f97-884b-2c40cbb9c425', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 05:50:56.607668+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a9f94704-d7d3-4910-bc67-d06de6baa58f', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 05:50:56.608326+00', ''),
+	('00000000-0000-0000-0000-000000000000', '65f854d7-a47b-4341-8df9-a6015eb7ea60', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 07:36:48.71052+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c54bf7a9-2577-4073-a23f-96e8c1736e04', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 08:38:58.076088+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3c7acd66-f8db-4e7b-947f-f8ad93f21d8a', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 09:40:04.066179+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1197bb28-3452-4dab-a8b3-1846582ed1f8', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 09:40:04.067096+00', ''),
+	('00000000-0000-0000-0000-000000000000', '191bd86f-a6bb-41aa-b956-7d041f5bacbf', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 09:40:04.078563+00', ''),
+	('00000000-0000-0000-0000-000000000000', '23ba0ea3-5e45-42ab-ab48-2f80e2551e7b', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 09:40:08.122929+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f4233fda-ba80-466d-a930-c698ca15c179', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 09:40:49.558884+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0772a579-ca42-4233-883b-2f0e23dddf6f', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 10:36:03.004236+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'eb6c0b48-55d9-4531-b101-eadd00f34f3d', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 10:42:21.272822+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ed254484-d4f2-43c7-ae91-bcd4d2f73f63', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 10:42:21.273858+00', ''),
+	('00000000-0000-0000-0000-000000000000', '89028ba7-6179-4c02-880c-e281c0f8694a', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 10:42:21.706047+00', ''),
+	('00000000-0000-0000-0000-000000000000', '53c2e068-dc24-4cbe-9ae9-6d07166151c6', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 13:14:17.78402+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b7d8006a-1352-414e-b48f-502c05a725da', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 13:14:17.785433+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8aa6fea8-34ce-487f-bd46-3c3315a6be40', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 13:14:17.794061+00', ''),
+	('00000000-0000-0000-0000-000000000000', '520fbcd0-531b-4950-93e4-c9baf131a379', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-21 13:14:17.794664+00', ''),
+	('00000000-0000-0000-0000-000000000000', '091b5215-525e-4c7e-a222-64944f58f4db', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 13:24:49.856671+00', ''),
+	('00000000-0000-0000-0000-000000000000', '88d9e6ec-0fb0-4c76-9de7-738e2a7b92b2', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-21 16:56:16.075441+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7fe37eee-6e66-488e-bada-e481a4dea8c6', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-22 04:23:38.13248+00', ''),
+	('00000000-0000-0000-0000-000000000000', '65f040bb-5ab9-4638-af4f-c7342ebfab7f', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-22 05:25:58.901094+00', ''),
+	('00000000-0000-0000-0000-000000000000', '825d6d17-658f-4c67-8965-a8341670ea02', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-22 05:25:58.903132+00', ''),
+	('00000000-0000-0000-0000-000000000000', '30eeca1c-fc15-4383-be1e-3298be1b06a1', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-22 05:25:58.941932+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4355fd1c-a5d2-4381-9247-300036eef9b0', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-22 05:26:03.871349+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9c109673-f8c9-437d-b503-7526962705f1', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-22 06:30:08.553297+00', ''),
+	('00000000-0000-0000-0000-000000000000', '604a40a2-abff-45fe-bba0-b0ae60e8e7c6', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-22 15:32:21.660603+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9ab24427-0698-47f4-969a-62bff3c3d900', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 02:40:24.108225+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cbaf5da2-6d84-4666-b793-1ccb5b098ab2', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 04:15:14.667192+00', ''),
+	('00000000-0000-0000-0000-000000000000', '81241256-7401-4f09-a812-a9de397f2c2c', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 05:33:56.499315+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c6d775f7-cc8f-40e6-9131-0abf6c9e134e', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 05:33:56.500433+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a7da16e9-291e-4835-ad4f-b30385f4f184', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 05:35:03.419053+00', ''),
+	('00000000-0000-0000-0000-000000000000', '03a57486-806a-40ad-beea-3e3208fbdb43', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 06:48:20.704293+00', ''),
+	('00000000-0000-0000-0000-000000000000', '343b6407-1b23-492b-a6d2-7a220ce72b30', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 07:49:59.558851+00', ''),
+	('00000000-0000-0000-0000-000000000000', '300182b1-4ab7-432d-b5ae-d5b330a3e70b', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 07:49:59.55961+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0683bfa8-24dc-4713-8365-89e9741baa46', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 07:50:03.901415+00', ''),
+	('00000000-0000-0000-0000-000000000000', '690fe983-9fcc-4aba-a56c-c4d8dd528862', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 07:50:09.449845+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bb5731da-dd53-4643-b390-bfdb5e7d2167', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 09:27:45.164787+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f71c7352-bdbf-4218-a473-2f0141ce07b6', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.593578+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6acf294c-ce16-4b71-8b18-38038ea6d559', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.595045+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'db83a4bf-f5f7-4bab-8a3f-658fd5d70b74', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.944851+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f1f36f0b-2c56-4a5f-aff0-c1f69b419b92', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.949545+00', ''),
+	('00000000-0000-0000-0000-000000000000', '03d73c40-ed76-4166-b785-80c9bf12cc26', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.954368+00', ''),
+	('00000000-0000-0000-0000-000000000000', '93ffb4b8-001d-40ac-88fa-c677e9499b73', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.95844+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b9d32b16-5bc4-45eb-9835-fb7496c4574a', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.963268+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4ab3e4d8-442f-4ca5-a836-c788e580d5be', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.970158+00', ''),
+	('00000000-0000-0000-0000-000000000000', '312c8eb2-8db6-426f-b1a4-560a92f187de', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.976281+00', ''),
+	('00000000-0000-0000-0000-000000000000', '58b4392b-dd3d-4607-9ae0-b283cebfeb1a', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.984635+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a28d2d9b-2eb0-44f3-8ad3-e70906df496b', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.989572+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dbf787cc-81d2-41dc-bc80-2fd399962f8f', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.993444+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6ef4e695-e0db-4281-b2f9-07929b25e216', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 10:28:50.997302+00', ''),
+	('00000000-0000-0000-0000-000000000000', '067e57c0-734e-4cf2-8e04-7e18280bf016', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 10:28:56.492212+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7b85fcea-8a08-40fb-9c3a-20760cef6af3', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 11:30:05.673222+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8094883f-416b-40ec-9de2-369bc424bc1b', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 12:37:57.865551+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8d0c3d1a-38f8-4479-9b5f-2e710d36f961', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 12:37:57.866654+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd1852f91-f5b0-430d-a095-8ad33e77aebf', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 12:37:57.885185+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1024deba-19a5-4ea6-8fc7-5240c83421b3', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 12:37:57.892472+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e7a94f0e-2ada-4e35-bdcf-6153b45a5586', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 12:38:01.926081+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5286a8ef-ee55-46a6-ae64-e0bee53fe776', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 12:59:38.087684+00', ''),
+	('00000000-0000-0000-0000-000000000000', '97c96802-654f-443c-87a4-31a5e0b54839', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 13:00:41.342407+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7cf791ab-81d7-4b93-aa08-b23ad9a68d89', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 14:06:35.300016+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ba63bcfc-148a-4db2-835f-28fece338928', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 14:06:35.30116+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c7b18adc-87cb-48c6-b99a-22bc445fb1d7', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 15:08:50.17452+00', ''),
+	('00000000-0000-0000-0000-000000000000', '47d1dd29-63f7-4667-8ec1-891bed63834b', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-23 15:08:50.175663+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3bd1317f-b618-4bc4-a67d-7f37b26ee7b6', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-23 15:08:54.092972+00', ''),
+	('00000000-0000-0000-0000-000000000000', '235b9e57-8d51-4563-8ca9-7482ac7267a5', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-24 17:34:05.85236+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'abf678d9-a592-413d-b62f-d24b50f6d627', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-24 17:49:51.420717+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'df96048e-87fc-4f0d-98cb-71e77c5021cd', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.008471+00', ''),
+	('00000000-0000-0000-0000-000000000000', '62bfc9ef-05d4-4f35-b8d7-a3169818c2ca', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.008965+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9bd879ca-50fd-48d5-830b-a9371df990ab', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.211986+00', ''),
+	('00000000-0000-0000-0000-000000000000', '913ee736-b69f-4f0a-bf7d-d41859ffe7a7', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.272578+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b7317ab8-d151-4fe5-9521-eec4eb434201', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.305642+00', ''),
+	('00000000-0000-0000-0000-000000000000', '04c5ecb9-f143-4b1d-a961-79e3d51f1a5a', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.409998+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b956a506-814e-4cc4-97c9-85dc0c4ca33b', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.67898+00', ''),
+	('00000000-0000-0000-0000-000000000000', '453ca131-6793-402c-89f3-3cbcb77fdb36', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.715533+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f5ca0680-b195-4ac8-a92e-c3d2ce9df326', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.745417+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5cd67bcf-b6e0-4b24-9998-26f1a94f828e', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.77815+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ca22d157-53c3-4e2b-a069-d8306b582689', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.81014+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1cea33e9-ed3a-45ab-97fb-2d5f09a6c4d4', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.856297+00', ''),
+	('00000000-0000-0000-0000-000000000000', '08643c98-b9a6-46c1-8297-1b8ed17295ae', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.88796+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0df045b5-e53c-43a7-af86-61d39972aaac', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.916449+00', ''),
+	('00000000-0000-0000-0000-000000000000', '027d5684-ef90-4d2e-a53c-d476c1799a9f', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.944459+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9fa4509d-e11b-4481-9866-85afa0830205', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.969077+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bf9c2942-529d-4bf8-9b3a-3521ee5bddf2', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:57.994557+00', ''),
+	('00000000-0000-0000-0000-000000000000', '00bcd8ee-0a47-4064-9753-654639ceb17c', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.019179+00', ''),
+	('00000000-0000-0000-0000-000000000000', '90a2bc96-ae0a-4f32-81aa-09fe8933b531', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.043217+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5a407995-0e22-4a22-a4ba-8471408b45b1', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.067274+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7cc69e2f-a01b-4a1a-ac5c-a461f172c9ae', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.100194+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2b1080c3-57be-4138-99bb-e519323d3c46', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.12898+00', ''),
+	('00000000-0000-0000-0000-000000000000', '246269dc-0aa3-42a5-a814-d9dd6b87bc7c', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.155064+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8a6ba6fd-0041-4d73-b7c5-e20aa4fb9fb1', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.185955+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd6c51c8f-8fdb-47d9-b001-14577a83fdc7', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.215748+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd5639a84-ed70-404b-968d-e6bfc4467e42', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.243697+00', ''),
+	('00000000-0000-0000-0000-000000000000', '16d7de84-99f2-4029-8fa8-39c0d479e301', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.270783+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2c80ab53-798f-45b6-98a4-424f6a9f1cb3', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.300893+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7e6c1e35-d327-415f-8649-75b315b73a9e', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.331213+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd1b1cba0-3972-4404-9aa2-ecb42d4ed515', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.358521+00', ''),
+	('00000000-0000-0000-0000-000000000000', '85793fcf-e09b-4d24-8647-97de6803bf40', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.387248+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f1351e73-d3ef-44ae-a49d-94a7cfb6d54e', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.413029+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b5e2c31e-40bd-4f1c-a177-61b2d1a0ef22', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.439298+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3b645458-72d1-4788-956e-5b6a2aaec68f', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.468321+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fe651fda-bcbc-4028-a559-a1acc363eb41', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.495212+00', ''),
+	('00000000-0000-0000-0000-000000000000', '572bc9e5-80ef-47bd-95bc-67bc4c8daa35', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.52061+00', ''),
+	('00000000-0000-0000-0000-000000000000', '41a45765-7558-46be-8bcd-07460a80f575', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.548563+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7f08afb0-f8d0-4599-bf81-42b6ac3e1ca8', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.575071+00', ''),
+	('00000000-0000-0000-0000-000000000000', '49675b52-ec8d-45d5-9484-f7c8fc240203', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 18:59:58.601289+00', ''),
+	('00000000-0000-0000-0000-000000000000', '40faa913-d4dd-4358-b50b-776357846565', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:00.889642+00', ''),
+	('00000000-0000-0000-0000-000000000000', '08c7171a-8bf5-48c4-ac81-02e1d63fe467', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:00.974689+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f2dc1def-f889-4f39-8f68-f3c015871ba2', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.005996+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'facedb3c-6804-4598-8368-80f66235dfdf', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.035321+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1fc2fd79-62db-41e5-bd1d-080b5bb124c2', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.060103+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0e1093f1-2bda-4919-ac90-0ce5d8b0784e', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.088545+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6955ce4b-8877-4b96-a834-5d7db4646ae4', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.123486+00', ''),
+	('00000000-0000-0000-0000-000000000000', '871f6aa3-1c47-482b-a741-3643d3ff66fd', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.164279+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f4a9f294-8c9c-4ec0-88fd-d53473f8c0df', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.200256+00', ''),
+	('00000000-0000-0000-0000-000000000000', '47d7c7ad-5d96-4f8c-b06b-f97061b7c049', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.23678+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b605cbb9-c9d7-4cba-8ffa-d2f9cbce30da', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.271183+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6d0109da-cbcd-4d27-956a-faf0a92a2d7d', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.306342+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9e5414d8-b912-43a3-8f2f-4b6d802924d2', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.339841+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b7f6412c-a979-43ef-8f6e-7dc5bd57d9d7', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.37322+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6375e775-1d76-4a3e-82ef-00c891497712', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.40412+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4a482455-da13-4e35-81df-c78f6e7f09ed', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.476454+00', ''),
+	('00000000-0000-0000-0000-000000000000', '60be7af3-49cf-44b0-87ac-38a1f60e1db0', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.504036+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f70bcaff-147f-4d38-808e-1738a07f4e52', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.535976+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6f45b2b0-e6a4-40da-9cc3-2f17d651edca', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.566438+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd098958e-8450-45b2-b2f3-ad906275eff1', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.596957+00', ''),
+	('00000000-0000-0000-0000-000000000000', '490b3f8f-d60c-4dc4-a121-5ae2ff5f3df4', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.629082+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2d5174bf-0cce-49fb-8a09-e9f79bd2a703', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.66201+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f8a381a5-1a6c-4bc3-b322-2c71018d29fc', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.691902+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6d6bc051-2d45-487d-989e-7d6006dc1ef4', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.724322+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9c8f842a-a89e-409c-92dc-b6ae62943fb6', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.751345+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'effe7704-6e20-41c9-88f4-6ad0128dcea6', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.77842+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ae7691bc-a159-4f49-aa24-bf8d4312761b', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.808183+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e1e05333-397d-478f-96b3-4ced5ec4e25b', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.83702+00', ''),
+	('00000000-0000-0000-0000-000000000000', '64347ad6-2472-48e3-a43d-324bc9ffd733', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.866349+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd15a2532-7832-4968-9efa-873bf909f2eb', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.89636+00', ''),
+	('00000000-0000-0000-0000-000000000000', '717b3876-1694-41ee-b84c-06d07f0d324a', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.923809+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6649c7bc-3677-4328-8559-621ed929fdeb', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.949984+00', ''),
+	('00000000-0000-0000-0000-000000000000', '06e2053d-899c-4d5d-8217-bc16aada05ca', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:01.97971+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f096d979-4343-42c9-9075-2233c4d86e3a', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.010392+00', ''),
+	('00000000-0000-0000-0000-000000000000', '82cb14a2-103d-4556-9cdf-1008922e5e55', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.038354+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7d36f48e-76a1-416c-97d0-d97c39c322f2', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.069927+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f98403c8-dbc5-4945-90b6-e591e5a96c48', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.097826+00', ''),
+	('00000000-0000-0000-0000-000000000000', '310faedd-e0a0-4876-a6dd-d0d07d0944f9', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.127492+00', ''),
+	('00000000-0000-0000-0000-000000000000', '72d65b32-e7a3-4665-bb2b-80088a44cf09', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.159572+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dbf743d3-dea1-4729-9f57-d45b6b69f44c', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.701032+00', ''),
+	('00000000-0000-0000-0000-000000000000', '75fd57b5-be53-4b9f-909c-a3bcebec8436', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.737372+00', ''),
+	('00000000-0000-0000-0000-000000000000', '37a6ad41-7c02-49ab-9ba4-d90d0fd52aea', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.76896+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2ef014e4-6919-4f31-9228-cbf0ee684bfb', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.798085+00', ''),
+	('00000000-0000-0000-0000-000000000000', '92e62021-9b1a-4088-84a2-01f8cef94b34', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.828873+00', ''),
+	('00000000-0000-0000-0000-000000000000', '90db7ca1-5ca6-42e7-8de7-1fb7ad83d3b1', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.859645+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fd3e1e2a-9eee-4516-b465-d1afa60df18c', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.889907+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f1a28337-12af-423c-a7e7-e79a2a4213b6', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.922289+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7aecf65b-57af-4c5e-9e80-3a778fabe71e', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.950455+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3b6cdd06-c43b-4e31-8b3f-88ee6dbf0d53', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:02.976743+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3d3635dc-7ca1-440c-966e-1f1f9977c1a5', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.003869+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a8755ac7-655f-4331-b7a8-fab6d33bcbdc', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.032548+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'afb98852-da35-4b87-ad66-af603e8da9ad', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.057522+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd7be0dc6-1b17-49f8-90b6-e929f78412f8', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.083964+00', ''),
+	('00000000-0000-0000-0000-000000000000', '78764bf6-c6cd-4545-bb92-11b1c515da32', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.111702+00', ''),
+	('00000000-0000-0000-0000-000000000000', '903b47d3-72b8-4724-b31d-297f67a18a60', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.140729+00', ''),
+	('00000000-0000-0000-0000-000000000000', '11b3c73f-e48c-4a9b-8ada-a0192ff2bcd7', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.169093+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a70c476e-02be-4081-ba9f-fec41d3cfae7', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.200267+00', ''),
+	('00000000-0000-0000-0000-000000000000', '855f8d2e-6239-47dd-bc2c-90e91eff1839', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.230452+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6b7266f0-824e-4813-a1b2-b7068772fe3c', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.258009+00', ''),
+	('00000000-0000-0000-0000-000000000000', '26c9019d-9905-4564-9a3c-8f6bd61d9909', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.289091+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2b451503-195d-4a1d-8d09-e7ebf6da62de', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.317241+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7578300d-9ad7-4231-bf91-a7c626930ce1', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.346302+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4e1e3e54-e2e9-42e4-9b66-c0badaf9a782', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.375801+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2b833f94-5dfd-480c-9db4-7c431bcef2a3', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:03.406541+00', ''),
+	('00000000-0000-0000-0000-000000000000', '71058720-55d9-42df-bddc-60a19b8c7079', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:04.860903+00', ''),
+	('00000000-0000-0000-0000-000000000000', '31d3410f-e272-4013-a08d-5ebb7078f995', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:04.890682+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a50450d0-09fb-4d0a-8fd0-c4cf40427f2c', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:04.920315+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9368c8fb-f2ac-49c1-a60e-d9dbf20244d2', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:06.983502+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1d92412d-76f0-47e3-a756-4f5d55091da8', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.01801+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a4b768ea-9878-4c47-858c-6b5417614725', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.047744+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dc168ece-e984-47cd-8b53-bd7207485ca8', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.077061+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f7aaba07-9631-47be-a917-dc216d124acb', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.109113+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd3af6686-d22c-4cf0-b352-ae36f6f1e94f', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.13755+00', ''),
+	('00000000-0000-0000-0000-000000000000', '00ecbfbf-28c9-4790-a4dc-f13d9048eaa0', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.168421+00', ''),
+	('00000000-0000-0000-0000-000000000000', '34b208ef-1f2b-4054-90c8-b766b97df9ed', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.198107+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'de5f1fdc-303c-4d53-9a66-bae7a34797b9', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.226613+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ff10fd21-9dab-4dbd-804e-7ccf0d7c5eba', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.25756+00', ''),
+	('00000000-0000-0000-0000-000000000000', '62e10343-66a2-49e2-940f-24491c30bc98', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.291341+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8f9a5351-3df4-4d39-a851-57202fae1af9', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.326017+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e66beab8-f0aa-48a3-a3dd-0b46db979f4e', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.357849+00', ''),
+	('00000000-0000-0000-0000-000000000000', '804ad097-1de0-4f34-8ed2-9120f4b928cd', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:07.390477+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dfe45df2-bf0a-4e81-9122-9132b8c84a77', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:08.669917+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e7dc6c29-598f-449d-935f-f9e6197ea5d4', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.00647+00', ''),
+	('00000000-0000-0000-0000-000000000000', '593e0877-f13a-4026-926b-18fde8bdb827', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.046123+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f144a601-2e85-4259-9adb-ef54fa33a790', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.076365+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6431bf62-121a-49d4-b9da-37e0345633ba', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.104175+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'da6e13ea-0904-4602-b73f-67af97e3c443', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.131219+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f2b61672-f63f-467a-9132-517a8146871c', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.158449+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1d5c9b2f-939e-4b78-93d5-d13436ff0b3f', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.186425+00', ''),
+	('00000000-0000-0000-0000-000000000000', '74ed14cc-d4c8-44f0-a3ae-30346b768858', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.212286+00', ''),
+	('00000000-0000-0000-0000-000000000000', '83493697-6f8f-4bc1-9bae-a364804647ee', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.239711+00', ''),
+	('00000000-0000-0000-0000-000000000000', '47de65b6-c2ae-42cc-9266-2494ccaee5ae', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.264984+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5face60d-ac11-460d-9e55-6fcd86de351e', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.289649+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7a694a9a-fe96-41c0-bc43-83640f24c671', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.316776+00', ''),
+	('00000000-0000-0000-0000-000000000000', '594c5fb1-2b04-47a4-bdef-355e127b498d', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.34564+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0609b00c-6660-43c7-8d27-0dbb6f9229c2', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.371222+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3c455356-aaf6-4487-9f75-270b1035eb4b', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.402367+00', ''),
+	('00000000-0000-0000-0000-000000000000', '82633340-d820-4250-9034-372ebe945d2b', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 19:00:09.432575+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e14743ad-1427-478e-87b8-10a9da716317', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-24 19:00:28.509229+00', ''),
+	('00000000-0000-0000-0000-000000000000', '26963aa3-1b05-4965-a4ff-99b72739fc10', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 20:25:02.043337+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e3f4df8e-e385-4a8c-a670-d7fc62b30c8a', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 20:25:02.043771+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'eb18706d-042c-4901-b45b-936b494fe850', '{"action":"token_refreshed","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 20:25:02.074228+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ec366d5e-093d-427a-9f29-1f4c72d378df', '{"action":"token_revoked","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"token"}', '2025-11-24 20:25:02.074712+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3b247db4-8fb4-46b1-af30-870758d47026', '{"action":"login","actor_id":"eff2a1fd-210c-4b44-9a6f-81af6534c3c8","actor_username":"quentin+1@jayd.ai","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2025-11-24 20:40:50.074612+00', '');
+
+
+--
+-- Data for Name: flow_state; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encrypted_password", "email_confirmed_at", "invited_at", "confirmation_token", "confirmation_sent_at", "recovery_token", "recovery_sent_at", "email_change_token_new", "email_change", "email_change_sent_at", "last_sign_in_at", "raw_app_meta_data", "raw_user_meta_data", "is_super_admin", "created_at", "updated_at", "phone", "phone_confirmed_at", "phone_change", "phone_change_token", "phone_change_sent_at", "email_change_token_current", "email_change_confirm_status", "banned_until", "reauthentication_token", "reauthentication_sent_at", "is_sso_user", "deleted_at", "is_anonymous") VALUES
+	('00000000-0000-0000-0000-000000000000', '0eaa7f45-1f7e-403b-84fc-f02d0f0e18a4', 'authenticated', 'authenticated', 'arthur@jayd.ai', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-05 16:08:02.088+00', '{"provider": "google", "providers": ["google"]}', '{"hd": "jayd.ai", "sub": "113451562904096463359", "name": "Arthur Bricout", "email": "arthur@jayd.ai", "picture": "https://lh3.googleusercontent.com/a/.../s96-c/photo.jpg", "given_name": "Arthur", "family_name": "Bricout", "email_verified": true}', false, '2024-12-05 16:07:59.785+00', '2025-01-07 14:17:08.394+00', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', '95fec575-147d-49ba-bd8d-d8c1295159e6', 'authenticated', 'authenticated', 'jean-baptiste@jayd.ai', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-05 16:13:36.023+00', '{"provider": "google", "providers": ["google"]}', '{"hd": "jayd.ai", "sub": "116884903631491222905", "name": "Jean-Baptiste", "email": "jean-baptiste@jayd.ai", "picture": "https://lh3.googleusercontent.com/a/.../s96-c/photo.jpg", "given_name": "Jean-Baptiste", "family_name": "", "email_verified": true}', false, '2024-12-05 16:13:34.624+00', '2024-12-05 16:13:36.025+00', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', 'e1e08a40-7482-46e0-87dc-890212ff9148', 'authenticated', 'authenticated', 'jean-baptiste+2@jayd.ai', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-05 16:36:53.874+00', '{"provider": "google", "providers": ["google"]}', '{"hd": "jayd.ai", "sub": "111282921288593876694", "name": "Jean-Baptiste", "email": "jean-baptiste+2@jayd.ai", "picture": "https://lh3.googleusercontent.com/a/.../s96-c/photo.jpg", "given_name": "Jean-Baptiste", "family_name": "", "email_verified": true}', false, '2024-12-05 16:36:52.386+00', '2025-06-05 10:53:39.257+00', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', '947ec8bb-d278-4cd8-9d77-6d9c091ad0f6', 'authenticated', 'authenticated', 'quentin@jayd.ai', NULL, '2024-12-05 16:05:11.317+00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-30 11:36:24.318+00', '{"provider": "email", "providers": ["email", "google"]}', '{"email": "quentin@jayd.ai"}', false, '2024-12-05 16:05:11.315+00', '2025-07-30 15:06:04.577+00', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', '478b7491-ff6c-490b-982c-a4dc866dcefc', 'authenticated', 'authenticated', 'vincent@jayd.ai', '$2a$10$8yu9ablgdUc1NLHfIYPPPOIjul2vMpcXbTF3pGE3etdS3SeMC827y', '2025-11-05 15:08:36.634051+00', NULL, '', NULL, '', NULL, '', '', NULL, '2025-11-10 11:32:57.668989+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "478b7491-ff6c-490b-982c-a4dc866dcefc", "name": "vincent barbier", "email": "vincent@jayd.ai", "origin": "webapp", "email_verified": true, "phone_verified": false}', NULL, '2025-11-05 15:08:36.572904+00', '2025-11-10 12:13:37.363054+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', '51eee0a1-8f20-4403-b5f1-0566375db20b', 'authenticated', 'authenticated', 'test@jayd.ai', '$2a$10$Dd3Ba6R0TsaAxUXPKhOp/OEiNfF.hwK1cXBtWd3oZGy1Cm0bOwjo6', '2025-10-27 09:20:24.307179+00', NULL, '', NULL, '', NULL, '', '', NULL, '2025-11-05 09:15:31.339328+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "51eee0a1-8f20-4403-b5f1-0566375db20b", "name": "Testing Account Jaydai", "email": "test@jayd.ai", "origin": "extension", "email_verified": true, "phone_verified": false}', NULL, '2025-10-27 09:20:24.297032+00', '2025-11-05 13:59:31.370202+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', 'authenticated', 'authenticated', 'quentin+1@jayd.ai', '$2a$10$KeE2ESPmPBbPavfB6jkjT.b3AMS82NSjnami8ozwcSY/V9t54lOQu', '2025-11-09 22:29:52.285598+00', NULL, '', NULL, '', NULL, '', '', NULL, '2025-11-24 20:40:50.075203+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "eff2a1fd-210c-4b44-9a6f-81af6534c3c8", "name": "Quentin Bragard", "email": "quentin+1@jayd.ai", "origin": "webapp", "email_verified": true, "phone_verified": false}', NULL, '2025-11-09 22:29:52.221988+00', '2025-11-24 20:40:50.07727+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false);
+
+
+--
+-- Data for Name: identities; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."identities" ("provider_id", "user_id", "identity_data", "provider", "last_sign_in_at", "created_at", "updated_at", "id") VALUES
+	('51eee0a1-8f20-4403-b5f1-0566375db20b', '51eee0a1-8f20-4403-b5f1-0566375db20b', '{"sub": "51eee0a1-8f20-4403-b5f1-0566375db20b", "name": "Testing Account Jaydai", "email": "test@jayd.ai", "origin": "extension", "email_verified": false, "phone_verified": false}', 'email', '2025-10-27 09:20:24.302691+00', '2025-10-27 09:20:24.302743+00', '2025-10-27 09:20:24.302743+00', '1df81057-da84-4548-ba1b-2f75e9fa9e64'),
+	('478b7491-ff6c-490b-982c-a4dc866dcefc', '478b7491-ff6c-490b-982c-a4dc866dcefc', '{"sub": "478b7491-ff6c-490b-982c-a4dc866dcefc", "name": "vincent barbier", "email": "vincent@jayd.ai", "origin": "webapp", "email_verified": false, "phone_verified": false}', 'email', '2025-11-05 15:08:36.614064+00', '2025-11-05 15:08:36.614118+00', '2025-11-05 15:08:36.614118+00', '834bb9cd-99ea-43b9-85c8-aed1c5920439'),
+	('eff2a1fd-210c-4b44-9a6f-81af6534c3c8', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '{"sub": "eff2a1fd-210c-4b44-9a6f-81af6534c3c8", "name": "Quentin Bragard", "email": "quentin+1@jayd.ai", "origin": "webapp", "email_verified": false, "phone_verified": false}', 'email', '2025-11-09 22:29:52.26125+00', '2025-11-09 22:29:52.261709+00', '2025-11-09 22:29:52.261709+00', '8d6248c3-438c-4a8f-ad41-a4ff7d0fbd0c');
+
+
+--
+-- Data for Name: instances; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: oauth_clients; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: sessions; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."sessions" ("id", "user_id", "created_at", "updated_at", "factor_id", "aal", "not_after", "refreshed_at", "user_agent", "ip", "tag", "oauth_client_id", "refresh_token_hmac_key", "refresh_token_counter") VALUES
+	('f659f228-b8c1-4371-acf3-2734454ba78a', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 10:39:48.6981+00', '2025-11-19 10:39:48.6981+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('6b608049-a5f3-4f51-8090-0b1994206264', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 10:39:55.146008+00', '2025-11-19 10:39:55.146008+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('7e5a373a-1c32-4782-861f-1810e4ee1a51', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 10:44:37.630729+00', '2025-11-19 10:44:37.630729+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('7815feeb-d958-47ce-8720-f03d9aedfd83', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 10:49:20.788124+00', '2025-11-19 10:49:20.788124+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('e211a908-3e65-43e2-bda3-4b031f1734af', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 10:50:42.297395+00', '2025-11-19 10:50:42.297395+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('4ccfca6e-4508-4952-9f36-913e0e579bd6', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 10:51:26.066535+00', '2025-11-19 10:51:26.066535+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('d28b667c-a394-4584-93f7-2b94e3a7fc8d', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 10:54:03.277189+00', '2025-11-19 10:54:03.277189+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('2b0ac138-1c25-456d-b01f-b53e8769d1ec', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 10:55:27.288994+00', '2025-11-19 10:55:27.288994+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('b29ec3d2-d98c-44fd-bbd2-521bdb205255', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:00:00.339291+00', '2025-11-19 11:00:00.339291+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('912ea0fc-fe92-4d7a-976b-bf60af1cd21a', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:03:03.853826+00', '2025-11-19 11:03:03.853826+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('65f11250-0ded-437e-92a7-2a161da4c52a', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:05:23.81346+00', '2025-11-19 11:05:23.81346+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('62f33bac-1dee-4f78-b09c-fbcabedf3710', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:06:30.077213+00', '2025-11-19 11:06:30.077213+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('38327a2e-8754-43cf-bacf-3aeae7cf7a8c', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:11:07.879976+00', '2025-11-19 11:11:07.879976+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('d90abf3c-0889-4950-9c9f-4dd01d120afe', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:19:43.88129+00', '2025-11-19 11:19:43.88129+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('1085074c-5951-4191-88a4-094a36481eb7', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:24:50.879283+00', '2025-11-19 11:24:50.879283+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('58745f3c-83fc-48b5-b87e-8bac98c98984', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:47:51.352778+00', '2025-11-19 11:47:51.352778+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('e3a9df36-5c16-427f-953c-57a8b3a8b2e0', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:51:34.970081+00', '2025-11-19 11:51:34.970081+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('5c27b13a-b19e-4d83-b83a-2fb331e2e66f', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:54:43.231471+00', '2025-11-19 11:54:43.231471+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('5953fab2-789b-48e8-83c4-9b2b642706c6', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:57:05.214057+00', '2025-11-19 11:57:05.214057+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('9c056e28-9fc7-4eb7-9e34-1be63c86f062', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:58:24.4805+00', '2025-11-19 11:58:24.4805+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('ad2b958d-61f7-414a-8ef7-1abcd15b1e3b', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 11:58:33.043416+00', '2025-11-19 11:58:33.043416+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('7105694d-23bb-49f8-a21b-154addacd19b', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 12:16:48.454566+00', '2025-11-19 12:16:48.454566+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('40ead552-98cb-4ff9-80a8-911dfab02afa', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 12:27:27.894458+00', '2025-11-19 12:27:27.894458+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('82dca3ad-3618-4530-85c7-d2fb9b449b4b', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:22:17.99134+00', '2025-11-19 17:22:17.99134+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('050df491-6d5d-49e3-ac1e-b8cb05aed927', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:23:33.691368+00', '2025-11-19 17:23:33.691368+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('a778a486-1e85-4355-8998-bc5fd57c9298', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:24:57.612537+00', '2025-11-19 17:24:57.612537+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('cbbf6504-e79f-4b5b-83dd-530fcb3878ea', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:26:26.854453+00', '2025-11-19 17:26:26.854453+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('7265210f-19bc-4597-94c4-e3ad3822668c', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:30:16.834783+00', '2025-11-19 17:30:16.834783+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('de0f22f0-99c4-4e7f-bbf2-13797128fcb9', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:32:13.620902+00', '2025-11-19 17:32:13.620902+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('b1b45f5d-3db5-42a0-aa94-d9353e043be0', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:33:10.320467+00', '2025-11-19 17:33:10.320467+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('51cecb13-e2be-48c8-9f11-b336c9142fa2', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:34:41.330206+00', '2025-11-19 17:34:41.330206+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('cf15550a-6c83-4f34-8cef-d339075c2509', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-19 17:34:50.249268+00', '2025-11-19 17:34:50.249268+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.253.118.95', NULL, NULL, NULL, NULL),
+	('3901e192-cacf-447d-b269-08927f2f9391', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-20 09:23:18.662912+00', '2025-11-20 09:23:18.662912+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('85fe9661-cdfd-487c-b48a-475bdc87f952', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-20 09:50:51.020297+00', '2025-11-20 09:50:51.020297+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('393bb9ed-f794-4f1d-9c80-013ce9411a38', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-22 04:23:38.133312+00', '2025-11-22 05:25:58.942975+00', NULL, 'aal1', NULL, '2025-11-22 05:25:58.942945', 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('079aa870-f442-4eb5-bd35-f0425968e3d3', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-20 09:54:35.916657+00', '2025-11-20 10:54:24.913546+00', NULL, 'aal1', NULL, '2025-11-20 10:54:24.913504', 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('f46ad0b8-ab31-43c5-81ce-f2e49bf8f04e', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-20 16:03:25.678892+00', '2025-11-20 16:03:25.678892+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('d0d1e33f-600e-441f-8139-59be83f17a6d', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 02:33:35.937218+00', '2025-11-21 02:33:35.937218+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('779bdbcb-fc7a-402e-a807-86ec989fcfe9', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 02:37:44.403403+00', '2025-11-21 02:37:44.403403+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('a65d18fd-f201-4ea5-b1cc-4f1035d94778', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 03:34:48.952618+00', '2025-11-21 03:34:48.952618+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('7bfbb9fd-bdf5-4c8d-94ae-f2a423e7b716', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 03:38:29.419046+00', '2025-11-21 03:38:29.419046+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('7710fdcc-9be7-4d1e-af5d-8cefbe1a9e96', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 03:39:25.39545+00', '2025-11-21 03:39:25.39545+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('edcfc636-24d8-45ea-a900-a059c567d9d4', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 04:22:52.147234+00', '2025-11-21 04:22:52.147234+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('ba7d59ca-9b4c-4f08-98ab-62494ff88054', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-22 05:26:03.871769+00', '2025-11-22 05:26:03.871769+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('ca5a120d-16a3-416e-a740-0a025588e199', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 04:51:07.709592+00', '2025-11-21 05:50:56.610421+00', NULL, 'aal1', NULL, '2025-11-21 05:50:56.610384', 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('b124f011-cc65-4482-9209-43ddbf11e8c4', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 07:36:48.711335+00', '2025-11-21 07:36:48.711335+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('b821798e-1611-4116-b6e9-4a83fe6bbd87', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-22 06:30:08.554439+00', '2025-11-22 06:30:08.554439+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('3f7be0c2-5dc3-44b2-bf4b-4f94c1ab45df', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 08:38:58.077107+00', '2025-11-21 09:40:04.079723+00', NULL, 'aal1', NULL, '2025-11-21 09:40:04.079695', 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('0631cc8f-fd4c-4363-9310-7ec7700e098e', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 09:40:08.123318+00', '2025-11-21 09:40:08.123318+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('378d6363-edb2-464b-8064-3d6e82f91c77', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 10:36:03.004933+00', '2025-11-21 10:36:03.004933+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('91b161e5-634c-4dbf-9399-8fe510cc63a3', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-22 15:32:21.661413+00', '2025-11-22 15:32:21.661413+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('7eaa77b0-ca60-4c52-afa4-34c13224e041', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 02:40:24.108619+00', '2025-11-23 02:40:24.108619+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('ff95fa64-f800-4881-b426-552e08232e9a', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 09:40:49.559448+00', '2025-11-21 13:14:17.796622+00', NULL, 'aal1', NULL, '2025-11-21 13:14:17.796585', 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('243f4778-4957-41f8-8c70-4783df6e035b', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 13:24:49.85734+00', '2025-11-21 13:24:49.85734+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('8a2342f1-cabc-4453-8010-a672e98a2877', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-21 16:56:16.076366+00', '2025-11-21 16:56:16.076366+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('f22b919e-2f24-4280-a30e-dab5dabb9c9f', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 04:15:14.667603+00', '2025-11-23 05:33:56.50309+00', NULL, 'aal1', NULL, '2025-11-23 05:33:56.50306', 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('f466ced3-fe00-4ea4-b350-db9f5e24ee10', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 05:35:03.419494+00', '2025-11-23 05:35:03.419494+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('1392d08c-c48a-44ef-9f07-567ef1887b0f', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 06:48:20.704788+00', '2025-11-23 07:50:03.90462+00', NULL, 'aal1', NULL, '2025-11-23 07:50:03.904557', 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('58d2be2c-be8c-44c0-aa27-dd7377983264', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 07:50:09.450313+00', '2025-11-23 07:50:09.450313+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('d6370eec-1fb1-448d-8655-f2bf8f399ff3', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 11:30:05.673699+00', '2025-11-23 12:37:57.892888+00', NULL, 'aal1', NULL, '2025-11-23 12:37:57.892867', 'python-httpx/0.28.1', '172.217.12.138', NULL, NULL, NULL, NULL),
+	('863081b3-f23d-49bb-b816-d3e9a03ae5e5', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 09:27:45.165441+00', '2025-11-23 10:28:50.997815+00', NULL, 'aal1', NULL, '2025-11-23 10:28:50.997793', 'python-httpx/0.28.1', '172.217.20.170', NULL, NULL, NULL, NULL),
+	('f20e11f8-9d3a-467f-902c-fc8716933b72', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 10:28:56.492674+00', '2025-11-23 10:28:56.492674+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.217.20.170', NULL, NULL, NULL, NULL),
+	('eb4ce8f6-ce63-443e-94c5-2675d6abc936', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 12:59:38.088093+00', '2025-11-23 12:59:38.088093+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '142.250.204.74', NULL, NULL, NULL, NULL),
+	('71637a28-7439-448d-8af5-76a31355134c', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 12:38:01.926512+00', '2025-11-23 12:38:01.926512+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.217.12.138', NULL, NULL, NULL, NULL),
+	('cb06af4f-bb49-4495-96bd-3acb39a1cdeb', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 13:00:41.342801+00', '2025-11-23 15:08:50.179079+00', NULL, 'aal1', NULL, '2025-11-23 15:08:50.179009', 'python-httpx/0.28.1', '172.217.12.138', NULL, NULL, NULL, NULL),
+	('39b60ae0-daca-4cc4-ae17-6d350e2ee6a7', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-23 15:08:54.093373+00', '2025-11-23 15:08:54.093373+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.217.12.138', NULL, NULL, NULL, NULL),
+	('fff30544-6512-4ac2-8619-967e431dcdc0', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-24 17:34:05.853005+00', '2025-11-24 17:34:05.853005+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.217.20.170', NULL, NULL, NULL, NULL),
+	('bcb07284-e989-434a-b5b2-fa769e806305', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-24 17:49:51.421447+00', '2025-11-24 19:00:09.433181+00', NULL, 'aal1', NULL, '2025-11-24 19:00:09.433153', 'python-httpx/0.28.1', '172.217.20.170', NULL, NULL, NULL, NULL),
+	('e97d4c5e-646b-4bec-8664-2623ae712bc6', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-24 19:00:28.509989+00', '2025-11-24 20:25:02.07605+00', NULL, 'aal1', NULL, '2025-11-24 20:25:02.076025', 'python-httpx/0.28.1', '172.217.20.170', NULL, NULL, NULL, NULL),
+	('0728373c-2b0a-4522-83f0-585bc90c2e24', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '2025-11-24 20:40:50.075241+00', '2025-11-24 20:40:50.075241+00', NULL, 'aal1', NULL, NULL, 'python-httpx/0.28.1', '172.217.20.170', NULL, NULL, NULL, NULL);
+
+
+--
+-- Data for Name: mfa_amr_claims; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."mfa_amr_claims" ("session_id", "created_at", "updated_at", "authentication_method", "id") VALUES
+	('f659f228-b8c1-4371-acf3-2734454ba78a', '2025-11-19 10:39:48.699747+00', '2025-11-19 10:39:48.699747+00', 'password', 'a874ea26-3a1d-4fbc-993e-03436e69bff0'),
+	('6b608049-a5f3-4f51-8090-0b1994206264', '2025-11-19 10:39:55.147841+00', '2025-11-19 10:39:55.147841+00', 'password', 'ede4c0cc-ab56-485d-b1d0-21f7e05e1e14'),
+	('7e5a373a-1c32-4782-861f-1810e4ee1a51', '2025-11-19 10:44:37.631683+00', '2025-11-19 10:44:37.631683+00', 'password', '771b68f4-6e9b-43b6-a46a-56c35f2d22e9'),
+	('7815feeb-d958-47ce-8720-f03d9aedfd83', '2025-11-19 10:49:20.789232+00', '2025-11-19 10:49:20.789232+00', 'password', 'a30b0a92-2312-4591-94d8-6cd46f4173cc'),
+	('e211a908-3e65-43e2-bda3-4b031f1734af', '2025-11-19 10:50:42.298365+00', '2025-11-19 10:50:42.298365+00', 'password', 'ad8be1c5-0fdf-481f-936d-0abfc8c689a2'),
+	('4ccfca6e-4508-4952-9f36-913e0e579bd6', '2025-11-19 10:51:26.067448+00', '2025-11-19 10:51:26.067448+00', 'password', '33830eeb-9851-4377-bed1-7f570649c334'),
+	('d28b667c-a394-4584-93f7-2b94e3a7fc8d', '2025-11-19 10:54:03.277996+00', '2025-11-19 10:54:03.277996+00', 'password', '0079175d-1ec4-4f3b-9354-bee8d5af843c'),
+	('2b0ac138-1c25-456d-b01f-b53e8769d1ec', '2025-11-19 10:55:27.289827+00', '2025-11-19 10:55:27.289827+00', 'password', 'b52ac705-becc-4f85-8aff-1b88ee3e927f'),
+	('b29ec3d2-d98c-44fd-bbd2-521bdb205255', '2025-11-19 11:00:00.340229+00', '2025-11-19 11:00:00.340229+00', 'password', 'd69dd252-ab82-4306-883f-5a78dde0e80e'),
+	('912ea0fc-fe92-4d7a-976b-bf60af1cd21a', '2025-11-19 11:03:03.854726+00', '2025-11-19 11:03:03.854726+00', 'password', '0c1708a7-8773-4542-95e8-b7e0b9ff2683'),
+	('65f11250-0ded-437e-92a7-2a161da4c52a', '2025-11-19 11:05:23.814296+00', '2025-11-19 11:05:23.814296+00', 'password', '41b62ed8-d315-4652-a3e4-2aa97e10fd5b'),
+	('62f33bac-1dee-4f78-b09c-fbcabedf3710', '2025-11-19 11:06:30.078056+00', '2025-11-19 11:06:30.078056+00', 'password', '5dc5d2e3-4ba5-4210-b9b7-77b4742fa585'),
+	('38327a2e-8754-43cf-bacf-3aeae7cf7a8c', '2025-11-19 11:11:07.880793+00', '2025-11-19 11:11:07.880793+00', 'password', 'efa8df26-a8c0-4c81-bb97-2f97a7584616'),
+	('d90abf3c-0889-4950-9c9f-4dd01d120afe', '2025-11-19 11:19:43.88211+00', '2025-11-19 11:19:43.88211+00', 'password', '6474b30c-f42b-4041-b42b-b7242ecc454f'),
+	('1085074c-5951-4191-88a4-094a36481eb7', '2025-11-19 11:24:50.880265+00', '2025-11-19 11:24:50.880265+00', 'password', 'ca243ce1-1304-465b-adc0-f4e5b7a997b6'),
+	('58745f3c-83fc-48b5-b87e-8bac98c98984', '2025-11-19 11:47:51.353644+00', '2025-11-19 11:47:51.353644+00', 'password', '45612ccd-423e-4cce-aecb-90ea5927869d'),
+	('e3a9df36-5c16-427f-953c-57a8b3a8b2e0', '2025-11-19 11:51:34.971128+00', '2025-11-19 11:51:34.971128+00', 'password', 'ef512dc9-6a5d-4f55-bf1b-7f92fb5efe61'),
+	('5c27b13a-b19e-4d83-b83a-2fb331e2e66f', '2025-11-19 11:54:43.232295+00', '2025-11-19 11:54:43.232295+00', 'password', 'f47aa863-89f0-403d-b061-7189ecff50ad'),
+	('5953fab2-789b-48e8-83c4-9b2b642706c6', '2025-11-19 11:57:05.214869+00', '2025-11-19 11:57:05.214869+00', 'password', '59739913-c1d7-435b-b389-9a43d7d8d48b'),
+	('9c056e28-9fc7-4eb7-9e34-1be63c86f062', '2025-11-19 11:58:24.481272+00', '2025-11-19 11:58:24.481272+00', 'password', 'a91cc0b9-44f5-4617-b686-0c1ba55f83da'),
+	('ad2b958d-61f7-414a-8ef7-1abcd15b1e3b', '2025-11-19 11:58:33.04431+00', '2025-11-19 11:58:33.04431+00', 'password', 'dcc7da09-16d7-45ca-8d0f-1365ac1dfd78'),
+	('7105694d-23bb-49f8-a21b-154addacd19b', '2025-11-19 12:16:48.455576+00', '2025-11-19 12:16:48.455576+00', 'password', '9d4527c8-e722-4e0b-a61c-7af6e16456f8'),
+	('40ead552-98cb-4ff9-80a8-911dfab02afa', '2025-11-19 12:27:27.895349+00', '2025-11-19 12:27:27.895349+00', 'password', '4ccdb8fd-1fb3-4174-a38c-8ec97534b135'),
+	('82dca3ad-3618-4530-85c7-d2fb9b449b4b', '2025-11-19 17:22:17.992534+00', '2025-11-19 17:22:17.992534+00', 'password', 'd8ae54a9-7fd5-4846-97d6-b3c11fc290ea'),
+	('050df491-6d5d-49e3-ac1e-b8cb05aed927', '2025-11-19 17:23:33.692271+00', '2025-11-19 17:23:33.692271+00', 'password', '323bcb42-af2a-476f-bd66-6a7524fca625'),
+	('a778a486-1e85-4355-8998-bc5fd57c9298', '2025-11-19 17:24:57.613368+00', '2025-11-19 17:24:57.613368+00', 'password', 'f72c2aa6-132a-4849-b714-76b9eb64d4ae'),
+	('cbbf6504-e79f-4b5b-83dd-530fcb3878ea', '2025-11-19 17:26:26.855322+00', '2025-11-19 17:26:26.855322+00', 'password', '72fce65b-5553-42f0-8358-758c489ef049'),
+	('7265210f-19bc-4597-94c4-e3ad3822668c', '2025-11-19 17:30:16.835636+00', '2025-11-19 17:30:16.835636+00', 'password', '1e12fce8-9d68-4b78-8ebb-39c72854c4ee'),
+	('de0f22f0-99c4-4e7f-bbf2-13797128fcb9', '2025-11-19 17:32:13.621749+00', '2025-11-19 17:32:13.621749+00', 'password', 'dda12ad2-6b08-4be8-8ab0-ef4e8ebcae35'),
+	('b1b45f5d-3db5-42a0-aa94-d9353e043be0', '2025-11-19 17:33:10.321299+00', '2025-11-19 17:33:10.321299+00', 'password', '48737ca9-762c-4ad1-89cb-30274b36319d'),
+	('51cecb13-e2be-48c8-9f11-b336c9142fa2', '2025-11-19 17:34:41.330967+00', '2025-11-19 17:34:41.330967+00', 'password', '8422e063-6a0f-4a64-a7dc-d0e718d387c1'),
+	('cf15550a-6c83-4f34-8cef-d339075c2509', '2025-11-19 17:34:50.250036+00', '2025-11-19 17:34:50.250036+00', 'password', '1615b38f-e049-4db3-92f6-838f7e9399f6'),
+	('3901e192-cacf-447d-b269-08927f2f9391', '2025-11-20 09:23:18.664374+00', '2025-11-20 09:23:18.664374+00', 'password', '045196e1-481a-4c1a-bd59-d83d263799bf'),
+	('85fe9661-cdfd-487c-b48a-475bdc87f952', '2025-11-20 09:50:51.02119+00', '2025-11-20 09:50:51.02119+00', 'password', 'e673b12f-4831-4fa8-9012-16388d3279b9'),
+	('079aa870-f442-4eb5-bd35-f0425968e3d3', '2025-11-20 09:54:35.917554+00', '2025-11-20 09:54:35.917554+00', 'password', '1d18a6be-92c9-448c-9cc7-de102244f431'),
+	('f46ad0b8-ab31-43c5-81ce-f2e49bf8f04e', '2025-11-20 16:03:25.680232+00', '2025-11-20 16:03:25.680232+00', 'password', '1f63bdc0-5e8f-4009-905e-f4a1aaddd14c'),
+	('d0d1e33f-600e-441f-8139-59be83f17a6d', '2025-11-21 02:33:35.938299+00', '2025-11-21 02:33:35.938299+00', 'password', '48125581-2eaa-4bd5-92f3-08fd363bbadb'),
+	('779bdbcb-fc7a-402e-a807-86ec989fcfe9', '2025-11-21 02:37:44.404304+00', '2025-11-21 02:37:44.404304+00', 'password', 'b0dd82aa-dfe6-43e0-bf0e-ef12f82f7bd7'),
+	('a65d18fd-f201-4ea5-b1cc-4f1035d94778', '2025-11-21 03:34:48.953782+00', '2025-11-21 03:34:48.953782+00', 'password', 'a85f7182-3a2c-4761-8306-b129ae8578f1'),
+	('7bfbb9fd-bdf5-4c8d-94ae-f2a423e7b716', '2025-11-21 03:38:29.420437+00', '2025-11-21 03:38:29.420437+00', 'password', '988bb7a5-b8c5-4c9a-91a6-adf01aa806f5'),
+	('7710fdcc-9be7-4d1e-af5d-8cefbe1a9e96', '2025-11-21 03:39:25.396339+00', '2025-11-21 03:39:25.396339+00', 'password', '591350dc-7a4d-45f8-88a1-3e5b45db9c7b'),
+	('edcfc636-24d8-45ea-a900-a059c567d9d4', '2025-11-21 04:22:52.148495+00', '2025-11-21 04:22:52.148495+00', 'password', 'c4afee02-35c1-4c4f-bd4d-1e7fe5514045'),
+	('ca5a120d-16a3-416e-a740-0a025588e199', '2025-11-21 04:51:07.710798+00', '2025-11-21 04:51:07.710798+00', 'password', '42976bea-7f7e-4aed-9bf5-74d74104872c'),
+	('b124f011-cc65-4482-9209-43ddbf11e8c4', '2025-11-21 07:36:48.712941+00', '2025-11-21 07:36:48.712941+00', 'password', 'f8bd89a9-7c7f-4146-9be2-80eae37d37cc'),
+	('3f7be0c2-5dc3-44b2-bf4b-4f94c1ab45df', '2025-11-21 08:38:58.078692+00', '2025-11-21 08:38:58.078692+00', 'password', '79718247-bd1d-465b-9009-9787b00f6474'),
+	('0631cc8f-fd4c-4363-9310-7ec7700e098e', '2025-11-21 09:40:08.124245+00', '2025-11-21 09:40:08.124245+00', 'password', 'f60401f3-56d9-495b-b807-56de4537dea1'),
+	('ff95fa64-f800-4881-b426-552e08232e9a', '2025-11-21 09:40:49.560361+00', '2025-11-21 09:40:49.560361+00', 'password', 'b6bd226b-db68-427d-9384-4f02dc1dad16'),
+	('378d6363-edb2-464b-8064-3d6e82f91c77', '2025-11-21 10:36:03.006509+00', '2025-11-21 10:36:03.006509+00', 'password', '72227561-f302-40ae-9539-6ec89a41f65f'),
+	('243f4778-4957-41f8-8c70-4783df6e035b', '2025-11-21 13:24:49.858804+00', '2025-11-21 13:24:49.858804+00', 'password', '0718b5ca-05b1-4d2e-923c-c3c7981f3865'),
+	('8a2342f1-cabc-4453-8010-a672e98a2877', '2025-11-21 16:56:16.077992+00', '2025-11-21 16:56:16.077992+00', 'password', '4b181f8a-1ba5-4887-a6f5-72476fef22cd'),
+	('393bb9ed-f794-4f1d-9c80-013ce9411a38', '2025-11-22 04:23:38.134941+00', '2025-11-22 04:23:38.134941+00', 'password', '44904847-ec1d-46f3-b737-45b37e9b4016'),
+	('ba7d59ca-9b4c-4f08-98ab-62494ff88054', '2025-11-22 05:26:03.873684+00', '2025-11-22 05:26:03.873684+00', 'password', '4cf127c7-6b54-4bb8-935c-866ac5a87315'),
+	('b821798e-1611-4116-b6e9-4a83fe6bbd87', '2025-11-22 06:30:08.556768+00', '2025-11-22 06:30:08.556768+00', 'password', '05320520-32d6-4404-8f3c-97132d37355f'),
+	('91b161e5-634c-4dbf-9399-8fe510cc63a3', '2025-11-22 15:32:21.662845+00', '2025-11-22 15:32:21.662845+00', 'password', '0f487b19-970d-4e73-93d6-8decda7fc20c'),
+	('7eaa77b0-ca60-4c52-afa4-34c13224e041', '2025-11-23 02:40:24.109439+00', '2025-11-23 02:40:24.109439+00', 'password', '5715feee-8876-498a-8c1a-a1bd02f2eb4b'),
+	('f22b919e-2f24-4280-a30e-dab5dabb9c9f', '2025-11-23 04:15:14.668562+00', '2025-11-23 04:15:14.668562+00', 'password', '323e258d-1555-4ef2-8ff5-17468409bb95'),
+	('f466ced3-fe00-4ea4-b350-db9f5e24ee10', '2025-11-23 05:35:03.420803+00', '2025-11-23 05:35:03.420803+00', 'password', 'e93a4934-94d3-4a02-aaf8-e8bf34f1d827'),
+	('1392d08c-c48a-44ef-9f07-567ef1887b0f', '2025-11-23 06:48:20.705779+00', '2025-11-23 06:48:20.705779+00', 'password', '9bccba01-7af5-4a9a-94f1-9c064fa8ac77'),
+	('58d2be2c-be8c-44c0-aa27-dd7377983264', '2025-11-23 07:50:09.451254+00', '2025-11-23 07:50:09.451254+00', 'password', '7226191e-0a6d-488d-abf7-ccb9dc36f568'),
+	('863081b3-f23d-49bb-b816-d3e9a03ae5e5', '2025-11-23 09:27:45.166557+00', '2025-11-23 09:27:45.166557+00', 'password', '84a2f2e8-ebd4-4f09-abea-60f64bdf2100'),
+	('f20e11f8-9d3a-467f-902c-fc8716933b72', '2025-11-23 10:28:56.493558+00', '2025-11-23 10:28:56.493558+00', 'password', 'fcf2f891-e20d-49e3-aae0-3f4f9bd0e7b8'),
+	('d6370eec-1fb1-448d-8655-f2bf8f399ff3', '2025-11-23 11:30:05.674555+00', '2025-11-23 11:30:05.674555+00', 'password', '191138ad-cbe2-4296-8961-d9eabd07d8b0'),
+	('71637a28-7439-448d-8af5-76a31355134c', '2025-11-23 12:38:01.927439+00', '2025-11-23 12:38:01.927439+00', 'password', '7b25dd0f-0106-4288-9112-a59f49c8a0ef'),
+	('eb4ce8f6-ce63-443e-94c5-2675d6abc936', '2025-11-23 12:59:38.089059+00', '2025-11-23 12:59:38.089059+00', 'password', '3591fabd-eff1-48e8-9c8b-541b08015482'),
+	('cb06af4f-bb49-4495-96bd-3acb39a1cdeb', '2025-11-23 13:00:41.343646+00', '2025-11-23 13:00:41.343646+00', 'password', '7f5f06cb-448f-4a69-a0f8-8958ce8b8e84'),
+	('39b60ae0-daca-4cc4-ae17-6d350e2ee6a7', '2025-11-23 15:08:54.094313+00', '2025-11-23 15:08:54.094313+00', 'password', 'e1f9f3c8-4064-4bd9-bc1b-00f0cfff9237'),
+	('fff30544-6512-4ac2-8619-967e431dcdc0', '2025-11-24 17:34:05.854582+00', '2025-11-24 17:34:05.854582+00', 'password', '89057c49-820d-4c70-8c23-d177645ac37f'),
+	('bcb07284-e989-434a-b5b2-fa769e806305', '2025-11-24 17:49:51.423257+00', '2025-11-24 17:49:51.423257+00', 'password', 'a69fb914-44f0-4456-a67b-36ceb0ce0eb1'),
+	('e97d4c5e-646b-4bec-8664-2623ae712bc6', '2025-11-24 19:00:28.511594+00', '2025-11-24 19:00:28.511594+00', 'password', 'd361b033-dff3-4d8d-80a2-fd985149317b'),
+	('0728373c-2b0a-4522-83f0-585bc90c2e24', '2025-11-24 20:40:50.077656+00', '2025-11-24 20:40:50.077656+00', 'password', '3695cf47-9e4f-4d53-93c1-f7758f05f02a');
+
+
+--
+-- Data for Name: mfa_factors; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: mfa_challenges; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: oauth_authorizations; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: oauth_consents; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: one_time_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: refresh_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."refresh_tokens" ("instance_id", "id", "token", "user_id", "revoked", "created_at", "updated_at", "parent", "session_id") VALUES
+	('00000000-0000-0000-0000-000000000000', 1429, 'ecioy32d7bkx', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 10:39:48.698822+00', '2025-11-19 10:39:48.698822+00', NULL, 'f659f228-b8c1-4371-acf3-2734454ba78a'),
+	('00000000-0000-0000-0000-000000000000', 1430, 'c3y43j3vmtbc', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 10:39:55.146467+00', '2025-11-19 10:39:55.146467+00', NULL, '6b608049-a5f3-4f51-8090-0b1994206264'),
+	('00000000-0000-0000-0000-000000000000', 1431, 'fzsryhfswmex', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 10:44:37.631193+00', '2025-11-19 10:44:37.631193+00', NULL, '7e5a373a-1c32-4782-861f-1810e4ee1a51'),
+	('00000000-0000-0000-0000-000000000000', 1432, 'mncufb3ven3b', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 10:49:20.788502+00', '2025-11-19 10:49:20.788502+00', NULL, '7815feeb-d958-47ce-8720-f03d9aedfd83'),
+	('00000000-0000-0000-0000-000000000000', 1433, '3bcgcyectpjt', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 10:50:42.297763+00', '2025-11-19 10:50:42.297763+00', NULL, 'e211a908-3e65-43e2-bda3-4b031f1734af'),
+	('00000000-0000-0000-0000-000000000000', 1434, 'qx5rxd2urb4l', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 10:51:26.066911+00', '2025-11-19 10:51:26.066911+00', NULL, '4ccfca6e-4508-4952-9f36-913e0e579bd6'),
+	('00000000-0000-0000-0000-000000000000', 1435, 'xyncvw4v2bin', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 10:54:03.277572+00', '2025-11-19 10:54:03.277572+00', NULL, 'd28b667c-a394-4584-93f7-2b94e3a7fc8d'),
+	('00000000-0000-0000-0000-000000000000', 1436, 'gcqhfestpzcu', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 10:55:27.28937+00', '2025-11-19 10:55:27.28937+00', NULL, '2b0ac138-1c25-456d-b01f-b53e8769d1ec'),
+	('00000000-0000-0000-0000-000000000000', 1437, 'ynwafabv7pet', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:00:00.339702+00', '2025-11-19 11:00:00.339702+00', NULL, 'b29ec3d2-d98c-44fd-bbd2-521bdb205255'),
+	('00000000-0000-0000-0000-000000000000', 1438, 'y6co2pzzmo2k', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:03:03.854262+00', '2025-11-19 11:03:03.854262+00', NULL, '912ea0fc-fe92-4d7a-976b-bf60af1cd21a'),
+	('00000000-0000-0000-0000-000000000000', 1439, 'fzipvvltxo5c', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:05:23.813847+00', '2025-11-19 11:05:23.813847+00', NULL, '65f11250-0ded-437e-92a7-2a161da4c52a'),
+	('00000000-0000-0000-0000-000000000000', 1440, 'x6qtco67dssw', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:06:30.077585+00', '2025-11-19 11:06:30.077585+00', NULL, '62f33bac-1dee-4f78-b09c-fbcabedf3710'),
+	('00000000-0000-0000-0000-000000000000', 1441, '4lona6saskgy', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:11:07.880381+00', '2025-11-19 11:11:07.880381+00', NULL, '38327a2e-8754-43cf-bacf-3aeae7cf7a8c'),
+	('00000000-0000-0000-0000-000000000000', 1442, 'zpsfzyb3c3dx', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:19:43.881661+00', '2025-11-19 11:19:43.881661+00', NULL, 'd90abf3c-0889-4950-9c9f-4dd01d120afe'),
+	('00000000-0000-0000-0000-000000000000', 1443, 'iv3jtn6j67jb', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:24:50.879717+00', '2025-11-19 11:24:50.879717+00', NULL, '1085074c-5951-4191-88a4-094a36481eb7'),
+	('00000000-0000-0000-0000-000000000000', 1444, 'wdpsfjwh7nw6', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:47:51.35314+00', '2025-11-19 11:47:51.35314+00', NULL, '58745f3c-83fc-48b5-b87e-8bac98c98984'),
+	('00000000-0000-0000-0000-000000000000', 1445, 'jkqluzi6znoz', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:51:34.970591+00', '2025-11-19 11:51:34.970591+00', NULL, 'e3a9df36-5c16-427f-953c-57a8b3a8b2e0'),
+	('00000000-0000-0000-0000-000000000000', 1446, '5v7qvaj2kvu6', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:54:43.231872+00', '2025-11-19 11:54:43.231872+00', NULL, '5c27b13a-b19e-4d83-b83a-2fb331e2e66f'),
+	('00000000-0000-0000-0000-000000000000', 1447, 'otv3bxfxg6u5', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:57:05.214389+00', '2025-11-19 11:57:05.214389+00', NULL, '5953fab2-789b-48e8-83c4-9b2b642706c6'),
+	('00000000-0000-0000-0000-000000000000', 1448, 'az56thzjwtcz', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:58:24.480795+00', '2025-11-19 11:58:24.480795+00', NULL, '9c056e28-9fc7-4eb7-9e34-1be63c86f062'),
+	('00000000-0000-0000-0000-000000000000', 1449, 'zklgkondoohn', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 11:58:33.043744+00', '2025-11-19 11:58:33.043744+00', NULL, 'ad2b958d-61f7-414a-8ef7-1abcd15b1e3b'),
+	('00000000-0000-0000-0000-000000000000', 1450, 'mpphdruxfdxa', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 12:16:48.454949+00', '2025-11-19 12:16:48.454949+00', NULL, '7105694d-23bb-49f8-a21b-154addacd19b'),
+	('00000000-0000-0000-0000-000000000000', 1451, 'b36ryeqrsgkp', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 12:27:27.894823+00', '2025-11-19 12:27:27.894823+00', NULL, '40ead552-98cb-4ff9-80a8-911dfab02afa'),
+	('00000000-0000-0000-0000-000000000000', 1452, 'qr56tmd3puns', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:22:17.991881+00', '2025-11-19 17:22:17.991881+00', NULL, '82dca3ad-3618-4530-85c7-d2fb9b449b4b'),
+	('00000000-0000-0000-0000-000000000000', 1453, 'hfwdbkpjvj6f', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:23:33.691715+00', '2025-11-19 17:23:33.691715+00', NULL, '050df491-6d5d-49e3-ac1e-b8cb05aed927'),
+	('00000000-0000-0000-0000-000000000000', 1454, 'j6pdbkyusfw7', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:24:57.61288+00', '2025-11-19 17:24:57.61288+00', NULL, 'a778a486-1e85-4355-8998-bc5fd57c9298'),
+	('00000000-0000-0000-0000-000000000000', 1455, 'gpaap2fhqojo', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:26:26.854791+00', '2025-11-19 17:26:26.854791+00', NULL, 'cbbf6504-e79f-4b5b-83dd-530fcb3878ea'),
+	('00000000-0000-0000-0000-000000000000', 1456, 'trlgv3kxh24e', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:30:16.835126+00', '2025-11-19 17:30:16.835126+00', NULL, '7265210f-19bc-4597-94c4-e3ad3822668c'),
+	('00000000-0000-0000-0000-000000000000', 1457, 'poqyp3dej5ow', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:32:13.621279+00', '2025-11-19 17:32:13.621279+00', NULL, 'de0f22f0-99c4-4e7f-bbf2-13797128fcb9'),
+	('00000000-0000-0000-0000-000000000000', 1458, 'gctqvd4z5uu4', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:33:10.320791+00', '2025-11-19 17:33:10.320791+00', NULL, 'b1b45f5d-3db5-42a0-aa94-d9353e043be0'),
+	('00000000-0000-0000-0000-000000000000', 1459, 'cltyjmaty5vc', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:34:41.33049+00', '2025-11-19 17:34:41.33049+00', NULL, '51cecb13-e2be-48c8-9f11-b336c9142fa2'),
+	('00000000-0000-0000-0000-000000000000', 1460, 'obtgf3rvhkzp', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-19 17:34:50.249578+00', '2025-11-19 17:34:50.249578+00', NULL, 'cf15550a-6c83-4f34-8cef-d339075c2509'),
+	('00000000-0000-0000-0000-000000000000', 1461, 'exeiycxsyjfp', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-20 09:23:18.663549+00', '2025-11-20 09:23:18.663549+00', NULL, '3901e192-cacf-447d-b269-08927f2f9391'),
+	('00000000-0000-0000-0000-000000000000', 1462, '7sc5l3aatyis', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-20 09:50:51.020686+00', '2025-11-20 09:50:51.020686+00', NULL, '85fe9661-cdfd-487c-b48a-475bdc87f952'),
+	('00000000-0000-0000-0000-000000000000', 1463, 'jitsad6bnh6w', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-20 09:54:35.917032+00', '2025-11-20 10:54:24.899833+00', NULL, '079aa870-f442-4eb5-bd35-f0425968e3d3'),
+	('00000000-0000-0000-0000-000000000000', 1464, 'r6qmfo5s24dr', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-20 10:54:24.900639+00', '2025-11-20 10:54:24.912182+00', 'jitsad6bnh6w', '079aa870-f442-4eb5-bd35-f0425968e3d3'),
+	('00000000-0000-0000-0000-000000000000', 1465, 'lvvoyc3l3poo', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-20 10:54:24.912437+00', '2025-11-20 10:54:24.912437+00', 'r6qmfo5s24dr', '079aa870-f442-4eb5-bd35-f0425968e3d3'),
+	('00000000-0000-0000-0000-000000000000', 1466, 'u6fztjo67mif', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-20 16:03:25.679435+00', '2025-11-20 16:03:25.679435+00', NULL, 'f46ad0b8-ab31-43c5-81ce-f2e49bf8f04e'),
+	('00000000-0000-0000-0000-000000000000', 1467, 'sm7djpsswfnz', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 02:33:35.937761+00', '2025-11-21 02:33:35.937761+00', NULL, 'd0d1e33f-600e-441f-8139-59be83f17a6d'),
+	('00000000-0000-0000-0000-000000000000', 1468, 'e7ksxhkf3fdm', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 02:37:44.403858+00', '2025-11-21 02:37:44.403858+00', NULL, '779bdbcb-fc7a-402e-a807-86ec989fcfe9'),
+	('00000000-0000-0000-0000-000000000000', 1469, 'r6rpwnvkxdir', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 03:34:48.953131+00', '2025-11-21 03:34:48.953131+00', NULL, 'a65d18fd-f201-4ea5-b1cc-4f1035d94778'),
+	('00000000-0000-0000-0000-000000000000', 1470, 'fyjl6zmvpzeb', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 03:38:29.419876+00', '2025-11-21 03:38:29.419876+00', NULL, '7bfbb9fd-bdf5-4c8d-94ae-f2a423e7b716'),
+	('00000000-0000-0000-0000-000000000000', 1471, 'nudhyczghpv4', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 03:39:25.39586+00', '2025-11-21 03:39:25.39586+00', NULL, '7710fdcc-9be7-4d1e-af5d-8cefbe1a9e96'),
+	('00000000-0000-0000-0000-000000000000', 1472, 'gzj5jbluw7tb', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 04:22:52.147808+00', '2025-11-21 04:22:52.147808+00', NULL, 'edcfc636-24d8-45ea-a900-a059c567d9d4'),
+	('00000000-0000-0000-0000-000000000000', 1473, 'jj5xxzg4vwv4', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-21 04:51:07.710104+00', '2025-11-21 05:50:56.597111+00', NULL, 'ca5a120d-16a3-416e-a740-0a025588e199'),
+	('00000000-0000-0000-0000-000000000000', 1474, 'bju477y7yhzc', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-21 05:50:56.597538+00', '2025-11-21 05:50:56.609133+00', 'jj5xxzg4vwv4', 'ca5a120d-16a3-416e-a740-0a025588e199'),
+	('00000000-0000-0000-0000-000000000000', 1475, 'nv32saa7ibd5', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 05:50:56.609336+00', '2025-11-21 05:50:56.609336+00', 'bju477y7yhzc', 'ca5a120d-16a3-416e-a740-0a025588e199'),
+	('00000000-0000-0000-0000-000000000000', 1476, 'eqpon3jh3fyx', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 07:36:48.711952+00', '2025-11-21 07:36:48.711952+00', NULL, 'b124f011-cc65-4482-9209-43ddbf11e8c4'),
+	('00000000-0000-0000-0000-000000000000', 1477, 'oxnwf35yfvap', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-21 08:38:58.077883+00', '2025-11-21 09:40:04.067637+00', NULL, '3f7be0c2-5dc3-44b2-bf4b-4f94c1ab45df'),
+	('00000000-0000-0000-0000-000000000000', 1478, 'r4fee7gnif5k', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 09:40:04.068528+00', '2025-11-21 09:40:04.068528+00', 'oxnwf35yfvap', '3f7be0c2-5dc3-44b2-bf4b-4f94c1ab45df'),
+	('00000000-0000-0000-0000-000000000000', 1479, 's22mpv7k6hmj', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 09:40:08.123902+00', '2025-11-21 09:40:08.123902+00', NULL, '0631cc8f-fd4c-4363-9310-7ec7700e098e'),
+	('00000000-0000-0000-0000-000000000000', 1481, 'qzj43qcqtpzw', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 10:36:03.005601+00', '2025-11-21 10:36:03.005601+00', NULL, '378d6363-edb2-464b-8064-3d6e82f91c77'),
+	('00000000-0000-0000-0000-000000000000', 1480, '3yuatzds3sux', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-21 09:40:49.559862+00', '2025-11-21 10:42:21.27456+00', NULL, 'ff95fa64-f800-4881-b426-552e08232e9a'),
+	('00000000-0000-0000-0000-000000000000', 1482, 'obmr54cejkrl', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-21 10:42:21.275166+00', '2025-11-21 13:14:17.785912+00', '3yuatzds3sux', 'ff95fa64-f800-4881-b426-552e08232e9a'),
+	('00000000-0000-0000-0000-000000000000', 1483, 'ljqggz7ee6fn', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-21 13:14:17.786462+00', '2025-11-21 13:14:17.795148+00', 'obmr54cejkrl', 'ff95fa64-f800-4881-b426-552e08232e9a'),
+	('00000000-0000-0000-0000-000000000000', 1485, 'duvsbix3h2v3', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 13:24:49.858064+00', '2025-11-21 13:24:49.858064+00', NULL, '243f4778-4957-41f8-8c70-4783df6e035b'),
+	('00000000-0000-0000-0000-000000000000', 1486, '7hdzywkqngow', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-21 16:56:16.077231+00', '2025-11-21 16:56:16.077231+00', NULL, '8a2342f1-cabc-4453-8010-a672e98a2877'),
+	('00000000-0000-0000-0000-000000000000', 1484, '6uays2llp3u3', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-21 13:14:17.795407+00', '2025-11-22 04:24:48.123316+00', 'ljqggz7ee6fn', 'ff95fa64-f800-4881-b426-552e08232e9a'),
+	('00000000-0000-0000-0000-000000000000', 1487, '3tzheaqlsdot', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-22 04:23:38.134037+00', '2025-11-22 05:25:58.903677+00', NULL, '393bb9ed-f794-4f1d-9c80-013ce9411a38'),
+	('00000000-0000-0000-0000-000000000000', 1488, 'ewr4fpmwb7nl', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-22 05:25:58.907129+00', '2025-11-22 05:25:58.907129+00', '3tzheaqlsdot', '393bb9ed-f794-4f1d-9c80-013ce9411a38'),
+	('00000000-0000-0000-0000-000000000000', 1489, 'odjdhp3qzx2x', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-22 05:26:03.873161+00', '2025-11-22 05:26:03.873161+00', NULL, 'ba7d59ca-9b4c-4f08-98ab-62494ff88054'),
+	('00000000-0000-0000-0000-000000000000', 1490, 'd6zslrmuomxu', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-22 06:30:08.555561+00', '2025-11-22 06:30:08.555561+00', NULL, 'b821798e-1611-4116-b6e9-4a83fe6bbd87'),
+	('00000000-0000-0000-0000-000000000000', 1491, 'qrzeko4sas67', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-22 15:32:21.662094+00', '2025-11-22 15:32:21.662094+00', NULL, '91b161e5-634c-4dbf-9399-8fe510cc63a3'),
+	('00000000-0000-0000-0000-000000000000', 1492, 'hqavrqlbp25t', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 02:40:24.10897+00', '2025-11-23 02:40:24.10897+00', NULL, '7eaa77b0-ca60-4c52-afa4-34c13224e041'),
+	('00000000-0000-0000-0000-000000000000', 1493, 't6xbse75azoy', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-23 04:15:14.668025+00', '2025-11-23 05:33:56.501003+00', NULL, 'f22b919e-2f24-4280-a30e-dab5dabb9c9f'),
+	('00000000-0000-0000-0000-000000000000', 1494, 'rw42o74o56s5', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 05:33:56.501567+00', '2025-11-23 05:33:56.501567+00', 't6xbse75azoy', 'f22b919e-2f24-4280-a30e-dab5dabb9c9f'),
+	('00000000-0000-0000-0000-000000000000', 1495, 'mlo7v22unty7', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 05:35:03.420224+00', '2025-11-23 05:35:03.420224+00', NULL, 'f466ced3-fe00-4ea4-b350-db9f5e24ee10'),
+	('00000000-0000-0000-0000-000000000000', 1496, 'bkmm7ana3wsd', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-23 06:48:20.705215+00', '2025-11-23 07:49:59.560438+00', NULL, '1392d08c-c48a-44ef-9f07-567ef1887b0f'),
+	('00000000-0000-0000-0000-000000000000', 1497, '7qxagptoh7wj', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 07:49:59.560742+00', '2025-11-23 07:49:59.560742+00', 'bkmm7ana3wsd', '1392d08c-c48a-44ef-9f07-567ef1887b0f'),
+	('00000000-0000-0000-0000-000000000000', 1498, 'zl752cpwmh56', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 07:50:09.450738+00', '2025-11-23 07:50:09.450738+00', NULL, '58d2be2c-be8c-44c0-aa27-dd7377983264'),
+	('00000000-0000-0000-0000-000000000000', 1499, 'jnteb6vwn7za', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-23 09:27:45.165941+00', '2025-11-23 10:28:50.595562+00', NULL, '863081b3-f23d-49bb-b816-d3e9a03ae5e5'),
+	('00000000-0000-0000-0000-000000000000', 1500, '7ijpdz62l7do', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 10:28:50.596274+00', '2025-11-23 10:28:50.596274+00', 'jnteb6vwn7za', '863081b3-f23d-49bb-b816-d3e9a03ae5e5'),
+	('00000000-0000-0000-0000-000000000000', 1501, 'qylvtzr7gy2f', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 10:28:56.493072+00', '2025-11-23 10:28:56.493072+00', NULL, 'f20e11f8-9d3a-467f-902c-fc8716933b72'),
+	('00000000-0000-0000-0000-000000000000', 1502, 'w3kfd42sym7t', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-23 11:30:05.674057+00', '2025-11-23 12:37:57.86738+00', NULL, 'd6370eec-1fb1-448d-8655-f2bf8f399ff3'),
+	('00000000-0000-0000-0000-000000000000', 1503, 'cxkl4la32yxq', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 12:37:57.867994+00', '2025-11-23 12:37:57.867994+00', 'w3kfd42sym7t', 'd6370eec-1fb1-448d-8655-f2bf8f399ff3'),
+	('00000000-0000-0000-0000-000000000000', 1504, 'hjgtuwc2td6b', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 12:38:01.926945+00', '2025-11-23 12:38:01.926945+00', NULL, '71637a28-7439-448d-8af5-76a31355134c'),
+	('00000000-0000-0000-0000-000000000000', 1505, 'qopffoeptxqe', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 12:59:38.088512+00', '2025-11-23 12:59:38.088512+00', NULL, 'eb4ce8f6-ce63-443e-94c5-2675d6abc936'),
+	('00000000-0000-0000-0000-000000000000', 1506, 'awbg2wwtsxf2', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-23 13:00:41.343176+00', '2025-11-23 14:06:35.301934+00', NULL, 'cb06af4f-bb49-4495-96bd-3acb39a1cdeb'),
+	('00000000-0000-0000-0000-000000000000', 1507, 'nfkyvam3reu2', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-23 14:06:35.302393+00', '2025-11-23 15:08:50.176498+00', 'awbg2wwtsxf2', 'cb06af4f-bb49-4495-96bd-3acb39a1cdeb'),
+	('00000000-0000-0000-0000-000000000000', 1508, 'xgeox5q7zlpd', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 15:08:50.177065+00', '2025-11-23 15:08:50.177065+00', 'nfkyvam3reu2', 'cb06af4f-bb49-4495-96bd-3acb39a1cdeb'),
+	('00000000-0000-0000-0000-000000000000', 1509, 'quhlkfqx7qgb', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-23 15:08:54.093756+00', '2025-11-23 15:08:54.093756+00', NULL, '39b60ae0-daca-4cc4-ae17-6d350e2ee6a7'),
+	('00000000-0000-0000-0000-000000000000', 1510, 'rae44gqudjfr', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-24 17:34:05.853855+00', '2025-11-24 17:34:05.853855+00', NULL, 'fff30544-6512-4ac2-8619-967e431dcdc0'),
+	('00000000-0000-0000-0000-000000000000', 1511, 'qan7j6ttnk66', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-24 17:49:51.422357+00', '2025-11-24 18:59:57.00936+00', NULL, 'bcb07284-e989-434a-b5b2-fa769e806305'),
+	('00000000-0000-0000-0000-000000000000', 1512, 'lkpja2ixbnwm', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-24 18:59:57.009812+00', '2025-11-24 18:59:57.009812+00', 'qan7j6ttnk66', 'bcb07284-e989-434a-b5b2-fa769e806305'),
+	('00000000-0000-0000-0000-000000000000', 1513, 'eu75vcnevsqt', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-24 19:00:28.510824+00', '2025-11-24 20:25:02.044145+00', NULL, 'e97d4c5e-646b-4bec-8664-2623ae712bc6'),
+	('00000000-0000-0000-0000-000000000000', 1514, 'p6jso5a55nhe', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-24 20:25:02.044518+00', '2025-11-24 20:25:02.074945+00', 'eu75vcnevsqt', 'e97d4c5e-646b-4bec-8664-2623ae712bc6'),
+	('00000000-0000-0000-0000-000000000000', 1515, 'ajpdwpokggvd', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', true, '2025-11-24 20:25:02.075211+00', '2025-11-24 20:40:45.863364+00', 'p6jso5a55nhe', 'e97d4c5e-646b-4bec-8664-2623ae712bc6'),
+	('00000000-0000-0000-0000-000000000000', 1516, 'yhxi5b3dwyot', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', false, '2025-11-24 20:40:50.076531+00', '2025-11-24 20:40:50.076531+00', NULL, '0728373c-2b0a-4522-83f0-585bc90c2e24');
+
+
+--
+-- Data for Name: sso_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: saml_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: saml_relay_states; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: sso_domains; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: blog_posts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+
+
+--
+-- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
+--
 
 INSERT INTO "public"."notifications" ("id", "created_at", "user_id", "read_at", "type", "title", "body", "metadata") VALUES
 	(89, '2025-10-27 09:20:25.197166+00', '51eee0a1-8f20-4403-b5f1-0566375db20b', NULL, 'welcome_new_user', 'welcome_notification_title', 'welcome_notification_body', '{"action_url": "https://www.linkedin.com/company/104914264/admin/dashboard/", "action_type": "openUrl", "action_title_key": "followOnLinkedIn"}'),
@@ -392,8 +1147,10 @@ INSERT INTO "public"."prompt_templates_versions" ("id", "created_at", "updated_a
 
 INSERT INTO "public"."teams" ("id", "organization_id", "name", "description", "parent_team_id", "color", "created_at", "updated_at") VALUES
 	('57542124-f334-4851-adfd-584d436469a8', '19864b30-936d-4a8d-996a-27d17f11f00f', 'Marketing', NULL, NULL, '#3B82F6', '2025-11-23 07:05:33.116911+00', '2025-11-23 07:05:33.116911+00'),
-	('9d4c2402-b9c1-4e8d-997d-c7ed1cd0d11a', '19864b30-936d-4a8d-996a-27d17f11f00f', 'Ressources Humaines', NULL, NULL, '#3B82F6', '2025-11-23 07:05:47.823469+00', '2025-11-23 07:05:47.823469+00'),
-	('6a3dce98-5634-4467-b7f1-53be6b47e005', '19864b30-936d-4a8d-996a-27d17f11f00f', 'Growth', NULL, '57542124-f334-4851-adfd-584d436469a8', '#3B82F6', '2025-11-23 11:42:17.935359+00', '2025-11-23 11:42:17.935359+00');
+	('6a3dce98-5634-4467-b7f1-53be6b47e005', '19864b30-936d-4a8d-996a-27d17f11f00f', 'Growth', NULL, '57542124-f334-4851-adfd-584d436469a8', '#3B82F6', '2025-11-23 11:42:17.935359+00', '2025-11-23 11:42:17.935359+00'),
+	('02f4840f-4ad8-471f-895f-244b6b055def', '19864b30-936d-4a8d-996a-27d17f11f00f', 'Tech & Produit', NULL, NULL, '#FFCD00', '2025-11-24 17:47:10.788148+00', '2025-11-24 17:47:10.788148+00'),
+	('59cfa82f-6116-4135-87ed-841a39f4df15', '19864b30-936d-4a8d-996a-27d17f11f00f', 'Sales', NULL, NULL, '#D77655', '2025-11-24 17:48:04.685645+00', '2025-11-24 17:48:04.685645+00'),
+	('9d4c2402-b9c1-4e8d-997d-c7ed1cd0d11a', '19864b30-936d-4a8d-996a-27d17f11f00f', 'Ressources Humaines', NULL, NULL, '7B9EB3', '2025-11-23 07:05:47.823469+00', '2025-11-24 17:48:27.353981+00');
 
 
 --
@@ -402,7 +1159,9 @@ INSERT INTO "public"."teams" ("id", "organization_id", "name", "description", "p
 
 INSERT INTO "public"."user_organization_roles" ("id", "user_id", "organization_id", "role") VALUES
 	('1433d2a8-4dd7-4c30-9e02-4dd7eeb7c209', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '19864b30-936d-4a8d-996a-27d17f11f00f', 'admin'),
-	('3061fa92-1a3d-45ac-8faf-90c4509e44c9', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', 'a0a0e03a-fdbe-4924-83fd-8d4a547c5892', 'admin');
+	('3061fa92-1a3d-45ac-8faf-90c4509e44c9', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', 'a0a0e03a-fdbe-4924-83fd-8d4a547c5892', 'admin'),
+	('06bc1f23-942b-49b9-849e-f442e9132868', '0eaa7f45-1f7e-403b-84fc-f02d0f0e18a4', '19864b30-936d-4a8d-996a-27d17f11f00f', 'admin'),
+	('a01bdfe9-c7b3-4b01-8483-213dfed1ffdd', '95fec575-147d-49ba-bd8d-d8c1295159e6', '19864b30-936d-4a8d-996a-27d17f11f00f', 'admin');
 
 
 --
@@ -410,7 +1169,9 @@ INSERT INTO "public"."user_organization_roles" ("id", "user_id", "organization_i
 --
 
 INSERT INTO "public"."user_team_permissions" ("id", "user_id", "team_id", "role", "created_at", "updated_at") VALUES
-	('2653d500-889d-4b03-b7e4-3be69fd4cb9f', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '57542124-f334-4851-adfd-584d436469a8', 'admin', '2025-11-23 07:06:51.556134+00', '2025-11-23 07:42:34.977482+00');
+	('2653d500 -889d-4b03-b7e4-3be69fd4cb9f', 'eff2a1fd-210c-4b44-9a6f-81af6534c3c8', '02f4840f-4ad8-471f-895f-244b6b055def', 'admin', '2025-11-23 07:06:51.556134+00', '2025-11-24 17:48:41.992726+00'),
+	('1d9f8b0c-322d-4209-a96f-186e412d7bfa', '0eaa7f45-1f7e-403b-84fc-f02d0f0e18a4', '57542124-f334-4851-adfd-584d436469a8', 'admin', '2025-11-24 17:49:03.401147+00', '2025-11-24 17:49:03.401147+00'),
+	('b5fdeff6-5f18-4f6e-9e08-766ab38cdced', '95fec575-147d-49ba-bd8d-d8c1295159e6', '9d4c2402-b9c1-4e8d-997d-c7ed1cd0d11a', 'member', '2025-11-24 17:49:19.941566+00', '2025-11-24 17:49:19.941566+00');
 
 
 --
@@ -449,6 +1210,12 @@ INSERT INTO "storage"."buckets" ("id", "name", "owner", "created_at", "updated_a
 
 --
 -- Data for Name: buckets_analytics; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: buckets_vectors; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
 --
 
 
@@ -503,6 +1270,12 @@ INSERT INTO "storage"."prefixes" ("bucket_id", "name", "created_at", "updated_at
 
 
 --
+-- Data for Name: vector_indexes; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
 -- Data for Name: hooks; Type: TABLE DATA; Schema: supabase_functions; Owner: supabase_functions_admin
 --
 
@@ -512,7 +1285,7 @@ INSERT INTO "storage"."prefixes" ("bucket_id", "name", "created_at", "updated_at
 -- Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: supabase_auth_admin
 --
 
-SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 1509, true);
+SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 1516, true);
 
 
 --
@@ -526,7 +1299,7 @@ SELECT pg_catalog.setval('"public"."blog_posts_id_seq"', 1, false);
 -- Name: chats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."chats_id_seq"', 16017, true);
+SELECT pg_catalog.setval('"public"."chats_id_seq"', 16018, true);
 
 
 --
@@ -540,7 +1313,7 @@ SELECT pg_catalog.setval('"public"."enriched_chats_id_seq"', 149, true);
 -- Name: enriched_messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."enriched_messages_id_seq"', 116, true);
+SELECT pg_catalog.setval('"public"."enriched_messages_id_seq"', 132, true);
 
 
 --
@@ -589,6 +1362,6 @@ SELECT pg_catalog.setval('"supabase_functions"."hooks_id_seq"', 1, false);
 -- PostgreSQL database dump complete
 --
 
--- \unrestrict HBeeCZAeUEx2WEX4f4C7OfeezJvYhLz9tVIal4tEwxe0vqvF6Gg3vv3FbxT7C2f
+-- \unrestrict EKwjdeA0cneSFUq59TtkdLNACU7LtSkgtRqUfykGz61cyj8cPYmGGdT1Wf7oDo2
 
 RESET ALL;

@@ -21,9 +21,9 @@ class AuditRepository:
     @staticmethod
     def get_organization_member_ids(client: Client, organization_id: str) -> list[str]:
         """Get all user IDs for organization members"""
-        response = client.table("users_metadata") \
+        response = client.table("user_organization_roles") \
             .select("user_id") \
-            .contains("organization_ids", [organization_id]) \
+            .eq("organization_id", organization_id) \
             .execute()
 
         if not response.data:
@@ -42,28 +42,51 @@ class AuditRepository:
         loop = asyncio.get_event_loop()
 
         def _fetch():
-            # Current period stats
-            current_response = client.table("enriched_chats") \
-                .select("quality_score, clarity_score, context_score, specificity_score, actionability_score") \
+            # Get messages in current period to determine which chats to include
+            current_messages = client.table("messages") \
+                .select("chat_provider_id") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
 
+            current_chat_ids = list(set([msg["chat_provider_id"] for msg in (current_messages.data or []) if msg.get("chat_provider_id")]))
+
+            # Get quality stats for chats that have messages in current period
+            current_data = []
+            if current_chat_ids:
+                current_response = client.table("enriched_chats") \
+                    .select("quality_score, clarity_score, context_score, specificity_score, actionability_score") \
+                    .in_("chat_provider_id", current_chat_ids) \
+                    .in_("user_id", user_ids) \
+                    .execute()
+                current_data = current_response.data or []
+
             # Previous period for trend (7 days before start_date)
             trend_start = start_date - timedelta(days=7)
             trend_end = start_date
 
-            trend_response = client.table("enriched_chats") \
-                .select("quality_score") \
+            trend_messages = client.table("messages") \
+                .select("chat_provider_id") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", trend_start.isoformat()) \
                 .lt("created_at", trend_end.isoformat()) \
                 .execute()
 
+            trend_chat_ids = list(set([msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")]))
+
+            trend_data = []
+            if trend_chat_ids:
+                trend_response = client.table("enriched_chats") \
+                    .select("quality_score") \
+                    .in_("chat_provider_id", trend_chat_ids) \
+                    .in_("user_id", user_ids) \
+                    .execute()
+                trend_data = trend_response.data or []
+
             return {
-                "current": current_response.data,
-                "trend": trend_response.data
+                "current": current_data,
+                "trend": trend_data
             }
 
         with ThreadPoolExecutor() as executor:
@@ -107,25 +130,30 @@ class AuditRepository:
         loop = asyncio.get_event_loop()
 
         def _fetch():
-            # Total messages/chats
+            # Total messages/chats with chat_provider_id
             messages_response = client.table("messages") \
-                .select("id, user_id") \
+                .select("id, user_id, chat_provider_id") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
 
-            # Work-related stats
-            work_response = client.table("enriched_chats") \
-                .select("is_work_related") \
-                .in_("user_id", user_ids) \
-                .gte("created_at", start_date.isoformat()) \
-                .lte("created_at", end_date.isoformat()) \
-                .execute()
+            # Extract unique chat_provider_ids from messages in date range
+            chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
+
+            # Work-related stats for chats that have messages in the date range
+            work_data = []
+            if chat_provider_ids:
+                work_response = client.table("enriched_chats") \
+                    .select("is_work_related, chat_provider_id") \
+                    .in_("chat_provider_id", chat_provider_ids) \
+                    .in_("user_id", user_ids) \
+                    .execute()
+                work_data = work_response.data or []
 
             return {
                 "messages": messages_response.data,
-                "work_classification": work_response.data
+                "work_classification": work_data
             }
 
         with ThreadPoolExecutor() as executor:
@@ -144,30 +172,53 @@ class AuditRepository:
         loop = asyncio.get_event_loop()
 
         def _fetch():
-            # Current period
-            current_response = client.table("enriched_chats") \
-                .select("theme") \
+            # Get messages in current period to determine which chats to include
+            current_messages = client.table("messages") \
+                .select("chat_provider_id") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
-                .not_.is_("theme", "null") \
                 .execute()
+
+            current_chat_ids = list(set([msg["chat_provider_id"] for msg in (current_messages.data or []) if msg.get("chat_provider_id")]))
+
+            # Get themes for chats that have messages in current period
+            current_data = []
+            if current_chat_ids:
+                current_response = client.table("enriched_chats") \
+                    .select("theme") \
+                    .in_("chat_provider_id", current_chat_ids) \
+                    .in_("user_id", user_ids) \
+                    .not_.is_("theme", "null") \
+                    .execute()
+                current_data = current_response.data or []
 
             # Previous period for trend
             trend_start = start_date - timedelta(days=7)
             trend_end = start_date
 
-            trend_response = client.table("enriched_chats") \
-                .select("theme") \
+            trend_messages = client.table("messages") \
+                .select("chat_provider_id") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", trend_start.isoformat()) \
                 .lt("created_at", trend_end.isoformat()) \
-                .not_.is_("theme", "null") \
                 .execute()
 
+            trend_chat_ids = list(set([msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")]))
+
+            trend_data = []
+            if trend_chat_ids:
+                trend_response = client.table("enriched_chats") \
+                    .select("theme") \
+                    .in_("chat_provider_id", trend_chat_ids) \
+                    .in_("user_id", user_ids) \
+                    .not_.is_("theme", "null") \
+                    .execute()
+                trend_data = trend_response.data or []
+
             return {
-                "current": current_response.data,
-                "trend": trend_response.data
+                "current": current_data,
+                "trend": trend_data
             }
 
         with ThreadPoolExecutor() as executor:
@@ -186,15 +237,27 @@ class AuditRepository:
         loop = asyncio.get_event_loop()
 
         def _fetch():
-            response = client.table("enriched_chats") \
-                .select("intent, quality_score") \
+            # Get messages in date range to determine which chats to include
+            messages_response = client.table("messages") \
+                .select("chat_provider_id") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
-                .not_.is_("intent", "null") \
                 .execute()
 
-            return response.data
+            chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
+
+            # Get intent stats for chats that have messages in date range
+            if chat_provider_ids:
+                response = client.table("enriched_chats") \
+                    .select("intent, quality_score") \
+                    .in_("chat_provider_id", chat_provider_ids) \
+                    .in_("user_id", user_ids) \
+                    .not_.is_("intent", "null") \
+                    .execute()
+                return response.data or []
+
+            return []
 
         with ThreadPoolExecutor() as executor:
             result = await loop.run_in_executor(executor, _fetch)
@@ -213,23 +276,28 @@ class AuditRepository:
         loop = asyncio.get_event_loop()
 
         def _fetch():
-            # Get message counts per user
+            # Get message counts per user  with chat_provider_id
             messages_response = client.table("messages") \
-                .select("user_id") \
+                .select("user_id, chat_provider_id") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
 
-            # Get quality scores per user
-            quality_response = client.table("enriched_chats") \
-                .select("user_id, quality_score, is_work_related") \
-                .in_("user_id", user_ids) \
-                .gte("created_at", start_date.isoformat()) \
-                .lte("created_at", end_date.isoformat()) \
-                .execute()
+            # Extract unique chat_provider_ids from messages in date range
+            chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
 
-            # Get risk levels per user
+            # Get quality scores for chats that have messages in the date range
+            quality_data = []
+            if chat_provider_ids:
+                quality_response = client.table("enriched_chats") \
+                    .select("user_id, quality_score, is_work_related, chat_provider_id") \
+                    .in_("chat_provider_id", chat_provider_ids) \
+                    .in_("user_id", user_ids) \
+                    .execute()
+                quality_data = quality_response.data or []
+
+            # Get risk levels for messages in date range
             risk_response = client.table("enriched_messages") \
                 .select("user_id, overall_risk_level") \
                 .in_("user_id", user_ids) \
@@ -240,7 +308,7 @@ class AuditRepository:
 
             return {
                 "messages": messages_response.data,
-                "quality": quality_response.data,
+                "quality": quality_data,
                 "risks": risk_response.data
             }
 
@@ -261,12 +329,27 @@ class AuditRepository:
         loop = asyncio.get_event_loop()
 
         def _fetch():
-            # Get top quality chats
-            chats_response = client.table("enriched_chats") \
-                .select("chat_provider_id, message_provider_id, quality_score, theme, intent, created_at") \
+            # Get messages in date range to determine which chats to include
+            messages_in_range = client.table("messages") \
+                .select("chat_provider_id, message_provider_id, created_at") \
                 .in_("user_id", user_ids) \
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
+                .execute()
+
+            chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_in_range.data or []) if msg.get("chat_provider_id")]))
+
+            # Get top quality chats that have messages in date range
+            if not chat_provider_ids:
+                return {
+                    "chats": [],
+                    "messages": []
+                }
+
+            chats_response = client.table("enriched_chats") \
+                .select("chat_provider_id, message_provider_id, quality_score, theme, intent") \
+                .in_("chat_provider_id", chat_provider_ids) \
+                .in_("user_id", user_ids) \
                 .not_.is_("quality_score", "null") \
                 .order("quality_score", desc=True) \
                 .limit(limit) \
@@ -278,17 +361,22 @@ class AuditRepository:
 
                 if message_ids:
                     messages_response = client.table("messages") \
-                        .select("message_provider_id, content") \
+                        .select("message_provider_id, content, created_at") \
                         .in_("message_provider_id", message_ids) \
                         .execute()
 
+                    # Add created_at from messages to chats
+                    msg_dates = {msg["message_provider_id"]: msg["created_at"] for msg in (messages_response.data or [])}
+                    for chat in chats_response.data:
+                        chat["created_at"] = msg_dates.get(chat.get("message_provider_id"))
+
                     return {
                         "chats": chats_response.data,
-                        "messages": messages_response.data
+                        "messages": messages_response.data or []
                     }
 
             return {
-                "chats": chats_response.data,
+                "chats": chats_response.data or [],
                 "messages": []
             }
 

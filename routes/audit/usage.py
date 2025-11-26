@@ -4,6 +4,7 @@ from . import router
 from dtos.audit_dto import UsageStatsWithContextDTO
 from services.audit_service import AuditService
 import logging
+import time
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -21,11 +22,16 @@ async def get_organization_usage_stats(
     Get usage statistics for organization
     Includes prompts, chats, active users, daily average, and 7-day trend
     """
+    start_time = time.time()
+    logger.info(f"[AUDIT:usage] Request started - org_id={organization_id}, start_date={start_date}, end_date={end_date}, days={days}")
+
     try:
         user_id = request.state.user_id
+        logger.info(f"[AUDIT:usage] User authenticated - user_id={user_id}")
 
         # TODO: Add permission check - verify user has admin/owner role in organization
 
+        logger.info(f"[AUDIT:usage] Calling AuditService.get_organization_usage_stats...")
         result = await AuditService.get_organization_usage_stats(
             request.state.supabase_client,
             user_id,
@@ -35,10 +41,16 @@ async def get_organization_usage_stats(
             days
         )
 
+        duration_ms = int((time.time() - start_time) * 1000)
+        logger.info(f"[AUDIT:usage] Request completed - org_id={organization_id}, duration={duration_ms}ms, has_data={result is not None}")
+
         return result
 
     except HTTPException:
+        duration_ms = int((time.time() - start_time) * 1000)
+        logger.warning(f"[AUDIT:usage] HTTP exception - org_id={organization_id}, duration={duration_ms}ms")
         raise
     except Exception as e:
-        logger.error(f"Error getting usage stats: {str(e)}", exc_info=True)
+        duration_ms = int((time.time() - start_time) * 1000)
+        logger.error(f"[AUDIT:usage] Error getting usage stats - org_id={organization_id}, duration={duration_ms}ms, error={str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to get usage stats: {str(e)}")
