@@ -2317,6 +2317,10 @@ CREATE POLICY "Enable insert access for all users" ON "public"."share_invitation
 
 
 
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."enriched_messages" FOR INSERT WITH CHECK (true);
+
+
+
 CREATE POLICY "Enable insert for authenticated users only" ON "public"."stripe_subscriptions" FOR INSERT TO "authenticated" WITH CHECK (true);
 
 
@@ -2338,6 +2342,22 @@ CREATE POLICY "Enable insert for users based on user_id" ON "public"."users_meta
 
 
 CREATE POLICY "Enable read access for all users" ON "public"."blog_posts" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."chats" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."enriched_chats" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."enriched_messages" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."messages" FOR SELECT USING (true);
 
 
 
