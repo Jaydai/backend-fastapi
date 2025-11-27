@@ -14,6 +14,8 @@ from dtos.audit_dto import (
     RiskyPromptsWithContextDTO,
     ThemeStatsWithContextDTO,
     TopPromptsWithContextDTO,
+    TopUsersWithContextDTO,
+    UsageStatsWithContextDTO,
 )
 from repositories.audit_repository import AuditRepository
 from supabase import Client

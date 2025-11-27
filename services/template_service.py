@@ -7,6 +7,7 @@ from dtos import (
     TemplateResponseDTO,
     TemplateTitleResponseDTO,
     TemplateVersionResponseDTO,
+    UpdateTemplateDTO,
     UsageResponseDTO,
 )
 from repositories import TemplateRepository, PermissionRepository, TemplateVersionRepository
