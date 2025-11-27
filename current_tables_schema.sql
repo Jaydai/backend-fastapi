@@ -1412,7 +1412,7 @@ CREATE TABLE IF NOT EXISTS "public"."prompt_templates_versions" (
     "template_id" "uuid",
     "is_current" boolean DEFAULT false,
     "optimized_for" "text"[],
-    "is_published" boolean DEFAULT false,
+    "published" boolean DEFAULT false,
     "slug" "text" NOT NULL
 );
 

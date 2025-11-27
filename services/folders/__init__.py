@@ -1,7 +1,6 @@
 """Folder services - Re-exports all folder service functions"""
 
 from .get_folder_by_id import get_folder_by_id
-from .get_folders_titles import get_folders_titles
 from .create_folder import create_folder
 from .update_folder import update_folder
 from .delete_folder import delete_folder

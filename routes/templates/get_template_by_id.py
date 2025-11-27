@@ -11,16 +11,17 @@ logger = logging.getLogger(__name__)
 @router.get("/{template_id}", response_model=TemplateResponseDTO, status_code=status.HTTP_200_OK)
 async def get_template_by_id(
     request: Request,
-    template_id: str  # UUID
+    template_id: str,
 ) -> TemplateResponseDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
         locale = request.state.locale
+        published = request.query_params.get("published", None)
 
         logger.info(f"User {user_id} fetching template {template_id}")
 
-        template = TemplateService.get_template_by_id(client, template_id, locale)
+        template = TemplateService.get_template_by_id(client, template_id, published, locale)
 
         if not template:
             raise HTTPException(

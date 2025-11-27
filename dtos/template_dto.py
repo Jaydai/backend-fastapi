@@ -45,7 +45,7 @@ class TemplateVersionResponseDTO(BaseModel):
     updated_at: str | None = None
     status: str
     is_current: bool
-    is_published: bool
+    published: bool
     usage_count: int
     parent_version_id: int | None = None
     optimized_for: list[str] | None = None
@@ -63,7 +63,7 @@ class VersionContentDTO(BaseModel):
     updated_at: str | None = None
     status: str
     is_current: bool
-    is_published: bool
+    published: bool
     optimized_for: list[str] | None = None
 
 class TemplateListItemDTO(BaseModel):
@@ -80,7 +80,7 @@ class TemplateListItemDTO(BaseModel):
     usage_count: int
     current_version_id: int | None = None
     is_free: bool
-    is_published: bool
+    published: bool
 
 class TemplateCommentAuthorDTO(BaseModel):
     id: str
@@ -109,7 +109,7 @@ class TemplateResponseDTO(BaseModel):
     usage_count: int
     last_used_at: str | None = None
     current_version_id: int | None = None
-    is_published: bool
+    published: bool
     versions: list[VersionSummary] = []
 
 class UsageResponseDTO(BaseModel):
@@ -140,7 +140,7 @@ class TemplateMetadataDTO(BaseModel):
     usage_count: int
     current_version_id: int | None = None
     is_free: bool
-    is_published: bool
+    published: bool
     versions: list[VersionSummary] = []  # List of versions without content
 
 class TemplateCountsResponseDTO(BaseModel):

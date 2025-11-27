@@ -15,7 +15,7 @@ class Template:
     usage_count: int
     last_used_at: str | None
     current_version_id: int | None
-    is_published: bool
+    published: bool
 
 @dataclass
 class TemplateVersion:
@@ -30,7 +30,7 @@ class TemplateVersion:
     updated_at: str | None
     status: str
     is_current: bool
-    is_published: bool
+    published: bool
     usage_count: int
     parent_version_id: int | None
     optimized_for: list[str] | None
@@ -70,5 +70,4 @@ class VersionSummary:
     name: str
     slug: str
     is_current: bool
-    is_published: bool
     status: str

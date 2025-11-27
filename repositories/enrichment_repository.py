@@ -63,7 +63,6 @@ class EnrichmentRepository:
             })
 
         response = client.table("enriched_chats").insert(data).execute()
-        print("response🙏🏻🙏🏻🙏🏻", response)
 
         if not response.data:
             return None

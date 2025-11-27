@@ -26,7 +26,7 @@ class TemplateMapper:
             usage_count=template.usage_count,
             current_version_id=template.current_version_id,
             is_free=template.is_free,
-            is_published=template.is_published
+            published=template.published
         )
 
     @staticmethod
@@ -38,10 +38,9 @@ class TemplateMapper:
         version_dtos = [
             VersionSummary(
                 id=v.id,
-                name=TemplateMapper.localize_string(v.name, locale),
+                name=LocaleService.localize_string(v.name, locale),
                 slug=v.slug,
                 is_current=v.is_current,
-                is_published=v.is_published,
                 status=v.status
             )
             for v in versions_summary
@@ -60,7 +59,7 @@ class TemplateMapper:
             last_used_at=template.last_used_at,
             usage_count=template.usage_count,
             current_version_id=template.current_version_id,
-            is_published=template.is_published,
+            published=template.published,
             versions=version_dtos
             )
 
@@ -77,7 +76,7 @@ class TemplateMapper:
             updated_at=version.updated_at,
             status=version.status,
             is_current=version.is_current,
-            is_published=version.is_published,
+            published=version.published,
             usage_count=version.usage_count,
             parent_version_id=version.parent_version_id,
             optimized_for=version.optimized_for

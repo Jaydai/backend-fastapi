@@ -2,7 +2,7 @@ from fastapi import HTTPException, Request, Query, status, Path
 import logging
 
 from . import router
-from services.templates import get_version_content as service_get_version_content
+from services import TemplateService, TemplateVersionService
 from dtos import VersionContentDTO
 from routes.dependencies import require_permission_in_organization
 from domains.enums import PermissionEnum
@@ -21,20 +21,9 @@ async def get_organization_template_version(
     template_id: str,
     slug: str = Path(..., description="Version slug (e.g., 'v1-draft', 'v2-production')"),
 ) -> VersionContentDTO:
-    """
-    Get specific version content by slug.
-
-    This endpoint returns the full version data including content.
-    Used when:
-    - User selects a different version from the dropdown
-    - Loading the default (current) version after metadata fetch
-
-    The slug is a URL-friendly identifier generated from the version name
-    (e.g., "Version 2.0" → "v1-version-2-0").
-    """
     locale = request.state.locale
     try:
-        version = service_get_version_content(
+        version = TemplateVersionService.get_version_by_slug(
             client=request.state.supabase_client,
             locale=locale,
             template_id=template_id,

@@ -20,7 +20,7 @@ class UpdateVersionDTO(BaseModel):
     change_notes: str | None = None
     status: str | None = None
     is_current: bool | None = None
-    is_published: bool | None = None
+    published: bool | None = None
     optimized_for: list[str] | None = None
 
 
@@ -46,7 +46,7 @@ async def update_template_version(
     - **change_notes**: New change notes (optional)
     - **status_val**: New status (optional)
     - **is_current**: Set as current version (optional)
-    - **is_published**: Set publish status (optional)
+    - **published**: Set publish status (optional)
     - **optimized_for**: List of AI tool IDs (optional)
 
     Returns:
@@ -126,8 +126,8 @@ async def update_template_version(
             update_dict["status"] = update_data.status
         if update_data.is_current is not None:
             update_dict["is_current"] = update_data.is_current
-        if update_data.is_published is not None:
-            update_dict["is_published"] = update_data.is_published
+        if update_data.published is not None:
+            update_dict["published"] = update_data.published
         if update_data.optimized_for is not None:
             update_dict["optimized_for"] = update_data.optimized_for
 

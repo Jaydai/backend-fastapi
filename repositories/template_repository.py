@@ -1,7 +1,7 @@
 """Template repository - handles pure database operations for templates"""
 from supabase import Client
+from datetime import datetime
 from domains.entities import Template, TemplateTitle, TemplateVersion, TemplateComment
-from repositories.templates import get_templates_titles, get_template_by_id, create_template, update_template, delete_template, increment_usage, update_pinned_status, get_user_templates_count, get_organization_templates_count
 from repositories.template_versions_repository import TemplateVersionRepository
 from services.locale_service import LocaleService
 
@@ -11,19 +11,52 @@ class TemplateRepository:
     @staticmethod
     def get_templates_titles(
         client: Client,
-        organization_id: str | None = None,
-        folder_ids: list[str] | None = None,
-        published: bool | None = None,
         user_id: str | None = None,
+        organization_id: str | None = None,
+        published: bool | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[TemplateTitle]:
-        return get_templates_titles(client, organization_id, folder_ids, published, user_id, limit, offset)
+        query = client.table("prompt_templates").select("id, title, folder_id")
+        if user_id:
+            query = query.eq("user_id", user_id)
+        if organization_id:
+            query = query.eq("organization_id", organization_id)
+        if published is not None:
+            query = query.eq("published", published)
+        query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
+        response = query.execute()
+        templates_data = response.data or []
+        templates = [TemplateTitle(**item) for item in templates_data]
+        return templates
 
 
     @staticmethod
     def get_template_by_id(client: Client, template_id: str) -> Template | None:
-       return get_template_by_id(client, template_id)
+        response = client.table("prompt_templates")\
+            .select("*")\
+            .eq("id", template_id)\
+            .execute()
+            
+        if not response.data:
+            return None
+
+        data = response.data[0]
+
+        return Template(
+            id=data["id"],
+            title=data.get("title", {}),
+            description=data.get("description"),
+            folder_id=data.get("folder_id"),
+            organization_id=data.get("organization_id"),
+            user_id=data["user_id"],
+            created_at=data["created_at"],
+            updated_at=data.get("updated_at"),
+            usage_count=data.get("usage_count", 0),
+            last_used_at=data.get("last_used_at"),
+            current_version_id=data.get("current_version_id"),
+            published=data.get("published", False)
+        )
 
     @staticmethod
     def create_template(
@@ -36,7 +69,20 @@ class TemplateRepository:
         tags: list[str] | None,
         workspace_type: str
     ) -> Template:
-        return create_template(client, user_id, title, description, folder_id, organization_id, tags, workspace_type)
+        template_data = {
+            "user_id": user_id,
+            "title": title,
+            "description": description,
+            "folder_id": folder_id,
+            "organization_id": organization_id,
+            "tags": tags or [],
+            "workspace_type": workspace_type
+        }
+        response = client.table("prompt_templates").insert(template_data).execute()
+        if len(response.data or []) == 0:
+            return None
+        data = response.data[0]
+        return Template(data)
        
 
 
@@ -50,16 +96,61 @@ class TemplateRepository:
         tags: list[str] | None = None,
         current_version_id: int | None = None
     ) -> bool:
-        return update_template(client, template_id, title, description, folder_id, tags, current_version_id)
+        update_data = {}
+        if title is not None:
+            update_data["title"] = title
+        if description is not None:
+            update_data["description"] = description
+        if folder_id is not None:
+            update_data["folder_id"] = folder_id
+        if tags is not None:
+            update_data["tags"] = tags
+        if current_version_id is not None:
+            update_data["current_version_id"] = current_version_id
+
+        response = client.table("prompt_templates")\
+            .update(update_data)\
+            .eq("id", template_id)\
+            .execute()
+
+        if len(response.data or []) == 0:
+            return None
+        data = response.data[0]
+
+        return Template(data)
 
 
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:
-        return delete_template(client, template_id)
+        response = client.table("prompt_templates")\
+        .delete()\
+        .eq("id", template_id)\
+        .execute()
+
+        return len(response.data or []) > 0
 
     @staticmethod
     def increment_usage(client: Client, template_id: str) -> int:
-        return increment_usage(client, template_id)
+        response = client.table("prompt_templates")\
+        .select("usage_count")\
+        .eq("id", template_id)\
+        .execute()
+
+        if not response.data:
+            return 0
+
+        current_count = response.data[0].get("usage_count", 0)
+        new_count = current_count + 1
+
+        client.table("prompt_templates")\
+            .update({
+                "usage_count": new_count,
+                "last_used_at": datetime.utcnow().isoformat()
+            })\
+            .eq("id", template_id)\
+            .execute()
+
+        return new_count
 
     @staticmethod
     def update_pinned_status(
@@ -68,19 +159,41 @@ class TemplateRepository:
         template_id: str,
         is_pinned: bool
     ) -> bool:
-        return update_pinned_status(client, user_id, template_id, is_pinned)
+        response = client.table("users_metadata")\
+        .select("pinned_template_ids")\
+        .eq("user_id", user_id)\
+        .single()\
+        .execute()
 
-    @staticmethod
-    def get_versions(client: Client, template_id: str) -> list[TemplateVersion]:
-        return TemplateVersionRepository.get_versions(client, template_id)
+        if not response.data:
+            return False
+
+        current_pinned = response.data.get("pinned_template_ids") or []
+
+        if is_pinned and template_id not in current_pinned:
+            current_pinned.append(template_id)
+        elif not is_pinned and template_id in current_pinned:
+            current_pinned.remove(template_id)
+
+        client.table("users_metadata")\
+            .update({"pinned_template_ids": current_pinned})\
+            .eq("user_id", user_id)\
+            .execute()
+
+        return True
+
 
     @staticmethod
     def get_user_templates_count(client: Client, user_id: str) -> int:
-        return get_user_templates_count(client, user_id)
+        query = client.table("prompt_templates").select("id").eq("organization_id", organization_id)
+        response = query.execute()
+        return len(response.data or [])
 
     @staticmethod
     def get_organization_templates_count(client: Client, organization_id: str) -> int:
-        return get_organization_templates_count(client, organization_id)
+        query = client.table("prompt_templates").select("id").eq("organization_id", organization_id)
+        response = query.execute()
+        return len(response.data or [])
 
     @staticmethod
     def create_version(
@@ -113,7 +226,7 @@ class TemplateRepository:
             "change_notes": change_notes,
             "status": status,
             "is_current": False,
-            "is_published": False,
+            "published": False,
             "usage_count": 0,
             "optimized_for": optimized_for
         }
@@ -133,7 +246,7 @@ class TemplateRepository:
             updated_at=data.get("updated_at"),
             status=data.get("status", "draft"),
             is_current=data.get("is_current", False),
-            is_published=data.get("is_published", False),
+            published=data.get("published", False),
             usage_count=data.get("usage_count", 0),
             parent_version_id=data.get("parent_version_id"),
             optimized_for=data.get("optimized_for")
@@ -178,7 +291,7 @@ class TemplateRepository:
             updated_at=data.get("updated_at"),
             status=data.get("status", "draft"),
             is_current=data.get("is_current", False),
-            is_published=data.get("is_published", False),
+            published=data.get("published", False),
             usage_count=data.get("usage_count", 0),
             parent_version_id=data.get("parent_version_id"),
             optimized_for=data.get("optimized_for")
@@ -224,7 +337,7 @@ class TemplateRepository:
                 last_used_at=data.get("last_used_at"),
                 current_version_id=data.get("current_version_id"),
                 is_free=data.get("is_free", True),
-                is_published=data.get("is_published", False)
+                published=data.get("published", False)
             ))
 
         return templates
