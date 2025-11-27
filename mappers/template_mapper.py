@@ -51,7 +51,17 @@ class TemplateMapper:
         versions_summary: list[VersionSummary],
         locale: str = "en"
     ) -> TemplateResponseDTO:
-        version_dtos = [VersionSummary(v.id, TemplateMapper.localize_string(v.name, locale), v.slug, v.is_current) for v in versions_summary]
+        version_dtos = [
+            VersionSummary(
+                id=v.id,
+                name=TemplateMapper.localize_string(v.name, locale),
+                slug=v.slug,
+                is_current=v.is_current,
+                is_published=v.is_published,
+                status=v.status
+            )
+            for v in versions_summary
+        ]
 
         return TemplateResponseDTO(
             id=template.id,

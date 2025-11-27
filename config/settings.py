@@ -36,6 +36,7 @@ class LocalSettings(BaseSettings):
 
     ALLOWED_ORIGINS: list = [
         "http://localhost:3000",
+        "http://localhost:3001",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:5173",
@@ -53,6 +54,7 @@ class DevSettings(BaseSettings):
     
     ALLOWED_ORIGINS: list = [
         "http://localhost:3000",
+        "http://localhost:3001",
         "https://app.dev.jayd.ai",
         "chrome-extension://enfcjmbdbldomiobfndablekgdkmcipd",
         "https://chatgpt.com",
