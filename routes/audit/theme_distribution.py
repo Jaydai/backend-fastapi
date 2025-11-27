@@ -26,7 +26,6 @@ async def get_theme_distribution(
     Returns top themes and their current distribution
     """
     try:
-
         # TODO: Add permission check - verify user has admin/owner role in organization
 
         result = await AuditTimeSeriesService.get_theme_distribution(

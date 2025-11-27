@@ -38,7 +38,12 @@ ignore = [
 
 # Autoriser les imports non utilisés dans __init__.py
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]
+"__init__.py" = ["F401", "E402"]
+
+# Configuration du tri des imports (ruff utilise les règles isort via la règle "I")
+[tool.ruff.lint.isort]
+known-first-party = ["config", "core", "domains", "dtos", "mappers", "middleware", "repositories", "routes", "services", "utils"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
 [tool.ruff.format]
 # Style de quotes

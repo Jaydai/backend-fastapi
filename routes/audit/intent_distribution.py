@@ -26,7 +26,6 @@ async def get_intent_distribution(
     Returns top intents and their current distribution
     """
     try:
-
         # TODO: Add permission check - verify user has admin/owner role in organization
 
         result = await AuditTimeSeriesService.get_intent_distribution(
