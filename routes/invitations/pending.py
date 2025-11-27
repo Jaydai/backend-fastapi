@@ -10,7 +10,11 @@ from . import router
 logger = logging.getLogger(__name__)
 
 
-@router.get("/pending", response_model=list[InvitationResponseDTO], status_code=status.HTTP_200_OK)
+@router.get(
+    "/pending",
+    response_model=list[InvitationResponseDTO],
+    status_code=status.HTTP_200_OK,
+)
 async def get_pending_invitations(request: Request) -> list[InvitationResponseDTO]:
     try:
         user_id = request.state.user_id
@@ -25,4 +29,6 @@ async def get_pending_invitations(request: Request) -> list[InvitationResponseDT
         raise
     except Exception as e:
         logger.error(f"Error getting pending invitations: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get pending invitations: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get pending invitations: {str(e)}"
+        )

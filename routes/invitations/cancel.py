@@ -27,4 +27,6 @@ async def cancel_invitation(request: Request, invitation_id: str):
         raise
     except Exception as e:
         logger.error(f"Error cancelling invitation: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to cancel invitation: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to cancel invitation: {str(e)}"
+        )

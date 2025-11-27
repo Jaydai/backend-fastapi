@@ -15,7 +15,9 @@ async def toggle_pin_folder(request: Request, folder_id: str, pinned: bool):
         user_id = request.state.user_id
         client = request.state.supabase_client
 
-        logger.info(f"User {user_id} {'pinning' if pinned else 'unpinning'} folder {folder_id}")
+        logger.info(
+            f"User {user_id} {'pinning' if pinned else 'unpinning'} folder {folder_id}"
+        )
 
         if pinned:
             result = FolderService.pin_folder(client, user_id, folder_id)
@@ -27,4 +29,6 @@ async def toggle_pin_folder(request: Request, folder_id: str, pinned: bool):
         raise
     except Exception as e:
         logger.error(f"Error toggling pin folder: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to toggle pin folder: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to toggle pin folder: {str(e)}"
+        )

@@ -10,8 +10,14 @@ from . import router
 logger = logging.getLogger(__name__)
 
 
-@router.get("/{invitation_id}", response_model=InvitationResponseDTO, status_code=status.HTTP_200_OK)
-async def get_invitation_by_id(request: Request, invitation_id: str) -> InvitationResponseDTO:
+@router.get(
+    "/{invitation_id}",
+    response_model=InvitationResponseDTO,
+    status_code=status.HTTP_200_OK,
+)
+async def get_invitation_by_id(
+    request: Request, invitation_id: str
+) -> InvitationResponseDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
@@ -28,4 +34,6 @@ async def get_invitation_by_id(request: Request, invitation_id: str) -> Invitati
         raise
     except Exception as e:
         logger.error(f"Error getting invitation: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get invitation: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get invitation: {str(e)}"
+        )

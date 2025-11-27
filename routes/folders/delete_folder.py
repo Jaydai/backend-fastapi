@@ -27,4 +27,6 @@ async def delete_folder(request: Request, folder_id: str):
         raise
     except Exception as e:
         logger.error(f"Error deleting folder: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to delete folder: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to delete folder: {str(e)}"
+        )

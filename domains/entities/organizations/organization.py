@@ -10,7 +10,9 @@ OrganizationType = Literal["company", "standard"]
 class Organization:
     id: str
     name: str
-    user_organization_role: UserOrganizationRole | None = None  # None in case of a global Admin
+    user_organization_role: UserOrganizationRole | None = (
+        None  # None in case of a global Admin
+    )
     type: OrganizationType = "standard"  # "company" for legacy company workspaces
     image_url: str | None = None
     banner_url: str | None = None

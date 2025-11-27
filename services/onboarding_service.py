@@ -3,9 +3,12 @@ from repositories.onboarding_repository import OnboardingRepository
 from supabase import Client
 
 
+
 class OnboardingService:
     @staticmethod
-    def get_onboarding_status(client: Client, user_id: str) -> OnboardingStatusResponseDTO:
+    def get_onboarding_status(
+        client: Client, user_id: str
+    ) -> OnboardingStatusResponseDTO:
         entity = OnboardingRepository.get_user_metadata(client, user_id)
 
         has_completed = (

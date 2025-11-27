@@ -5,12 +5,16 @@ from services.locale_service import LocaleService
 
 class BlockMapper:
     @staticmethod
-    def entity_to_response_dto(block: Block, locale: str = LocaleService.DEFAULT_LOCALE) -> BlockResponseDTO:
+    def entity_to_response_dto(
+        block: Block, locale: str = LocaleService.DEFAULT_LOCALE
+    ) -> BlockResponseDTO:
         return BlockResponseDTO(
             id=block.id,
             type=block.type,
             title=LocaleService.localize_string(block.title, locale),
-            description=LocaleService.localize_string(block.description, locale) if block.description else None,
+            description=LocaleService.localize_string(block.description, locale)
+            if block.description
+            else None,
             content=LocaleService.localize_string(block.content, locale),
             published=block.published,
             user_id=block.user_id,

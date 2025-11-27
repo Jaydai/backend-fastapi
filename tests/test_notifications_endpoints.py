@@ -35,7 +35,9 @@ class TestNotificationsEndpoints:
         # Cleanup notifications
         try:
             for notif_id in self.notification_ids_to_cleanup:
-                supabase_admin.table("notifications").delete().eq("id", notif_id).execute()
+                supabase_admin.table("notifications").delete().eq(
+                    "id", notif_id
+                ).execute()
         except Exception as e:
             print(f"Cleanup warning: {e}")
 
@@ -80,7 +82,9 @@ class TestNotificationsEndpoints:
     def test_mark_notification_as_read_unauthorized(self):
         fake_id = 99999  # Use integer ID instead of UUID
         client_no_auth = TestClient(self.client.app)
-        response = client_no_auth.patch(f"/notifications/{fake_id}", json={"read": True})
+        response = client_no_auth.patch(
+            f"/notifications/{fake_id}", json={"read": True}
+        )
         assert response.status_code in [401, 403]
 
     def test_mark_all_as_read_success(self):

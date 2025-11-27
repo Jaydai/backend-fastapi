@@ -25,4 +25,6 @@ async def update_pinned_folders(request: Request, data: UpdatePinnedFoldersDTO):
         raise
     except Exception as e:
         logger.error(f"Error updating pinned folders: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to update pinned folders: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update pinned folders: {str(e)}"
+        )
