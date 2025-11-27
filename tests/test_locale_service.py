@@ -43,13 +43,13 @@ class TestLocaleServiceExtraction:
         """Should return default locale when no headers present."""
         request = MockRequest(headers={})
         locale = LocaleService.extract_locale_from_request(request)
-        assert locale == "en"
+        assert locale == "fr"
 
     def test_extract_with_invalid_locale(self):
         """Should return default locale for unsupported locales."""
         request = MockRequest(headers={"X-Locale": "de"})  # German not supported
         locale = LocaleService.extract_locale_from_request(request)
-        assert locale == "en"
+        assert locale == "fr"
 
     def test_extract_with_complex_accept_language(self):
         """Should parse complex Accept-Language header correctly."""
@@ -71,16 +71,16 @@ class TestLocaleServiceValidation:
 
     def test_validate_unsupported_locale(self):
         """Should return default for unsupported locale."""
-        assert LocaleService.validate_locale("de") == "en"
-        assert LocaleService.validate_locale("es") == "en"
+        assert LocaleService.validate_locale("de") == "fr"
+        assert LocaleService.validate_locale("es") == "fr"
 
     def test_validate_none_locale(self):
         """Should return default for None."""
-        assert LocaleService.validate_locale(None) == "en"
+        assert LocaleService.validate_locale(None) == "fr"
 
     def test_validate_empty_locale(self):
         """Should return default for empty string."""
-        assert LocaleService.validate_locale("") == "en"
+        assert LocaleService.validate_locale("") == "fr"
 
     def test_validate_case_insensitive(self):
         """Should handle case-insensitive validation."""
