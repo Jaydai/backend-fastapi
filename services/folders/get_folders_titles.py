@@ -3,7 +3,6 @@ from supabase import Client
 from dtos import FolderTitleResponseDTO
 from repositories.folders import get_folders_titles as repo_get_folders_titles
 from services.locale_service import LocaleService
-from utils import localize_object
 
 
 def get_folders_titles(
@@ -43,6 +42,6 @@ def get_folders_titles(
     )
 
     return [
-        FolderTitleResponseDTO(**localize_object(folder.__dict__, locale, ["title"]))
+        FolderTitleResponseDTO(**LocaleService.localize_object(folder.__dict__, locale, ["title"]))
         for folder in folders
     ]

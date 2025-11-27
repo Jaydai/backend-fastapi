@@ -4,7 +4,6 @@ from dtos import BlockTitleResponseDTO
 from repositories.blocks import BlockBaseRepository
 from services.permissions import UserPermissionsService
 from services.locale_service import LocaleService
-from utils import localize_object
 
 class BlockTitleService:
     """Service for block title operations (list views)"""
@@ -59,6 +58,6 @@ class BlockTitleService:
 
         # Localize and convert to DTOs
         return [
-            BlockTitleResponseDTO(**localize_object(block.__dict__, locale, ["title"]))
+            BlockTitleResponseDTO(**LocaleService.localize_object(block.__dict__, locale, ["title"]))
             for block in blocks
         ]

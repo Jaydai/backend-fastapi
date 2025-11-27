@@ -3,7 +3,6 @@ from supabase import Client
 from dtos import TemplateTitleResponseDTO
 from repositories.templates import get_templates_titles as repo_get_templates_titles
 from services.locale_service import LocaleService
-from utils import localize_object
 
 
 def get_templates_titles(
@@ -40,6 +39,6 @@ def get_templates_titles(
     )
 
     return [
-        TemplateTitleResponseDTO(**localize_object(template.__dict__, locale, ["title"]))
+        TemplateTitleResponseDTO(**LocaleService.localize_object(template.__dict__, locale, ["title"]))
         for template in templates
     ]
