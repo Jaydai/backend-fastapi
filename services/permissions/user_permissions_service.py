@@ -1,16 +1,13 @@
 from supabase import Client
 
+
 class UserPermissionsService:
     """Service to handle user permissions and access checks"""
 
     @staticmethod
     def get_user_metadata(client: Client, user_id: str) -> dict:
         """Get user metadata including organization roles"""
-        response = client.table("users_metadata")\
-            .select("*")\
-            .eq("user_id", user_id)\
-            .single()\
-            .execute()
+        response = client.table("users_metadata").select("*").eq("user_id", user_id).single().execute()
 
         if not response.data:
             return {"organization_ids": [], "roles": {}}
@@ -33,10 +30,7 @@ class UserPermissionsService:
 
     @staticmethod
     def build_workspace_filter_conditions(
-        client: Client,
-        user_id: str,
-        workspace_type: str | None = None,
-        organization_id: str | None = None
+        client: Client, user_id: str, workspace_type: str | None = None, organization_id: str | None = None
     ) -> dict:
         """
         Build filter conditions for workspace-based queries.

@@ -211,8 +211,10 @@ class RiskyPromptsWithContextDTO(BaseModel):
 
 # Time-series DTOs for charts
 
+
 class TimeSeriesDataPointDTO(BaseModel):
     """Single data point in a time series"""
+
     date: str  # YYYY-MM-DD format
     value: float
     label: Optional[str] = None  # For categorical breakdowns
@@ -220,22 +222,27 @@ class TimeSeriesDataPointDTO(BaseModel):
 
 class MultiSeriesDataPointDTO(BaseModel):
     """Single data point with multiple series (e.g., per-team breakdown)"""
+
     date: str  # YYYY-MM-DD format
     values: dict[str, float]  # {series_name: value}
 
 
 class AdoptionCurveRequestDTO(BaseModel):
     """Request parameters for adoption curve"""
+
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
     team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs (empty = all teams)")
-    granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
-    view_mode: str = Field(default='chats', pattern=r'^(chats|messages|providers|models)$', description="View mode for analytics")
+    granularity: str = Field(default="day", pattern=r"^(day|week|month)$", description="Time granularity")
+    view_mode: str = Field(
+        default="chats", pattern=r"^(chats|messages|providers|models)$", description="View mode for analytics"
+    )
 
 
 class ProviderDistributionDTO(BaseModel):
     """Provider distribution statistics"""
+
     provider_name: str
     chat_count: int
     message_count: int
@@ -244,6 +251,7 @@ class ProviderDistributionDTO(BaseModel):
 
 class AdoptionCurveDataDTO(BaseModel):
     """Adoption curve data response"""
+
     overall: list[TimeSeriesDataPointDTO]  # Overall usage across all teams
     by_team: dict[str, list[TimeSeriesDataPointDTO]]  # {team_name: data_points}
     total_prompts: int
@@ -257,6 +265,7 @@ class AdoptionCurveDataDTO(BaseModel):
 
 class AdoptionCurveResponseDTO(BaseModel):
     """Adoption curve response with context"""
+
     organization_id: str
     date_range: dict[str, str]
     granularity: str
@@ -268,15 +277,17 @@ class AdoptionCurveResponseDTO(BaseModel):
 
 class RiskTimelineRequestDTO(BaseModel):
     """Request parameters for risk timeline"""
+
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
     team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
-    granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
+    granularity: str = Field(default="day", pattern=r"^(day|week|month)$", description="Time granularity")
 
 
 class RiskTimelineDataPointDTO(BaseModel):
     """Risk timeline data point with risk type breakdown"""
+
     date: str  # YYYY-MM-DD
     total_risky_messages: int
     by_risk_level: dict[str, int]  # {critical: x, high: y, medium: z, low: w}
@@ -285,6 +296,7 @@ class RiskTimelineDataPointDTO(BaseModel):
 
 class RiskTimelineDataDTO(BaseModel):
     """Risk timeline data response"""
+
     timeline: list[RiskTimelineDataPointDTO]
     total_risky_messages: int
     risk_level_totals: dict[str, int]
@@ -293,6 +305,7 @@ class RiskTimelineDataDTO(BaseModel):
 
 class RiskTimelineResponseDTO(BaseModel):
     """Risk timeline response with context"""
+
     organization_id: str
     date_range: dict[str, str]
     granularity: str
@@ -303,15 +316,17 @@ class RiskTimelineResponseDTO(BaseModel):
 
 class QualityTimelineRequestDTO(BaseModel):
     """Request parameters for quality timeline (old endpoint)"""
+
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
     team_ids: Optional[list[str]] = Field(None, description="Filter by team IDs")
-    granularity: str = Field(default='day', pattern=r'^(day|week|month)$', description="Time granularity")
+    granularity: str = Field(default="day", pattern=r"^(day|week|month)$", description="Time granularity")
 
 
 class QualityTimelineDataPointDTO(BaseModel):
     """Quality timeline data point (old endpoint format)"""
+
     date: str  # YYYY-MM-DD
     average_score: float
     median_score: Optional[float] = None
@@ -320,6 +335,7 @@ class QualityTimelineDataPointDTO(BaseModel):
 
 class QualityTimelineDataDTO(BaseModel):
     """Quality timeline data response (old endpoint format)"""
+
     overall: list[QualityTimelineDataPointDTO]  # Overall quality across all teams
     by_team: dict[str, list[QualityTimelineDataPointDTO]]  # {team_name: data_points}
     overall_average: float
@@ -328,6 +344,7 @@ class QualityTimelineDataDTO(BaseModel):
 
 class QualityTimelineResponseDTO(BaseModel):
     """Quality timeline response with context (old endpoint format)"""
+
     organization_id: str
     date_range: dict[str, str]
     granularity: str
@@ -338,6 +355,7 @@ class QualityTimelineResponseDTO(BaseModel):
 
 class ThemeTimelineRequestDTO(BaseModel):
     """Request parameters for theme distribution over time"""
+
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
@@ -347,12 +365,14 @@ class ThemeTimelineRequestDTO(BaseModel):
 
 class ThemeDistributionDTO(BaseModel):
     """Theme distribution at a point in time"""
+
     themes: dict[str, int]  # {theme_name: count}
     total: int
 
 
 class ThemeTimelineResponseDTO(BaseModel):
     """Theme timeline response"""
+
     organization_id: str
     date_range: dict[str, str]
     team_filter: Optional[list[str]] = None
@@ -363,6 +383,7 @@ class ThemeTimelineResponseDTO(BaseModel):
 
 class IntentTimelineRequestDTO(BaseModel):
     """Request parameters for intent distribution over time"""
+
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     days: int = Field(default=30, ge=1, le=365, description="Number of days to look back")
@@ -372,12 +393,14 @@ class IntentTimelineRequestDTO(BaseModel):
 
 class IntentDistributionDTO(BaseModel):
     """Intent distribution at a point in time"""
+
     intents: dict[str, int]  # {intent_name: count}
     total: int
 
 
 class IntentTimelineResponseDTO(BaseModel):
     """Intent timeline response"""
+
     organization_id: str
     date_range: dict[str, str]
     team_filter: Optional[list[str]] = None
@@ -388,8 +411,10 @@ class IntentTimelineResponseDTO(BaseModel):
 
 # Model and Provider Analytics DTOs
 
+
 class ModelDistributionItemDTO(BaseModel):
     """Single model distribution item"""
+
     model_name: str
     count: int
     percentage: float
@@ -397,6 +422,7 @@ class ModelDistributionItemDTO(BaseModel):
 
 class ModelDistributionResponseDTO(BaseModel):
     """Model distribution response"""
+
     organization_id: str
     date_range: dict[str, str]
     team_filter: Optional[list[str]] = None
@@ -407,6 +433,7 @@ class ModelDistributionResponseDTO(BaseModel):
 
 class ProviderDistributionResponseDTO(BaseModel):
     """Provider distribution response"""
+
     organization_id: str
     date_range: dict[str, str]
     team_filter: Optional[list[str]] = None
@@ -417,8 +444,10 @@ class ProviderDistributionResponseDTO(BaseModel):
 
 # Quality Analytics DTOs (New Enhanced Endpoint)
 
+
 class QualityMetricsTimelineDataPointDTO(BaseModel):
     """Quality metrics at a specific time (new analytics endpoint)"""
+
     date: str
     quality_score: Optional[float] = None
     clarity_score: Optional[float] = None
@@ -430,6 +459,7 @@ class QualityMetricsTimelineDataPointDTO(BaseModel):
 
 class QualityMetricsTimelineResponseDTO(BaseModel):
     """Quality metrics timeline response (new analytics endpoint)"""
+
     organization_id: str
     date_range: dict[str, str]
     granularity: str
@@ -441,6 +471,7 @@ class QualityMetricsTimelineResponseDTO(BaseModel):
 
 class QualityDistributionBinDTO(BaseModel):
     """Quality score distribution bin"""
+
     range: str  # e.g., "0-20", "21-40"
     count: int
     percentage: float
@@ -448,6 +479,7 @@ class QualityDistributionBinDTO(BaseModel):
 
 class QualityDistributionResponseDTO(BaseModel):
     """Quality score distribution response"""
+
     organization_id: str
     date_range: dict[str, str]
     team_filter: Optional[list[str]] = None
@@ -459,8 +491,10 @@ class QualityDistributionResponseDTO(BaseModel):
 
 # Usage Analytics DTOs
 
+
 class UsageByHourDataPointDTO(BaseModel):
     """Usage data for a specific hour"""
+
     hour: int  # 0-23
     weekday_count: int
     weekend_count: int
@@ -469,6 +503,7 @@ class UsageByHourDataPointDTO(BaseModel):
 
 class UsageByHourResponseDTO(BaseModel):
     """Usage by hour response"""
+
     organization_id: str
     date_range: dict[str, str]
     team_filter: Optional[list[str]] = None
@@ -480,8 +515,10 @@ class UsageByHourResponseDTO(BaseModel):
 
 # Risk Analytics DTOs
 
+
 class RiskCategoryItemDTO(BaseModel):
     """Risk category breakdown"""
+
     category: str
     count: int
     percentage: float
@@ -490,6 +527,7 @@ class RiskCategoryItemDTO(BaseModel):
 
 class RiskCategoriesResponseDTO(BaseModel):
     """Risk categories breakdown response"""
+
     organization_id: str
     date_range: dict[str, str]
     team_filter: Optional[list[str]] = None

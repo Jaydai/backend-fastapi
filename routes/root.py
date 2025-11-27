@@ -15,5 +15,5 @@ async def root():
         "version": settings.APP_VERSION,
         "status": "running",
         "environment": os.getenv("ENVIRONMENT"),
-        "supabase_url": os.getenv("SUPABASE_URL")
+        "supabase_url": os.getenv("SUPABASE_URL"),
     }

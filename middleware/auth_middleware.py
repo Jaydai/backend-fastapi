@@ -20,7 +20,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/enrichment/enrich-message-batch",
         "/enrichment/enrich-chat",
         "/enrichment/enrich-chat-batch",
-        "/docs", # TODO: désactiver en prod
+        "/docs",  # TODO: désactiver en prod
         "/redoc",
         "/auth/sign_in",
         "/auth/sign_up",
@@ -40,6 +40,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         if self._is_public_route(request):
             # For public routes, still provide an unauthenticated Supabase client
             from core.supabase import supabase
+
             request.state.supabase_client = supabase
             request.state.user_id = None
             return await call_next(request)

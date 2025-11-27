@@ -32,6 +32,7 @@ class FeedbackDetail:
 @dataclass
 class DomainExpertise:
     """Domain expertise detection"""
+
     theme_area: str  # Primary domain (coding, marketing, etc.)
     sub_specialties: list[str]  # Detected specialties
     tech_stack: list[str]  # Technologies/tools mentioned
@@ -41,6 +42,7 @@ class DomainExpertise:
 @dataclass
 class ProductivityIndicators:
     """Organizational productivity insights"""
+
     estimated_complexity: str  # simple, moderate, complex, very_complex
     collaboration_signals: list[str]  # Teamwork indicators
     reusability_score: int  # 0-100: How templateable is this prompt

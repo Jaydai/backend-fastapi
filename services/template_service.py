@@ -5,12 +5,14 @@ from dtos import (
     UpdateTemplateDTO,
     TemplateTitleResponseDTO,
     TemplateResponseDTO,
+    TemplateTitleResponseDTO,
+    TemplateVersionResponseDTO,
     UsageResponseDTO,
-    TemplateCountsResponseDTO
 )
 from repositories import TemplateRepository, PermissionRepository, TemplateVersionRepository
 from mappers.template_mapper import TemplateMapper
 from services.locale_service import LocaleService
+from services.templates import create_template, get_templates_titles, update_template
 
 
 class TemplateService:
@@ -23,7 +25,7 @@ class TemplateService:
         folder_id: str | None = None,
         published: bool | None = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[TemplateTitleResponseDTO]:
         """Get template titles with simplified signature"""
         # Business logic: Determine which filters to apply based on priority
@@ -48,7 +50,7 @@ class TemplateService:
             organization_id=filter_org_id,
             published=published,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
 
         return [
@@ -74,14 +76,9 @@ class TemplateService:
 
         return TemplateMapper.entity_to_response_dto(template, versions_summary, locale)
 
-
-
     @staticmethod
     def create_template(
-        client: Client,
-        user_id: str,
-        data: CreateTemplateDTO,
-        locale: str = LocaleService.DEFAULT_LOCALE
+        client: Client, user_id: str, data: CreateTemplateDTO, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO:
         workspace_type = "user"
         if data.organization_id:
@@ -122,13 +119,9 @@ class TemplateService:
 
         return TemplateService.get_template_by_id(client, template.id, locale)
 
-
     @staticmethod
     def update_template(
-        client: Client,
-        template_id: str,
-        data: UpdateTemplateDTO,
-        locale: str = LocaleService.DEFAULT_LOCALE
+        client: Client, template_id: str, data: UpdateTemplateDTO, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO | None:
         template = TemplateRepository.get_template_by_id(client, template_id)
         if not template:
@@ -195,7 +188,6 @@ class TemplateService:
 
         return TemplateService.get_template_by_id(client, template_id, locale)
 
-
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:
         return TemplateRepository.delete_template(client, template_id)
@@ -215,17 +207,9 @@ class TemplateService:
         tags: list[str] | None = None,
         include_public: bool = True,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[TemplateTitleResponseDTO]:
-        templates = TemplateRepository.search_templates(
-            client,
-            user_id,
-            query,
-            tags,
-            include_public,
-            limit,
-            offset
-        )
+        templates = TemplateRepository.search_templates(client, user_id, query, tags, include_public, limit, offset)
         return [TemplateMapper.entity_to_list_item_dto(t, locale) for t in templates]
 
     @staticmethod
@@ -235,5 +219,7 @@ class TemplateService:
         organization_counts = {}
         for role in user_all_roles:
             if role.organization_id:
-                organization_counts[role.organization_id] = TemplateRepository.get_organization_templates_count(client, role.organization_id)
+                organization_counts[role.organization_id] = TemplateRepository.get_organization_templates_count(
+                    client, role.organization_id
+                )
         return TemplateCountsResponseDTO(user_counts=user_counts, organization_counts=organization_counts)

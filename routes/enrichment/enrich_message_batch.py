@@ -23,12 +23,8 @@ async def enrich_message_batch(request: Request, dto: EnrichMessageBatchRequestD
 
     try:
         # Allow unauthenticated access for scripts - user_id will be None
-        user_id = getattr(request.state, 'user_id', None)
-        results = EnrichmentService.enrich_message_batch(
-            request.state.supabase_client,
-            user_id,
-            dto.messages
-        )
+        user_id = getattr(request.state, "user_id", None)
+        results = EnrichmentService.enrich_message_batch(request.state.supabase_client, user_id, dto.messages)
         return {"results": results}
     except HTTPException:
         raise

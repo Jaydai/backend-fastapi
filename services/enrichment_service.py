@@ -35,9 +35,7 @@ class EnrichmentService:
 
     @staticmethod
     def enrich_chat(
-        client: Client,
-        user_id: Optional[str],
-        request: ChatEnrichmentRequestDTO
+        client: Client, user_id: Optional[str], request: ChatEnrichmentRequestDTO
     ) -> ChatEnrichmentResponseDTO:
         """Enrich a single chat with classification and quality assessment"""
         # Truncate messages for AI processing
@@ -48,7 +46,7 @@ class EnrichmentService:
         classification_result = classification_service.classify_chat(user_message, assistant_response)
 
         # Use user_id from request payload if available (ChatEnrichmentBatchItemDTO), otherwise from auth
-        effective_user_id = getattr(request, 'user_id', None) or user_id
+        effective_user_id = getattr(request, "user_id", None) or user_id
 
         # Convert to entity and save (only if user_id is provided)
         if effective_user_id:
@@ -60,9 +58,7 @@ class EnrichmentService:
 
     @staticmethod
     async def enrich_chat_batch(
-        client: Client,
-        user_id: Optional[str],
-        requests: list[ChatEnrichmentRequestDTO]
+        client: Client, user_id: Optional[str], requests: list[ChatEnrichmentRequestDTO]
     ) -> list[dict]:
         """Enrich multiple chats in parallel"""
         tasks = [EnrichmentService._enrich_chat_async(client, user_id, req) for req in requests]
@@ -88,9 +84,7 @@ class EnrichmentService:
 
     @staticmethod
     def enrich_message(
-        client: Client,
-        user_id: Optional[str],
-        request: EnrichMessageRequestDTO
+        client: Client, user_id: Optional[str], request: EnrichMessageRequestDTO
     ) -> EnrichMessageResponseDTO:
         """Enrich a single message with risk assessment"""
         # Call risk assessment service
@@ -111,9 +105,7 @@ class EnrichmentService:
 
     @staticmethod
     def enrich_message_batch(
-        client: Client,
-        user_id: Optional[str],
-        requests: list[EnrichMessageRequestDTO]
+        client: Client, user_id: Optional[str], requests: list[EnrichMessageRequestDTO]
     ) -> list[dict]:
         """Enrich multiple messages sequentially"""
         results = []
@@ -128,13 +120,16 @@ class EnrichmentService:
                 logger.error(f"Failed to enrich message {request.message_provider_id}: {e}")
                 logger.error(f"Exception type: {type(e).__name__}, Exception args: {e.args}")
                 import traceback
+
                 logger.error(f"Traceback: {traceback.format_exc()}")
-                results.append({
-                    "success": False,
-                    "data": None,
-                    "error": str(e),
-                    "message_provider_id": request.message_provider_id
-                })
+                results.append(
+                    {
+                        "success": False,
+                        "data": None,
+                        "error": str(e),
+                        "message_provider_id": request.message_provider_id,
+                    }
+                )
 
         return results
 

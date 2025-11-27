@@ -6,14 +6,14 @@ For new code, import directly from repositories.folders.* modules.
 """
 
 from repositories.folders import (
+    create_folder,
+    delete_folder,
     get_folder_by_id,
     get_folders_titles,
-    create_folder,
-    update_folder,
-    delete_folder,
     get_pinned_folder_ids,
     pin_folder,
     unpin_folder,
+    update_folder,
     update_pinned_folders,
 )
 
@@ -30,7 +30,7 @@ class FolderRepository:
             organization_id=organization_id,
             parent_folder_id=parent_folder_id,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
 
     @staticmethod

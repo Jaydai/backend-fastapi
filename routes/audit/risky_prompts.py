@@ -1,14 +1,12 @@
 """Risky prompts endpoint"""
 
 import logging
+import time
 
 from fastapi import HTTPException, Query, Request
 
 from dtos.audit_dto import RiskyPromptsWithContextDTO
 from services.audit_service import AuditService
-import logging
-import time
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +24,9 @@ async def get_organization_risky_prompts(
     Includes top 10 risky prompts with risk details
     """
     start_time = time.time()
-    logger.info(f"[AUDIT:risky-prompts] Request started - org_id={organization_id}, start_date={start_date}, end_date={end_date}, days={days}")
+    logger.info(
+        f"[AUDIT:risky-prompts] Request started - org_id={organization_id}, start_date={start_date}, end_date={end_date}, days={days}"
+    )
 
     try:
         user_id = request.state.user_id
@@ -34,13 +34,15 @@ async def get_organization_risky_prompts(
 
         # TODO: Add permission check - verify user has admin/owner role in organization
 
-        logger.info(f"[AUDIT:risky-prompts] Calling AuditService.get_organization_risky_prompts...")
+        logger.info("[AUDIT:risky-prompts] Calling AuditService.get_organization_risky_prompts...")
         result = await AuditService.get_organization_risky_prompts(
             request.state.supabase_client, user_id, organization_id, start_date, end_date, days
         )
 
         duration_ms = int((time.time() - start_time) * 1000)
-        logger.info(f"[AUDIT:risky-prompts] Request completed - org_id={organization_id}, duration={duration_ms}ms, has_data={result is not None}")
+        logger.info(
+            f"[AUDIT:risky-prompts] Request completed - org_id={organization_id}, duration={duration_ms}ms, has_data={result is not None}"
+        )
 
         return result
 
@@ -50,5 +52,8 @@ async def get_organization_risky_prompts(
         raise
     except Exception as e:
         duration_ms = int((time.time() - start_time) * 1000)
-        logger.error(f"[AUDIT:risky-prompts] Error getting risky prompts - org_id={organization_id}, duration={duration_ms}ms, error={str(e)}", exc_info=True)
+        logger.error(
+            f"[AUDIT:risky-prompts] Error getting risky prompts - org_id={organization_id}, duration={duration_ms}ms, error={str(e)}",
+            exc_info=True,
+        )
         raise HTTPException(status_code=500, detail=f"Failed to get risky prompts: {str(e)}")

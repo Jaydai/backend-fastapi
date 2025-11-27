@@ -17,7 +17,9 @@ from .enrichment_service import EnrichmentService
 from .audit_service import AuditService
 from .auth_service import AuthService
 from .enrichment_service import EnrichmentService
+from .folder_service import FolderService
 from .invitation_service import InvitationService
+from .locale_service import LocaleService
 from .message_service import ChatService, MessageService
 from .notification_service import NotificationService
 from .onboarding_service import OnboardingService

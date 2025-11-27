@@ -3,6 +3,7 @@ from supabase import Client
 from datetime import datetime
 from domains.entities import Template, TemplateTitle, TemplateComment
 from services.locale_service import LocaleService
+from supabase import Client
 
 
 class TemplateRepository:
@@ -15,7 +16,7 @@ class TemplateRepository:
         organization_id: str | None = None,
         published: bool | None = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[TemplateTitle]:
         query = client.table("prompt_templates").select("id, title, folder_id")
         if user_id:
@@ -29,7 +30,6 @@ class TemplateRepository:
         templates_data = response.data or []
         templates = [TemplateTitle(**item) for item in templates_data]
         return templates
-
 
     @staticmethod
     def get_template_by_id(client: Client, template_id: str) -> Template | None:
@@ -94,7 +94,7 @@ class TemplateRepository:
         description: dict[str, str] | None = None,
         folder_id: str | None = None,
         tags: list[str] | None = None,
-        current_version_id: int | None = None
+        current_version_id: int | None = None,
     ) -> bool:
         update_data = {}
         if title is not None:
@@ -118,7 +118,6 @@ class TemplateRepository:
         data = response.data[0]
 
         return Template(data)
-
 
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:
@@ -247,7 +246,9 @@ class TemplateRepository:
         return templates
 
     @staticmethod
-    def get_comments(client: Client, template_id: str, locale: str = LocaleService.DEFAULT_LOCALE) -> list[TemplateComment]:
+    def get_comments(
+        client: Client, template_id: str, locale: str = LocaleService.DEFAULT_LOCALE
+    ) -> list[TemplateComment]:
         from domains.entities import TemplateComment, TemplateCommentAuthor
 
         parent_comments_response = (

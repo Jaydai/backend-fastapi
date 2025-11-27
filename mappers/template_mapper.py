@@ -12,7 +12,6 @@ from services.locale_service import LocaleService
 
 
 class TemplateMapper:
-
     @staticmethod
     def entity_to_list_item_dto(template: Template, locale: str = LocaleService.DEFAULT_LOCALE) -> TemplateListItemDTO:
         return TemplateListItemDTO(
@@ -34,9 +33,7 @@ class TemplateMapper:
 
     @staticmethod
     def entity_to_response_dto(
-        template: Template,
-        versions_summary: list[VersionSummary],
-        locale: str = LocaleService.DEFAULT_LOCALE
+        template: Template, versions_summary: list[VersionSummary], locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO:
         version_dtos = [
             VersionSummary(
@@ -51,7 +48,6 @@ class TemplateMapper:
             )
             for v in versions_summary
         ]
-
 
         return TemplateResponseDTO(
             id=template.id,

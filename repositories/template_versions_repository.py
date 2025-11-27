@@ -57,7 +57,7 @@ class TemplateVersionRepository:
         name: str | None = None,
         change_notes: dict[str, str] | None = None,
         status: str = "draft",
-        optimized_for: list[str] | None = None
+        optimized_for: list[str] | None = None,
     ) -> TemplateVersion:
         if not name:
             existing_versions = get_versions(client, template_id)
@@ -86,7 +86,7 @@ class TemplateVersionRepository:
         version_id: int,
         template_id: str,
         content: dict[str, str] | None = None,
-        status: str | None = None
+        status: str | None = None,
     ) -> TemplateVersion | None:
         update_data = {}
         if content is not None:

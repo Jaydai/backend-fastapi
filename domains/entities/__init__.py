@@ -13,8 +13,6 @@ from .organizations import (
     OrganizationInvitation,
     OrganizationMember,
 )
-from .folder_entities import Folder, FolderWithItems, FolderTitle
-from .block_entities import Block, BlockTitle
 from .permission_entities import ROLE_PERMISSIONS, UserOrganizationRole
 from .template_entities import (
     Template,
@@ -23,6 +21,7 @@ from .template_entities import (
     TemplateTitle,
     TemplateVersion,
     TemplateWithVersions,
+    VersionSummary,
 )
 from .user_entities import UserProfile
 

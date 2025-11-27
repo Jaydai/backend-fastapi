@@ -1,5 +1,6 @@
-from supabase import Client
 from domains.entities import Block, BlockTitle
+from supabase import Client
+
 
 class BlockRepository:
     @staticmethod
@@ -91,7 +92,7 @@ class BlockRepository:
         types: list[str] | None = None,
         published: bool | None = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[BlockTitle]:
         """
         Get block titles (id, title) with optional filtering.

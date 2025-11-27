@@ -29,7 +29,7 @@ class BaseSettings:
 
     # App
     APP_VERSION: str = "2.0.1"
-    
+
     # Environment
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", Environment.LOCAL)
 

@@ -1,11 +1,14 @@
 """Import message rows endpoint - for internal scripts"""
+
+import logging
+
 from fastapi import HTTPException, Request, status
 from pydantic import BaseModel
-import logging
 
 from .. import router as parent_router
 
 logger = logging.getLogger(__name__)
+
 
 class MessageRow(BaseModel):
     id: str | int  # Accept both string and int IDs from database
@@ -16,8 +19,10 @@ class MessageRow(BaseModel):
     content: str = ""
     created_at: str
 
+
 class ImportMessageRowsRequest(BaseModel):
     rows: list[MessageRow]
+
 
 class ChatRow(BaseModel):
     id: str | int  # Accept both string and int IDs from database
@@ -27,14 +32,13 @@ class ChatRow(BaseModel):
     created_at: str
     updated_at: str | None = None
 
+
 class ImportChatRowsRequest(BaseModel):
     rows: list[ChatRow]
 
+
 @parent_router.post("/internal/import-message-rows", status_code=status.HTTP_200_OK)
-async def import_message_rows(
-    request: Request,
-    body: ImportMessageRowsRequest
-) -> dict:
+async def import_message_rows(request: Request, body: ImportMessageRowsRequest) -> dict:
     """
     Import message rows for enrichment processing.
 
@@ -60,21 +64,18 @@ async def import_message_rows(
         return {
             "success": True,
             "imported_count": len(body.rows),
-            "message": f"Successfully queued {len(body.rows)} message rows for enrichment"
+            "message": f"Successfully queued {len(body.rows)} message rows for enrichment",
         }
 
     except Exception as e:
         logger.error(f"Error importing message rows: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to import message rows: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to import message rows: {str(e)}"
         )
 
+
 @parent_router.post("/internal/import-chat-rows", status_code=status.HTTP_200_OK)
-async def import_chat_rows(
-    request: Request,
-    body: ImportChatRowsRequest
-) -> dict:
+async def import_chat_rows(request: Request, body: ImportChatRowsRequest) -> dict:
     """
     Import chat rows for enrichment processing.
 
@@ -91,12 +92,11 @@ async def import_chat_rows(
         return {
             "success": True,
             "imported_count": len(body.rows),
-            "message": f"Successfully queued {len(body.rows)} chat rows for enrichment"
+            "message": f"Successfully queued {len(body.rows)} chat rows for enrichment",
         }
 
     except Exception as e:
         logger.error(f"Error importing chat rows: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to import chat rows: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to import chat rows: {str(e)}"
         )

@@ -16,6 +16,7 @@ class Block:
     updated_at: str | None
     usage_count: int
 
+
 @dataclass
 class BlockTitle:
     id: str

@@ -71,8 +71,10 @@ class OverrideQualityRequestDTO(BaseModel):
 
 # NEW: Advanced enrichment DTOs (defined first to avoid circular dependencies)
 
+
 class DomainExpertiseDTO(BaseModel):
     """Domain expertise detection"""
+
     theme_area: str = Field(..., description="Primary domain (coding, marketing, etc.)")
     sub_specialties: list[str] = Field(default_factory=list, description="Detected specialties")
     tech_stack: list[str] = Field(default_factory=list, description="Technologies/tools mentioned")
@@ -81,6 +83,7 @@ class DomainExpertiseDTO(BaseModel):
 
 class ProductivityIndicatorsDTO(BaseModel):
     """Organizational productivity insights"""
+
     estimated_complexity: str = Field(..., description="simple, moderate, complex, very_complex")
     collaboration_signals: list[str] = Field(default_factory=list, description="Teamwork indicators")
     reusability_score: int = Field(..., ge=0, le=100, description="How templateable is this prompt")
@@ -147,7 +150,9 @@ class EnrichMessageResponseDTO(BaseModel):
 
     overall_risk_level: str
     overall_risk_score: float = Field(..., ge=0.0, le=100.0)
-    overall_confidence: Optional[float] = Field(None, ge=0.0, le=100.0, description="Average confidence across detected risks")
+    overall_confidence: Optional[float] = Field(
+        None, ge=0.0, le=100.0, description="Average confidence across detected risks"
+    )
     suggested_action: Optional[str] = Field(None, description="Recommended action: block, warn, review, or allow")
     risk_categories: dict[str, RiskCategoryDetailDTO]
     risk_summary: list[str]

@@ -1,9 +1,11 @@
 """Block title service - handles business logic for block list operations"""
-from supabase import Client
+
 from dtos import BlockTitleResponseDTO
 from repositories.blocks import BlockBaseRepository
-from services.permissions import UserPermissionsService
 from services.locale_service import LocaleService
+from services.permissions import UserPermissionsService
+from supabase import Client
+
 
 class BlockTitleService:
     """Service for block title operations (list views)"""
@@ -18,7 +20,7 @@ class BlockTitleService:
         user_id: str | None = None,
         workspace_type: str | None = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[BlockTitleResponseDTO]:
         """
         Get block titles with optional filtering and permission checks.
@@ -53,7 +55,7 @@ class BlockTitleService:
             user_id=user_id if not or_conditions else None,
             or_conditions=or_conditions,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
 
         # Localize and convert to DTOs

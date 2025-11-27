@@ -21,12 +21,8 @@ async def enrich_chat(request: Request, dto: ChatEnrichmentRequestDTO):
     """
     try:
         # Allow unauthenticated access for scripts - user_id will be None
-        user_id = getattr(request.state, 'user_id', None)
-        result = EnrichmentService.enrich_chat(
-            request.state.supabase_client,
-            user_id,
-            dto
-        )
+        user_id = getattr(request.state, "user_id", None)
+        result = EnrichmentService.enrich_chat(request.state.supabase_client, user_id, dto)
         return result
     except HTTPException:
         raise

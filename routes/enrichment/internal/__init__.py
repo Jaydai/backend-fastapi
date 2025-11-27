@@ -1,4 +1,5 @@
 """Internal enrichment endpoints - no auth required"""
+
 from fastapi import APIRouter
 
 router = APIRouter()

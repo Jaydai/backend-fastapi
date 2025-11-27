@@ -1,16 +1,11 @@
 """Folder repository - Re-exports all folder repository functions"""
 
+from .create_folder import create_folder
+from .delete_folder import delete_folder
 from .get_folder_by_id import get_folder_by_id
 from .get_folders_titles import get_folders_titles
-from .create_folder import create_folder
+from .pinned_folders import get_pinned_folder_ids, pin_folder, unpin_folder, update_pinned_folders
 from .update_folder import update_folder
-from .delete_folder import delete_folder
-from .pinned_folders import (
-    get_pinned_folder_ids,
-    pin_folder,
-    unpin_folder,
-    update_pinned_folders
-)
 
 __all__ = [
     "get_folder_by_id",
@@ -21,5 +16,5 @@ __all__ = [
     "get_pinned_folder_ids",
     "pin_folder",
     "unpin_folder",
-    "update_pinned_folders"
+    "update_pinned_folders",
 ]

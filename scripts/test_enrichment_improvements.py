@@ -1,11 +1,13 @@
 """Test improved enrichment by processing actual Supabase data (sample)."""
+
 import argparse
 import logging
 import os
-from typing import Dict, Any, List
-from supabase import Client, ClientOptions, create_client
+from typing import Any
+
 import requests
 
+from supabase import Client, ClientOptions, create_client
 
 LOGGER = logging.getLogger(__name__)
 
@@ -20,14 +22,9 @@ def build_client(url: str, key: str) -> Client:
     return create_client(url, key, options=options)
 
 
-def fetch_sample_messages(client: Client, limit: int = None) -> List[Dict[str, Any]]:
+def fetch_sample_messages(client: Client, limit: int = None) -> list[dict[str, Any]]:
     """Fetch sample user messages from Supabase"""
-    query = (
-        client.table("messages")
-        .select("*")
-        .eq("role", "user")
-        .order("created_at", desc=True)
-    )
+    query = client.table("messages").select("*").eq("role", "user").order("created_at", desc=True)
 
     if limit:
         query = query.limit(limit)
@@ -36,7 +33,9 @@ def fetch_sample_messages(client: Client, limit: int = None) -> List[Dict[str, A
     return response.data or []
 
 
-def fetch_sample_chats(client: Client, message_rows: List[Dict[str, Any]], limit_chats: int = None) -> List[Dict[str, Any]]:
+def fetch_sample_chats(
+    client: Client, message_rows: list[dict[str, Any]], limit_chats: int = None
+) -> list[dict[str, Any]]:
     """Fetch messages for chat enrichment based on chat_provider_ids"""
     # Get unique chat IDs
     chat_ids = list({m.get("chat_provider_id") for m in message_rows if m.get("chat_provider_id")})
@@ -51,18 +50,14 @@ def fetch_sample_chats(client: Client, message_rows: List[Dict[str, Any]], limit
 
     # Fetch all messages for these chats
     response = (
-        client.table("messages")
-        .select("*")
-        .in_("chat_provider_id", chat_ids)
-        .order("created_at", desc=False)
-        .execute()
+        client.table("messages").select("*").in_("chat_provider_id", chat_ids).order("created_at", desc=False).execute()
     )
     return response.data or []
 
 
-def group_messages_by_chat(rows: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+def group_messages_by_chat(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     """Group messages by chat_provider_id"""
-    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    grouped: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
         chat_id = row.get("chat_provider_id")
         if chat_id:
@@ -72,10 +67,10 @@ def group_messages_by_chat(rows: List[Dict[str, Any]]) -> Dict[str, List[Dict[st
     return grouped
 
 
-def build_chat_enrichment_items(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def build_chat_enrichment_items(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Build chat enrichment items from messages"""
     grouped = group_messages_by_chat(messages)
-    chat_items: List[Dict[str, Any]] = []
+    chat_items: list[dict[str, Any]] = []
 
     for chat_provider_id, rows in grouped.items():
         # Sort by creation time
@@ -94,19 +89,21 @@ def build_chat_enrichment_items(messages: List[Dict[str, Any]]) -> List[Dict[str
 
         # Only create item if we have a user message
         if user_msg:
-            chat_items.append({
-                "user_message": user_msg,
-                "assistant_response": assistant_msg,
-                "chat_provider_id": chat_provider_id,
-                "message_provider_id": sorted_rows[0].get("message_provider_id"),
-                "chat_id": sorted_rows[0].get("chat_id"),
-                "user_id": sorted_rows[0].get("user_id"),
-            })
+            chat_items.append(
+                {
+                    "user_message": user_msg,
+                    "assistant_response": assistant_msg,
+                    "chat_provider_id": chat_provider_id,
+                    "message_provider_id": sorted_rows[0].get("message_provider_id"),
+                    "chat_id": sorted_rows[0].get("chat_id"),
+                    "user_id": sorted_rows[0].get("user_id"),
+                }
+            )
 
     return chat_items
 
 
-def post_json(base_url: str, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+def post_json(base_url: str, path: str, payload: dict[str, Any]) -> dict[str, Any]:
     """POST JSON to endpoint and return response"""
     url = f"{base_url.rstrip('/')}{path}"
     response = requests.post(url, json=payload, timeout=300)
@@ -117,9 +114,9 @@ def post_json(base_url: str, path: str, payload: Dict[str, Any]) -> Dict[str, An
     return response.json()
 
 
-def test_message_enrichment(base_url: str, messages: List[Dict[str, Any]]) -> None:
+def test_message_enrichment(base_url: str, messages: list[dict[str, Any]]) -> None:
     """Test message enrichment with real data"""
-    LOGGER.info(f"\n{'='*80}\nTesting MESSAGE ENRICHMENT (RISK ASSESSMENT)\n{'='*80}")
+    LOGGER.info(f"\n{'=' * 80}\nTesting MESSAGE ENRICHMENT (RISK ASSESSMENT)\n{'=' * 80}")
 
     # Convert to enrichment format
     enrichment_messages = [
@@ -140,7 +137,7 @@ def test_message_enrichment(base_url: str, messages: List[Dict[str, Any]]) -> No
     all_results = []
 
     for i in range(0, len(enrichment_messages), batch_size):
-        batch = enrichment_messages[i:i+batch_size]
+        batch = enrichment_messages[i : i + batch_size]
         batch_num = (i // batch_size) + 1
         total_batches = (len(enrichment_messages) + batch_size - 1) // batch_size
 
@@ -154,33 +151,36 @@ def test_message_enrichment(base_url: str, messages: List[Dict[str, Any]]) -> No
     success_count = sum(1 for r in all_results if r.get("success"))
     error_count = len(all_results) - success_count
 
-    LOGGER.info(f"\n--- RESULTS ---")
+    LOGGER.info("\n--- RESULTS ---")
     LOGGER.info(f"Total: {len(all_results)}, Success: {success_count}, Errors: {error_count}")
 
     # Show sample results
     for i, result_item in enumerate(all_results[:3]):  # Show first 3
         if result_item.get("success"):
             data = result_item.get("data", {})
-            LOGGER.info(f"\n[{i+1}] Message: {enrichment_messages[i]['message_provider_id']}")
+            LOGGER.info(f"\n[{i + 1}] Message: {enrichment_messages[i]['message_provider_id']}")
             LOGGER.info(f"  Risk Level: {data.get('overall_risk_level')} (score: {data.get('overall_risk_score')})")
             LOGGER.info(f"  Confidence: {data.get('overall_confidence')}%")
             LOGGER.info(f"  Action: {data.get('suggested_action')}")
 
             # Show detected risks
-            detected = [cat for cat, details in data.get('risk_categories', {}).items()
-                       if isinstance(details, dict) and details.get('detected')]
+            detected = [
+                cat
+                for cat, details in data.get("risk_categories", {}).items()
+                if isinstance(details, dict) and details.get("detected")
+            ]
             if detected:
                 LOGGER.info(f"  Detected: {', '.join(detected)}")
         else:
-            LOGGER.error(f"\n[{i+1}] FAILED: {result_item.get('error')}")
+            LOGGER.error(f"\n[{i + 1}] FAILED: {result_item.get('error')}")
 
     if error_count > 0:
         LOGGER.warning(f"\n⚠️  {error_count} messages failed to enrich")
 
 
-def test_chat_enrichment(base_url: str, chats: List[Dict[str, Any]]) -> None:
+def test_chat_enrichment(base_url: str, chats: list[dict[str, Any]]) -> None:
     """Test chat enrichment with real data"""
-    LOGGER.info(f"\n{'='*80}\nTesting CHAT ENRICHMENT (CLASSIFICATION + QUALITY)\n{'='*80}")
+    LOGGER.info(f"\n{'=' * 80}\nTesting CHAT ENRICHMENT (CLASSIFICATION + QUALITY)\n{'=' * 80}")
 
     LOGGER.info(f"Enriching {len(chats)} chats in batches of 50...")
 
@@ -189,7 +189,7 @@ def test_chat_enrichment(base_url: str, chats: List[Dict[str, Any]]) -> None:
     all_results = []
 
     for i in range(0, len(chats), batch_size):
-        batch = chats[i:i+batch_size]
+        batch = chats[i : i + batch_size]
         batch_num = (i // batch_size) + 1
         total_batches = (len(chats) + batch_size - 1) // batch_size
 
@@ -203,40 +203,37 @@ def test_chat_enrichment(base_url: str, chats: List[Dict[str, Any]]) -> None:
     success_count = sum(1 for r in all_results if r.get("success"))
     error_count = len(all_results) - success_count
 
-    LOGGER.info(f"\n--- RESULTS ---")
+    LOGGER.info("\n--- RESULTS ---")
     LOGGER.info(f"Total: {len(all_results)}, Success: {success_count}, Errors: {error_count}")
 
     # Show sample results
     for i, result_item in enumerate(all_results[:3]):  # Show first 3
         if result_item.get("success"):
             data = result_item.get("data", {})
-            LOGGER.info(f"\n[{i+1}] Chat: {chats[i]['chat_provider_id']}")
+            LOGGER.info(f"\n[{i + 1}] Chat: {chats[i]['chat_provider_id']}")
             LOGGER.info(f"  Work Related: {data.get('is_work_related')}")
             LOGGER.info(f"  Theme: {data.get('theme')}")
             LOGGER.info(f"  Intent: {data.get('intent')}")
             LOGGER.info(f"  Skill Level: {data.get('skill_level')}")
 
-            quality = data.get('quality', {})
+            quality = data.get("quality", {})
             if quality:
                 LOGGER.info(f"  Quality Score: {quality.get('quality_score')}/100")
                 LOGGER.info(f"  Clarity: {quality.get('clarity_score')}/5")
                 LOGGER.info(f"  Specificity: {quality.get('specificity_score')}/5")
 
-            domain = data.get('domain_expertise', {})
-            if domain and domain.get('tech_stack'):
+            domain = data.get("domain_expertise", {})
+            if domain and domain.get("tech_stack"):
                 LOGGER.info(f"  Tech Stack: {', '.join(domain.get('tech_stack', [])[:3])}")
         else:
-            LOGGER.error(f"\n[{i+1}] FAILED: {result_item.get('error')}")
+            LOGGER.error(f"\n[{i + 1}] FAILED: {result_item.get('error')}")
 
     if error_count > 0:
         LOGGER.warning(f"\n⚠️  {error_count} chats failed to enrich")
 
 
 def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(levelname)s %(message)s"
-    )
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
     parser = argparse.ArgumentParser(description="Test improved enrichment with real Supabase data")
     parser.add_argument("--supabase-url", help="Supabase project URL (or set SUPABASE_URL env)")
@@ -257,14 +254,14 @@ def main():
         return
 
     # Connect to Supabase
-    LOGGER.info(f"Connecting to Supabase...")
+    LOGGER.info("Connecting to Supabase...")
     client = build_client(supabase_url, supabase_key)
 
     # Fetch sample data
     if args.limit:
         LOGGER.info(f"Fetching {args.limit} sample messages...")
     else:
-        LOGGER.info(f"Fetching ALL messages...")
+        LOGGER.info("Fetching ALL messages...")
 
     messages = fetch_sample_messages(client, args.limit)
 
@@ -280,7 +277,7 @@ def main():
 
     # Test chat enrichment
     if not args.test_messages:
-        LOGGER.info(f"\nFetching messages for chat enrichment...")
+        LOGGER.info("\nFetching messages for chat enrichment...")
         chat_messages = fetch_sample_chats(client, messages, args.limit_chats)
         chat_items = build_chat_enrichment_items(chat_messages)
 
@@ -290,7 +287,7 @@ def main():
         else:
             LOGGER.warning("No chat items to enrich")
 
-    LOGGER.info(f"\n{'='*80}\nTESTING COMPLETE\n{'='*80}")
+    LOGGER.info(f"\n{'=' * 80}\nTESTING COMPLETE\n{'=' * 80}")
 
 
 if __name__ == "__main__":

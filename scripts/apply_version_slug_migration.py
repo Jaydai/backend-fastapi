@@ -13,11 +13,13 @@ from pathlib import Path
 # Add parent directory to path to import from backend modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from supabase import create_client, Client
 from dotenv import load_dotenv
+
+from supabase import Client, create_client
 
 # Load environment variables
 load_dotenv()
+
 
 def get_supabase_admin_client() -> Client:
     """Get Supabase admin client."""
@@ -38,7 +40,7 @@ def apply_migration(client: Client, migration_file: str) -> None:
         raise FileNotFoundError(f"Migration file not found: {migration_path}")
 
     print(f"📄 Reading migration file: {migration_file}")
-    with open(migration_path, 'r') as f:
+    with open(migration_path) as f:
         sql = f.read()
 
     print("🚀 Applying migration...")
@@ -47,9 +49,9 @@ def apply_migration(client: Client, migration_file: str) -> None:
         # We need to use the REST API or PostgreSQL connection
         # For now, this script will just read and display the SQL
         print("⚠️  This script displays the SQL. Please apply it manually via Supabase SQL Editor or psql.")
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print(sql)
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
     except Exception as e:
         print(f"❌ Error applying migration: {e}")
         raise
@@ -61,10 +63,7 @@ def verify_migration(client: Client) -> None:
 
     try:
         # Check if slug column exists by querying a version
-        response = client.table("prompt_templates_versions") \
-            .select("id, template_id, name, slug") \
-            .limit(5) \
-            .execute()
+        response = client.table("prompt_templates_versions").select("id, template_id, name, slug").limit(5).execute()
 
         if not response.data:
             print("⚠️  No versions found in database")

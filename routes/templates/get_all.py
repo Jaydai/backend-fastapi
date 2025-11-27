@@ -1,8 +1,9 @@
 import logging
 
-from . import router
-from services.template_service import TemplateService
 from dtos import TemplateTitleResponseDTO
+from services.template_service import TemplateService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -11,10 +12,12 @@ logger = logging.getLogger(__name__)
 async def get_all_templates(
     request: Request,
     organization_id: str | None = None,
-    folder_ids: str | None = Query(None, description="Comma-separated folder IDs to filter templates. Empty for root only."),
+    folder_ids: str | None = Query(
+        None, description="Comma-separated folder IDs to filter templates. Empty for root only."
+    ),
     published: bool | None = None,
     limit: int = Query(100, le=500),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
 ) -> list[TemplateTitleResponseDTO]:
     """
     Get template titles (id, title) with optional filtering.
@@ -29,7 +32,9 @@ async def get_all_templates(
         user_id = request.state.user_id
         locale = request.state.locale
 
-        logger.info(f"Fetching template titles with folder_ids={folder_ids}, published={published}, organization_id={organization_id}")
+        logger.info(
+            f"Fetching template titles with folder_ids={folder_ids}, published={published}, organization_id={organization_id}"
+        )
 
         # Parse folder_ids
         folder_id_list: list[str] | None = None
@@ -42,12 +47,12 @@ async def get_all_templates(
         templates = TemplateService.get_templates_titles(
             client,
             locale,
-            user_id,           # Pass user_id for personal templates
-            organization_id,   # Pass organization_id for org templates
+            user_id,  # Pass user_id for personal templates
+            organization_id,  # Pass organization_id for org templates
             folder_id_list,
             published,
             limit,
-            offset
+            offset,
         )
 
         logger.info(f"Returning {len(templates)} template titles")
@@ -56,6 +61,5 @@ async def get_all_templates(
     except Exception as e:
         logger.error(f"Error fetching template titles: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch template titles: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch template titles: {str(e)}"
         )

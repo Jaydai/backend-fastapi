@@ -1,28 +1,22 @@
-from fastapi import HTTPException, Request
 import logging
 
-from . import router
+from fastapi import HTTPException, Request
+
+from dtos.team_dto import TeamMemberDTO, UpdateTeamMemberRoleRequestDTO
 from services.team_service import TeamService
-from dtos.team_dto import UpdateTeamMemberRoleRequestDTO, TeamMemberDTO
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
 
 @router.patch("/{team_id}/members/{user_id}", response_model=TeamMemberDTO)
 async def update_member_role(
-    request: Request,
-    team_id: str,
-    user_id: str,
-    body: UpdateTeamMemberRoleRequestDTO
+    request: Request, team_id: str, user_id: str, body: UpdateTeamMemberRoleRequestDTO
 ) -> TeamMemberDTO:
     """Update a team member's role"""
     try:
-        member = TeamService.update_user_team_role(
-            request.state.supabase_client,
-            team_id,
-            user_id,
-            body.role
-        )
+        member = TeamService.update_user_team_role(request.state.supabase_client, team_id, user_id, body.role)
 
         return member
 

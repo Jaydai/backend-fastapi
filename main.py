@@ -8,14 +8,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from middleware.auth_middleware import AuthenticationMiddleware
-from middleware.locale_middleware import LocaleMiddleware
-import os
-import logging
 
 # Import config
 from config.settings import settings
 from middleware.auth_middleware import AuthenticationMiddleware
+from middleware.locale_middleware import LocaleMiddleware
 
 # Import main API router
 from routes import router as api_router
@@ -71,7 +68,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*", "authorization", "content-type", "accept-language", "x-locale", "accept"],
-    expose_headers=["*"]
+    expose_headers=["*"],
 )
 app.add_middleware(AuthenticationMiddleware)
 app.add_middleware(LocaleMiddleware)  # Automatically injects locale into request.state.locale

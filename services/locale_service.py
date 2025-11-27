@@ -1,7 +1,9 @@
 """Centralized locale management service."""
-from fastapi import Request
-from typing import Any
+
 import logging
+from typing import Any
+
+from fastapi import Request
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +74,7 @@ class LocaleService:
     def localize_object(obj: dict | Any, locale: str, fields: list[str]) -> dict:
         """Localize specific fields in an object."""
         if not isinstance(obj, dict):
-            obj = obj.__dict__ if hasattr(obj, '__dict__') else {}
+            obj = obj.__dict__ if hasattr(obj, "__dict__") else {}
 
         result = obj.copy()
         for field in fields:

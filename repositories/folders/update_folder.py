@@ -1,6 +1,7 @@
 """Update folder"""
-from supabase import Client
+
 from domains.entities import Folder
+from supabase import Client
 
 
 def update_folder(
@@ -8,7 +9,7 @@ def update_folder(
     folder_id: str,
     title: dict[str, str] | None = None,
     description: dict[str, str] | None = None,
-    parent_folder_id: str | None = None
+    parent_folder_id: str | None = None,
 ) -> Folder | None:
     """Update an existing folder"""
     update_data = {}
@@ -19,10 +20,7 @@ def update_folder(
     if parent_folder_id is not None:
         update_data["parent_folder_id"] = parent_folder_id
 
-    response = client.table("prompt_folders")\
-        .update(update_data)\
-        .eq("id", folder_id)\
-        .execute()
+    response = client.table("prompt_folders").update(update_data).eq("id", folder_id).execute()
 
     if not response.data:
         return None
@@ -37,5 +35,5 @@ def update_folder(
         parent_folder_id=data.get("parent_folder_id"),
         workspace_type=data["workspace_type"],
         created_at=data["created_at"],
-        updated_at=data.get("updated_at")
+        updated_at=data.get("updated_at"),
     )

@@ -1,6 +1,7 @@
 """Get folder titles repository"""
-from supabase import Client
+
 from domains.entities import FolderTitle
+from supabase import Client
 
 
 def get_folders_titles(
@@ -10,7 +11,7 @@ def get_folders_titles(
     published: bool | None = None,
     parent_folder_id: str | None = None,
     limit: int = 100,
-    offset: int = 0
+    offset: int = 0,
 ) -> list[FolderTitle]:
     """
     Repository function to fetch folder titles from database.

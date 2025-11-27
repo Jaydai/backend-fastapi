@@ -64,8 +64,7 @@ class ClassificationService:
         else:
             # Legacy: Use chat completions with template
             prompt = self.prompt_template.format(
-                user_message=user_message_truncated,
-                assistant_response=assistant_response_truncated
+                user_message=user_message_truncated, assistant_response=assistant_response_truncated
             )
             raw_response = self._call_llm_with_retry(prompt)
 
@@ -150,33 +149,22 @@ class ClassificationService:
                 thread = self.client.beta.threads.create()
 
                 # Add message to thread
-                self.client.beta.threads.messages.create(
-                    thread_id=thread.id,
-                    role="user",
-                    content=user_prompt
-                )
+                self.client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_prompt)
 
                 # Run the assistant
                 run = self.client.beta.threads.runs.create(
-                    thread_id=thread.id,
-                    assistant_id=enrichment_config.CHAT_CLASSIFICATION_ASSISTANT_ID
+                    thread_id=thread.id, assistant_id=enrichment_config.CHAT_CLASSIFICATION_ASSISTANT_ID
                 )
 
                 # Wait for completion
                 while run.status in ["queued", "in_progress"]:
                     time.sleep(0.5)
-                    run = self.client.beta.threads.runs.retrieve(
-                        thread_id=thread.id,
-                        run_id=run.id
-                    )
+                    run = self.client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
 
                 if run.status == "completed":
                     # Get messages
                     messages = self.client.beta.threads.messages.list(thread_id=thread.id)
-                    assistant_message = next(
-                        (msg for msg in messages.data if msg.role == "assistant"),
-                        None
-                    )
+                    assistant_message = next((msg for msg in messages.data if msg.role == "assistant"), None)
 
                     if assistant_message:
                         content = assistant_message.content[0].text.value
@@ -209,7 +197,9 @@ class ClassificationService:
                 time.sleep(enrichment_config.LLM_RETRY_DELAY_SECONDS)
 
         # All retries failed
-        logger.error(f"Assistant classification failed after {enrichment_config.MAX_LLM_RETRIES + 1} attempts: {last_error}")
+        logger.error(
+            f"Assistant classification failed after {enrichment_config.MAX_LLM_RETRIES + 1} attempts: {last_error}"
+        )
         raise Exception(f"Assistant classification service failed: {last_error}")
 
     def _validate_classification_response(self, raw_response: dict) -> dict:
@@ -223,4 +213,3 @@ class ClassificationService:
 
 # Singleton instance
 classification_service = ClassificationService()
-

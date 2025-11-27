@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from domains.entities import VersionSummary
 
 
@@ -96,11 +97,14 @@ class TemplateTitleResponseDTO(BaseModel):
     title: str
     folder_id: str | None = None
 
+
 class OrganizationTemplateTitleDTO(BaseModel):
     """Template title for organization context (with localization support)"""
+
     id: str
     title: str
 
+
 class TemplateCountsResponseDTO(BaseModel):
     user_counts: int
-    organization_counts: dict[str,int]
+    organization_counts: dict[str, int]

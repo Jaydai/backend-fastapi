@@ -2,20 +2,23 @@
 Update Template Version Route
 Allows updating a specific template version's properties
 """
-from fastapi import HTTPException, Request, status, Body
-from pydantic import BaseModel
+
 import logging
 
-from . import router
-from core.supabase import supabase
-from services import PermissionService
+from fastapi import Body, HTTPException, Request, status
+from pydantic import BaseModel
+
 from domains.enums import PermissionEnum
+from services import PermissionService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
 
 class UpdateVersionDTO(BaseModel):
     """DTO for updating version properties"""
+
     content: str | None = None
     change_notes: str | None = None
     status: str | None = None
@@ -24,15 +27,9 @@ class UpdateVersionDTO(BaseModel):
     optimized_for: list[str] | None = None
 
 
-@router.patch(
-    "/{template_id}/versions/{version_id}",
-    status_code=status.HTTP_200_OK
-)
+@router.patch("/{template_id}/versions/{version_id}", status_code=status.HTTP_200_OK)
 async def update_template_version(
-    request: Request,
-    template_id: str,
-    version_id: int,
-    update_data: UpdateVersionDTO = Body(...)
+    request: Request, template_id: str, version_id: int, update_data: UpdateVersionDTO = Body(...)
 ) -> dict:
     """
     Update a specific version of a template
@@ -61,9 +58,7 @@ async def update_template_version(
         user_id = request.state.user_id
         supabase_client = request.state.supabase_client
 
-        logger.info(
-            f"User {user_id} attempting to update version {version_id} of template {template_id}"
-        )
+        logger.info(f"User {user_id} attempting to update version {version_id} of template {template_id}")
 
         # Check if version exists
         version_response = (
@@ -76,10 +71,7 @@ async def update_template_version(
         )
 
         if not version_response.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Template version not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template version not found")
 
         # Check if user has permission (template owner or organization admin)
         template_response = (
@@ -91,10 +83,7 @@ async def update_template_version(
         )
 
         if not template_response.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Template not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
 
         template = template_response.data
 
@@ -104,16 +93,13 @@ async def update_template_version(
         # If template belongs to an organization, check organization permissions using new system
         if not has_permission and template.get("organization_id"):
             has_permission = PermissionService.user_has_permission_in_organization(
-                supabase_client,
-                user_id,
-                PermissionEnum.TEMPLATE_UPDATE,
-                template["organization_id"]
+                supabase_client, user_id, PermissionEnum.TEMPLATE_UPDATE, template["organization_id"]
             )
 
         if not has_permission:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have permission to update this template version"
+                detail="You don't have permission to update this template version",
             )
 
         # Build update data from DTO, excluding None values
@@ -132,21 +118,18 @@ async def update_template_version(
             update_dict["optimized_for"] = update_data.optimized_for
 
         if not update_dict:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No update data provided"
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No update data provided")
 
         # If setting as current, unset other versions first
         if update_dict.get("is_current") is True:
-            supabase_client.table("prompt_templates_versions").update({
-                "is_current": False
-            }).eq("template_id", template_id).execute()
+            supabase_client.table("prompt_templates_versions").update({"is_current": False}).eq(
+                "template_id", template_id
+            ).execute()
 
             # Also update the template's current_version_id
-            supabase_client.table("prompt_templates").update({
-                "current_version_id": version_id
-            }).eq("id", template_id).execute()
+            supabase_client.table("prompt_templates").update({"current_version_id": version_id}).eq(
+                "id", template_id
+            ).execute()
 
         # Update the version
         update_response = (
@@ -158,29 +141,20 @@ async def update_template_version(
         )
 
         if not update_response.data:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to update version"
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update version")
 
-        logger.info(
-            f"Successfully updated version {version_id} of template {template_id} by user {user_id}"
-        )
+        logger.info(f"Successfully updated version {version_id} of template {template_id} by user {user_id}")
 
         return {
             "success": True,
             "message": "Version updated successfully",
-            "data": update_response.data[0] if update_response.data else None
+            "data": update_response.data[0] if update_response.data else None,
         }
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Failed to update version {version_id} of template {template_id}: {e}",
-            exc_info=True
-        )
+        logger.error(f"Failed to update version {version_id} of template {template_id}: {e}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update template version: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update template version: {str(e)}"
         )

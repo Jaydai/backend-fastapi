@@ -19,6 +19,7 @@ class FolderWithItems:
     folders: list
     templates: list
 
+
 @dataclass
 class FolderTitle:
     id: str

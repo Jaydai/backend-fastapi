@@ -93,11 +93,7 @@ def validate_risk_scores(risk_data: dict) -> dict:
                 if isinstance(confidence, str):
                     # LLM sometimes returns confidence as string ("low", "medium", "high")
                     # Convert to numeric value
-                    confidence_map = {
-                        "low": 35.0,
-                        "medium": 65.0,
-                        "high": 90.0
-                    }
+                    confidence_map = {"low": 35.0, "medium": 65.0, "high": 90.0}
                     cat_data["confidence"] = confidence_map.get(confidence.lower(), 50.0)
                 elif isinstance(confidence, (int, float)):
                     # Clamp numeric confidence to 0-100
@@ -114,11 +110,7 @@ def validate_risk_scores(risk_data: dict) -> dict:
     if "overall_confidence" in validated:
         confidence = validated["overall_confidence"]
         if isinstance(confidence, str):
-            confidence_map = {
-                "low": 35.0,
-                "medium": 65.0,
-                "high": 90.0
-            }
+            confidence_map = {"low": 35.0, "medium": 65.0, "high": 90.0}
             validated["overall_confidence"] = confidence_map.get(confidence.lower(), 50.0)
         elif isinstance(confidence, (int, float)):
             validated["overall_confidence"] = max(0.0, min(100.0, float(confidence)))

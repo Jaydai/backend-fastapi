@@ -1,6 +1,7 @@
 from .auth_dto import OAuthSignIn, RefreshTokenDTO, SignInDTO, SignUpDTO, UserMeResponseDTO
 from .block_dto import (
     BlockResponseDTO,
+    BlockTitleResponseDTO,
     BlockType,
     CreateBlockDTO,
     UpdateBlockDTO,
@@ -9,7 +10,9 @@ from .block_dto import (
 from .folder_dto import (
     CreateFolderDTO,
     FolderResponseDTO,
+    FolderTitleResponseDTO,
     FolderWithItemsDTO,
+    OrganizationFolderTitleDTO,
     UpdateFolderDTO,
     UpdatePinnedFoldersDTO,
 )
@@ -55,7 +58,9 @@ from .template_dto import (
     TemplateResponseDTO,
     TemplateCommentAuthorDTO,
     TemplateCommentDTO,
+    TemplateCountsResponseDTO,
     TemplateListItemDTO,
+    TemplateMetadataDTO,
     TemplateResponseDTO,
     TemplateTitleResponseDTO,
     OrganizationTemplateTitleDTO,
@@ -111,6 +116,7 @@ from .block_dto import (
     UpdatePinnedBlocksDTO,
     BlockTitleResponseDTO,
 )
+from .user_dto import UpdateDataCollectionDTO, UpdateUserProfileDTO, UserProfileResponseDTO
 
 __all__ = [
     "SignInDTO",

@@ -10,21 +10,14 @@ router.include_router(stats_router)
 router.include_router(usage_router)
 
 # Implemented endpoints
-from . import (
-    get_profile,
-    update_profile,
-    update_data_collection,
-    me,
-    get_ai_coach_insights,
-    get_templates_counts,
-    get_templates,
-    get_folders,
-)
-
 # Not implemented yet (501)
 from . import (  # noqa: E402
+    get_ai_coach_insights,
+    get_folders,
     get_metadata,
     get_profile,
+    get_templates,
+    get_templates_counts,
     me,
     update_data_collection,
     update_metadata,

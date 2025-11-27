@@ -1,17 +1,10 @@
 """
 Service layer for team management
 """
-from supabase import Client
-from typing import Optional
-from dtos.team_dto import (
-    TeamDTO,
-    TeamWithMembersDTO,
-    TeamTreeNodeDTO,
-    TeamMemberDTO,
-    OrganizationTeamsResponseDTO
-)
-from domains.entities.team_entities import Team, TeamMember
+
+from dtos.team_dto import OrganizationTeamsResponseDTO, TeamDTO, TeamMemberDTO, TeamTreeNodeDTO
 from repositories.team_repository import TeamRepository
+from supabase import Client
 
 
 class TeamService:
@@ -46,7 +39,7 @@ class TeamService:
                 color=team.color,
                 created_at=team.created_at,
                 updated_at=team.updated_at,
-                member_count=team.member_count
+                member_count=team.member_count,
             )
             for team in teams
         ]
@@ -58,11 +51,11 @@ class TeamService:
             teams=team_dtos,
             tree=tree_dtos,
             total_teams=len(teams),
-            total_members=len(all_user_ids)
+            total_members=len(all_user_ids),
         )
 
     @staticmethod
-    def get_team_by_id(client: Client, team_id: str) -> Optional[TeamDTO]:
+    def get_team_by_id(client: Client, team_id: str) -> TeamDTO | None:
         """Get a specific team by ID"""
         team = TeamRepository.get_team_by_id(client, team_id)
         if not team:
@@ -79,7 +72,7 @@ class TeamService:
             color=team.color,
             created_at=team.created_at,
             updated_at=team.updated_at,
-            member_count=member_count
+            member_count=member_count,
         )
 
     @staticmethod
@@ -87,9 +80,9 @@ class TeamService:
         client: Client,
         organization_id: str,
         name: str,
-        description: Optional[str] = None,
-        parent_team_id: Optional[str] = None,
-        color: str = "#3B82F6"
+        description: str | None = None,
+        parent_team_id: str | None = None,
+        color: str = "#3B82F6",
     ) -> TeamDTO:
         """Create a new team"""
         # Validate parent team exists and belongs to same organization
@@ -100,14 +93,7 @@ class TeamService:
             if parent_team.organization_id != organization_id:
                 raise ValueError("Parent team must belong to the same organization")
 
-        team = TeamRepository.create_team(
-            client,
-            organization_id,
-            name,
-            description,
-            parent_team_id,
-            color
-        )
+        team = TeamRepository.create_team(client, organization_id, name, description, parent_team_id, color)
 
         return TeamDTO(
             id=team.id,
@@ -118,17 +104,17 @@ class TeamService:
             color=team.color,
             created_at=team.created_at,
             updated_at=team.updated_at,
-            member_count=0
+            member_count=0,
         )
 
     @staticmethod
     def update_team(
         client: Client,
         team_id: str,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        parent_team_id: Optional[str] = None,
-        color: Optional[str] = None
+        name: str | None = None,
+        description: str | None = None,
+        parent_team_id: str | None = None,
+        color: str | None = None,
     ) -> TeamDTO:
         """Update an existing team"""
         # Validate team exists
@@ -147,14 +133,7 @@ class TeamService:
             if parent_team.organization_id != existing_team.organization_id:
                 raise ValueError("Parent team must belong to the same organization")
 
-        team = TeamRepository.update_team(
-            client,
-            team_id,
-            name,
-            description,
-            parent_team_id,
-            color
-        )
+        team = TeamRepository.update_team(client, team_id, name, description, parent_team_id, color)
 
         member_count = TeamRepository.get_team_member_count(client, team_id)
 
@@ -167,7 +146,7 @@ class TeamService:
             color=team.color,
             created_at=team.created_at,
             updated_at=team.updated_at,
-            member_count=member_count
+            member_count=member_count,
         )
 
     @staticmethod
@@ -192,18 +171,13 @@ class TeamService:
                 role=member.role,
                 email=member.email,
                 name=member.name,
-                joined_at=member.joined_at
+                joined_at=member.joined_at,
             )
             for member in members
         ]
 
     @staticmethod
-    def add_user_to_team(
-        client: Client,
-        team_id: str,
-        user_id: str,
-        role: str = "member"
-    ) -> TeamMemberDTO:
+    def add_user_to_team(client: Client, team_id: str, user_id: str, role: str = "member") -> TeamMemberDTO:
         """Add a user to a team"""
         # Validate team exists
         team = TeamRepository.get_team_by_id(client, team_id)
@@ -220,12 +194,7 @@ class TeamService:
         if not added_member:
             # Fallback if member details not found
             return TeamMemberDTO(
-                user_id=user_id,
-                team_id=team_id,
-                role=role,
-                email="",
-                name=None,
-                joined_at=permission.created_at
+                user_id=user_id, team_id=team_id, role=role, email="", name=None, joined_at=permission.created_at
             )
 
         return TeamMemberDTO(
@@ -234,7 +203,7 @@ class TeamService:
             role=added_member.role,
             email=added_member.email,
             name=added_member.name,
-            joined_at=added_member.joined_at
+            joined_at=added_member.joined_at,
         )
 
     @staticmethod
@@ -243,12 +212,7 @@ class TeamService:
         return TeamRepository.remove_user_from_team(client, user_id, team_id)
 
     @staticmethod
-    def update_user_team_role(
-        client: Client,
-        team_id: str,
-        user_id: str,
-        role: str
-    ) -> TeamMemberDTO:
+    def update_user_team_role(client: Client, team_id: str, user_id: str, role: str) -> TeamMemberDTO:
         """Update a user's role in a team"""
         permission = TeamRepository.update_user_team_role(client, user_id, team_id, role)
 
@@ -259,12 +223,7 @@ class TeamService:
         if not updated_member:
             # Fallback if member details not found
             return TeamMemberDTO(
-                user_id=user_id,
-                team_id=team_id,
-                role=role,
-                email="",
-                name=None,
-                joined_at=permission.created_at
+                user_id=user_id, team_id=team_id, role=role, email="", name=None, joined_at=permission.created_at
             )
 
         return TeamMemberDTO(
@@ -273,7 +232,7 @@ class TeamService:
             role=updated_member.role,
             email=updated_member.email,
             name=updated_member.name,
-            joined_at=updated_member.joined_at
+            joined_at=updated_member.joined_at,
         )
 
     @staticmethod
@@ -291,7 +250,7 @@ class TeamService:
                 member_count=node.member_count,
                 depth=node.depth,
                 path=node.path,
-                children=TeamService._convert_tree_to_dtos(node.children)
+                children=TeamService._convert_tree_to_dtos(node.children),
             )
             dtos.append(dto)
         return dtos

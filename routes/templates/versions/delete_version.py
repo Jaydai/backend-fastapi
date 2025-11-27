@@ -7,10 +7,10 @@ import logging
 
 from fastapi import HTTPException, Request, status
 
-from . import router
-from core.supabase import supabase
-from services import PermissionService
 from domains.enums import PermissionEnum
+from services import PermissionService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -83,10 +83,7 @@ async def delete_template_version(request: Request, template_id: str, version_id
         # If template belongs to an organization, check organization permissions using new system
         if not has_permission and template.get("organization_id"):
             has_permission = PermissionService.user_has_permission_in_organization(
-                supabase_client,
-                user_id,
-                PermissionEnum.TEMPLATE_DELETE,
-                template["organization_id"]
+                supabase_client, user_id, PermissionEnum.TEMPLATE_DELETE, template["organization_id"]
             )
 
         if not has_permission:
@@ -112,7 +109,7 @@ async def delete_template_version(request: Request, template_id: str, version_id
         return {
             "success": True,
             "message": f"Version {version['name']} deleted successfully",
-            "deleted_version_id": version_id
+            "deleted_version_id": version_id,
         }
 
     except HTTPException:

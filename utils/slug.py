@@ -1,10 +1,9 @@
 """Slug generation utilities for database entities."""
 
 import re
-from typing import Optional
 
 
-def generate_version_slug(version_name: str, version_number: Optional[int] = None) -> str:
+def generate_version_slug(version_name: str, version_number: int | None = None) -> str:
     """
     Generate a URL-friendly slug from a version name.
 
@@ -24,13 +23,13 @@ def generate_version_slug(version_name: str, version_number: Optional[int] = Non
     slug = version_name.lower()
 
     # Replace spaces and special characters with hyphens
-    slug = re.sub(r'[^a-z0-9]+', '-', slug)
+    slug = re.sub(r"[^a-z0-9]+", "-", slug)
 
     # Remove leading/trailing hyphens
-    slug = slug.strip('-')
+    slug = slug.strip("-")
 
     # Collapse multiple consecutive hyphens
-    slug = re.sub(r'-+', '-', slug)
+    slug = re.sub(r"-+", "-", slug)
 
     # Prefix with version number if provided
     if version_number is not None:

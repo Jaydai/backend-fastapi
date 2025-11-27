@@ -1,9 +1,11 @@
-from fastapi import HTTPException, Request, status
 import logging
 
-from . import router
-from services.template_service import TemplateService
+from fastapi import HTTPException, Request, status
+
 from dtos import TemplateCountsResponseDTO
+from services.template_service import TemplateService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,5 @@ async def get_templates_counts(
     except Exception as e:
         logger.error(f"Error getting templates counts: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get templates counts: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get templates counts: {str(e)}"
         )

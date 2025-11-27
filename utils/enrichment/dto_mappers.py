@@ -2,11 +2,7 @@
 DTO Mapping Utilities
 Transforms between domain entities and DTOs for cleaner code
 """
-from domains.entities.enrichment_entities import (
-    EnrichedChat, EnrichedMessage, QualityMetrics,
-    FeedbackDetail, RiskCategory, RiskIssue,
-    DomainExpertise, ProductivityIndicators
-)
+
 from domains.entities.audit_entities import (
     IntentStats,
     QualityStats,
@@ -17,11 +13,15 @@ from domains.entities.audit_entities import (
     TopUser,
     UsageStats,
 )
-from dtos.enrichment_dto import (
-    ChatEnrichmentRequestDTO, ChatEnrichmentResponseDTO,
-    QualityMetricsDTO, FeedbackDTO,
-    RiskCategoryDetailDTO, RiskIssueDTO,
-    DomainExpertiseDTO, ProductivityIndicatorsDTO
+from domains.entities.enrichment_entities import (
+    DomainExpertise,
+    EnrichedChat,
+    EnrichedMessage,
+    FeedbackDetail,
+    ProductivityIndicators,
+    QualityMetrics,
+    RiskCategory,
+    RiskIssue,
 )
 from dtos.audit_dto import (
     IntentStatsDTO,
@@ -36,7 +36,9 @@ from dtos.audit_dto import (
 from dtos.enrichment_dto import (
     ChatEnrichmentRequestDTO,
     ChatEnrichmentResponseDTO,
+    DomainExpertiseDTO,
     FeedbackDTO,
+    ProductivityIndicatorsDTO,
     QualityMetricsDTO,
     RiskCategoryDetailDTO,
     RiskIssueDTO,
@@ -123,7 +125,7 @@ def risk_assessment_to_response_dto(risk_result: dict):
                 detected=cat_data.get("risk_level") not in ["none", None],
                 details=cat_data.get("description"),
                 confidence=cat_data.get("confidence"),
-                suggested_redaction=cat_data.get("suggested_redaction")
+                suggested_redaction=cat_data.get("suggested_redaction"),
             )
 
     detected_issues_dto = []
@@ -211,7 +213,7 @@ def _extract_quality_metrics(classification_result: dict) -> QualityMetrics | No
         context_score=q.get("context", 0),
         specificity_score=q.get("specificity", 0),
         actionability_score=q.get("actionability", 0),
-        complexity_score=q.get("complexity")
+        complexity_score=q.get("complexity"),
     )
 
 
@@ -226,7 +228,7 @@ def _extract_feedback(classification_result: dict) -> FeedbackDetail | None:
         strengths=f.get("strengths", []),
         improvements=f.get("improvements", []),
         improved_prompt_example=f.get("improved_prompt_example"),
-        personalized_tip=f.get("personalized_tip")
+        personalized_tip=f.get("personalized_tip"),
     )
 
 
@@ -241,7 +243,7 @@ def _quality_metrics_to_dto(quality_data: dict | None) -> QualityMetricsDTO | No
         context_score=quality_data.get("context", 0),
         specificity_score=quality_data.get("specificity", 0),
         actionability_score=quality_data.get("actionability", 0),
-        complexity_score=quality_data.get("complexity")
+        complexity_score=quality_data.get("complexity"),
     )
 
 
@@ -255,7 +257,7 @@ def _feedback_to_dto(feedback_data: dict | None) -> FeedbackDTO | None:
         strengths=feedback_data.get("strengths", []),
         improvements=feedback_data.get("improvements", []),
         improved_prompt_example=feedback_data.get("improved_prompt_example"),
-        personalized_tip=feedback_data.get("personalized_tip")
+        personalized_tip=feedback_data.get("personalized_tip"),
     )
 
 
@@ -271,7 +273,7 @@ def _extract_risk_categories(risk_result: dict) -> dict[str, RiskCategory]:
                 detected=cat_data.get("risk_level") not in ["none", None],
                 details=cat_data.get("description"),
                 confidence=cat_data.get("confidence"),
-                suggested_redaction=cat_data.get("suggested_redaction")
+                suggested_redaction=cat_data.get("suggested_redaction"),
             )
     return risk_categories
 
@@ -310,7 +312,7 @@ def _extract_domain_expertise(classification_result: dict) -> DomainExpertise | 
         theme_area=theme_area,
         sub_specialties=de.get("sub_specialties", []),
         tech_stack=de.get("tech_stack", []),
-        experience_level=de.get("experience_level") or "beginner"
+        experience_level=de.get("experience_level") or "beginner",
     )
 
 
@@ -329,7 +331,7 @@ def _extract_productivity_indicators(classification_result: dict) -> Productivit
     return ProductivityIndicators(
         estimated_complexity=estimated_complexity,
         collaboration_signals=pi.get("collaboration_signals", []),
-        reusability_score=pi.get("reusability_score") or 0
+        reusability_score=pi.get("reusability_score") or 0,
     )
 
 
@@ -348,7 +350,7 @@ def _domain_expertise_to_dto(domain_data: dict | None) -> DomainExpertiseDTO | N
         theme_area=theme_area,
         sub_specialties=domain_data.get("sub_specialties", []),
         tech_stack=domain_data.get("tech_stack", []),
-        experience_level=domain_data.get("experience_level") or "beginner"
+        experience_level=domain_data.get("experience_level") or "beginner",
     )
 
 
@@ -365,5 +367,5 @@ def _productivity_indicators_to_dto(productivity_data: dict | None) -> Productiv
     return ProductivityIndicatorsDTO(
         estimated_complexity=estimated_complexity,
         collaboration_signals=productivity_data.get("collaboration_signals", []),
-        reusability_score=productivity_data.get("reusability_score") or 0
+        reusability_score=productivity_data.get("reusability_score") or 0,
     )

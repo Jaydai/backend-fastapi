@@ -279,18 +279,20 @@ def aggregate_risky_prompts(risky_prompts_data: dict) -> list[RiskyPrompt]:
         user_id = risk.get("user_id")
         user_info = user_map.get(user_id, {})
 
-        risky_prompts.append(RiskyPrompt(
-            message_provider_id=msg_provider_id,
-            risk_level=risk.get("overall_risk_level", "none"),
-            risk_score=risk.get("overall_risk_score", 0.0),
-            risk_categories=risk_categories,
-            content_preview=content_preview,
-            content_full=content_full if content_full else "[No content]",
-            created_at=datetime.fromisoformat(risk.get("created_at")) if risk.get("created_at") else datetime.now(),
-            user_whitelist=risk.get("user_whitelist", False),
-            user_email=user_info.get("email"),
-            user_name=user_info.get("name")
-        ))
+        risky_prompts.append(
+            RiskyPrompt(
+                message_provider_id=msg_provider_id,
+                risk_level=risk.get("overall_risk_level", "none"),
+                risk_score=risk.get("overall_risk_score", 0.0),
+                risk_categories=risk_categories,
+                content_preview=content_preview,
+                content_full=content_full if content_full else "[No content]",
+                created_at=datetime.fromisoformat(risk.get("created_at")) if risk.get("created_at") else datetime.now(),
+                user_whitelist=risk.get("user_whitelist", False),
+                user_email=user_info.get("email"),
+                user_name=user_info.get("name"),
+            )
+        )
 
     return risky_prompts
 
