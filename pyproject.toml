@@ -3,7 +3,7 @@
 line-length = 120
 
 # Version Python cible
-target-version = "py311"
+target-version = "py312"
 
 # Dossiers à exclure du linting
 exclude = [
