@@ -1,5 +1,63 @@
 # backend-fastapi
 
+## Development
+
+### Code Quality Tools
+
+Ce projet utilise **Ruff** pour le linting et le formatage du code Python.
+
+#### Vérifier le code (linting)
+
+```bash
+# Vérifier les erreurs de linting
+ruff check .
+
+# Appliquer les corrections automatiques
+ruff check . --fix
+
+# Appliquer les corrections y compris les unsafe-fixes
+ruff check . --fix --unsafe-fixes
+```
+
+#### Formater le code
+
+```bash
+# Vérifier le formatage sans modifier les fichiers
+ruff format --check .
+
+# Appliquer le formatage
+ruff format .
+```
+
+#### Exécuter les tests
+
+```bash
+# Exécuter tous les tests
+python3 -m pytest -v
+
+# Exécuter un fichier de tests spécifique
+python3 -m pytest tests/test_locale_service.py -v
+
+# Exécuter les tests avec coverage
+python3 -m pytest --cov=routes --cov=services --cov=repositories --cov=mappers
+```
+
+#### Workflow recommandé avant commit
+
+```bash
+# 1. Formater le code
+ruff format .
+
+# 2. Corriger les erreurs de linting
+ruff check . --fix
+
+# 3. Vérifier qu'il n'y a plus d'erreurs
+ruff check .
+
+# 4. Exécuter les tests
+python3 -m pytest -v
+```
+
 ## Supabase CLI troubleshooting
 
 Running `supabase db pull` boots the local Supabase stack using the version
