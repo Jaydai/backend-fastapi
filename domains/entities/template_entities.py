@@ -70,3 +70,5 @@ class VersionSummary:
     name: str
     slug: str
     is_current: bool
+    is_published: bool
+    status: str
