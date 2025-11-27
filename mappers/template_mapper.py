@@ -6,32 +6,16 @@ from dtos import (
     TemplateCommentDTO,
     TemplateCommentAuthorDTO,
 )
+from services.locale_service import LocaleService
 
 class TemplateMapper:
-    @staticmethod
-    def localize_string(value: dict[str, str] | str | None, locale: str = "en") -> str:
-        # TODO need to use an appropriate service
-        if value is None:
-            return ""
-        if isinstance(value, str):
-            return value
-        if isinstance(value, dict):
-            return value.get(locale) or value.get("en") or list(value.values())[0] if value else ""
-        return ""
 
     @staticmethod
-    def ensure_localized_dict(value: str | None, locale: str = "en") -> dict[str, str]:
-        # TODO need to use an appropriate service
-        if value is None:
-            return {locale: ""}
-        return {locale: value}
-
-    @staticmethod
-    def entity_to_list_item_dto(template: Template, locale: str = "en") -> TemplateListItemDTO:
+    def entity_to_list_item_dto(template: Template, locale: str = LocaleService.DEFAULT_LOCALE) -> TemplateListItemDTO:
         return TemplateListItemDTO(
             id=template.id,
-            title=TemplateMapper.localize_string(template.title, locale),
-            description=TemplateMapper.localize_string(template.description, locale) if template.description else None,
+            title=LocaleService.localize_string(template.title, locale),
+            description=LocaleService.localize_string(template.description, locale) if template.description else None,
             folder_id=template.folder_id,
             organization_id=template.organization_id,
             user_id=template.user_id,
@@ -49,7 +33,7 @@ class TemplateMapper:
     def entity_to_response_dto(
         template: Template,
         versions_summary: list[VersionSummary],
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO:
         version_dtos = [
             VersionSummary(
@@ -63,10 +47,11 @@ class TemplateMapper:
             for v in versions_summary
         ]
 
+
         return TemplateResponseDTO(
             id=template.id,
-            title=TemplateMapper.localize_string(template.title, locale),
-            description=TemplateMapper.localize_string(template.description, locale) if template.description else None,
+            title=LocaleService.localize_string(template.title, locale),
+            description=LocaleService.localize_string(template.description, locale) if template.description else None,
             folder_id=template.folder_id,
             organization_id=template.organization_id,
             user_id=template.user_id,
@@ -80,14 +65,14 @@ class TemplateMapper:
             )
 
     @staticmethod
-    def version_entity_to_dto(version: TemplateVersion, locale: str = "en") -> TemplateVersionResponseDTO:
+    def version_entity_to_dto(version: TemplateVersion, locale: str = LocaleService.DEFAULT_LOCALE) -> TemplateVersionResponseDTO:
         return TemplateVersionResponseDTO(
             id=version.id,
             template_id=version.template_id,
             name=version.name,
-            content=TemplateMapper.localize_string(version.content, locale),
-            change_notes=TemplateMapper.localize_string(version.change_notes, locale) if version.change_notes else None,
-        author_id=version.author_id,
+            content=LocaleService.localize_string(version.content, locale),
+            change_notes=LocaleService.localize_string(version.change_notes, locale) if version.change_notes else None,
+            author_id=version.author_id,
             created_at=version.created_at,
             updated_at=version.updated_at,
             status=version.status,

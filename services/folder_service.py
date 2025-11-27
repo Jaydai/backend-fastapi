@@ -7,7 +7,6 @@ from dtos import (
     UpdatePinnedFoldersDTO,
     FolderTitleResponseDTO,
 )
-
 from services.folders import (
     get_folder_by_id,
     get_folders_titles,
@@ -19,7 +18,9 @@ from services.folders import (
     unpin_folder,
     update_pinned_folders,
 )
-
+from repositories.folder_repository import FolderRepository
+from mappers.folder_mapper import FolderMapper
+from services.locale_service import LocaleService
 
 class FolderService:
     """Folder service class for backward compatibility"""
@@ -27,8 +28,9 @@ class FolderService:
     @staticmethod
     def get_folders_titles(
         client: Client,
-        locale: str = "en",
-        user_id: str | None = None,
+        user_id: str,
+        locale: str = LocaleService.DEFAULT_LOCALE,
+        workspace_type: str | None = None,
         organization_id: str | None = None,
         parent_folder_id: str | None = None,
         limit: int = 100,
@@ -39,6 +41,7 @@ class FolderService:
             client=client,
             locale=locale,
             user_id=user_id,
+            workspace_type=workspace_type,
             organization_id=organization_id,
             parent_folder_id=parent_folder_id,
             limit=limit,
@@ -50,7 +53,7 @@ class FolderService:
     def get_folder_by_id(
         client: Client,
         folder_id: str,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> FolderResponseDTO | None:
         """Get folder by ID"""
         return get_folder_by_id(client, folder_id, locale)
@@ -60,7 +63,7 @@ class FolderService:
         client: Client,
         user_id: str,
         data: CreateFolderDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> FolderResponseDTO:
         """Create a new folder"""
         return create_folder(client, user_id, data, locale)
@@ -70,7 +73,7 @@ class FolderService:
         client: Client,
         folder_id: str,
         data: UpdateFolderDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> FolderResponseDTO | None:
         """Update a folder"""
         return update_folder(client, folder_id, data, locale)
@@ -84,7 +87,7 @@ class FolderService:
     def get_pinned_folders(
         client: Client,
         user_id: str,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> list[FolderResponseDTO]:
         """Get pinned folders"""
         return get_pinned_folders(client, user_id, locale)
@@ -107,25 +110,3 @@ class FolderService:
     ) -> dict:
         """Update pinned folders"""
         return update_pinned_folders(client, user_id, data)
-
-    @staticmethod
-    def get_root_items(
-        client: Client,
-        user_id: str,
-        locale: str = "en",
-        workspace_type: str | None = None,
-        organization_id: str | None = None
-    ) -> FolderWithItemsDTO:
-        """Get root items"""
-        return get_root_items(client, user_id, locale, workspace_type, organization_id)
-
-    @staticmethod
-    def get_folder_items(
-        client: Client,
-        folder_id: str,
-        locale: str = "en",
-        limit: int | None = None,
-        offset: int = 0
-    ) -> FolderWithItemsDTO:
-        """Get folder items"""
-        return get_folder_items(client, folder_id, locale, limit, offset)

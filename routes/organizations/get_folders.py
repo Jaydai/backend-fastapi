@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 async def get_organization_folders(
     request: Request,
     organization_id: str,
-    locale: str = Query("en", description="Locale for localization")
 ) -> list[FolderTitleResponseDTO]:
+    locale = request.state.locale
     try:
         # Fetch all folders for the organization (minimal data for tree building)
         folders = FolderService.get_folders_titles(

@@ -19,7 +19,6 @@ async def get_organization_template_metadata(
     request: Request,
     organization_id: str,
     template_id: str,
-    locale: str = Query("en", description="Locale for localization")
 ) -> TemplateMetadataDTO:
     """
     Get template metadata with version summaries (no content).
@@ -32,6 +31,7 @@ async def get_organization_template_metadata(
     Use this for the first render, then fetch specific version content
     using the version slug endpoint.
     """
+    locale = request.state.locale
     try:
         metadata = service_get_template_metadata(
             client=request.state.supabase_client,

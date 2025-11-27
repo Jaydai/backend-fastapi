@@ -17,6 +17,7 @@ class OrganizationRepository:
 
         if not response.data:
             return []
+        print(f"😎😎😎 response.data: {response.data}")
         
         organizations = []
         for row in response.data:

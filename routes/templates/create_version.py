@@ -17,7 +17,7 @@ async def create_template_version(
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
-        locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
+        locale = request.state.locale
 
         logger.info(f"User {user_id} creating version for template {template_id}")
 

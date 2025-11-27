@@ -2,12 +2,12 @@
 from supabase import Client
 from dtos import TemplateTitleResponseDTO
 from repositories.templates import get_templates_titles as repo_get_templates_titles
-from utils import localize_object
+from services.locale_service import LocaleService
 
 
 def get_templates_titles(
     client: Client,
-    locale: str = "en",
+    locale: str = LocaleService.DEFAULT_LOCALE,
     user_id: str | None = None,
     organization_id: str | None = None,
     folder_id: str | None = None,
@@ -42,6 +42,6 @@ def get_templates_titles(
     )
 
     return [
-        TemplateTitleResponseDTO(**localize_object(template.__dict__, locale, ["title"]))
+        TemplateTitleResponseDTO(**LocaleService.localize_object(template.__dict__, locale, ["title"]))
         for template in templates
     ]

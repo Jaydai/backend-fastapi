@@ -28,7 +28,7 @@ async def get_all_templates(
     try:
         client = request.state.supabase_client
         user_id = request.state.user_id
-        locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
+        locale = request.state.locale
 
         logger.info(f"Fetching template titles with folder_ids={folder_ids}, published={published}, organization_id={organization_id}")
 

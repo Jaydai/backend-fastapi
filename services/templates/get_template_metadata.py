@@ -4,7 +4,7 @@ from supabase import Client
 from dtos import TemplateMetadataDTO, VersionSummary
 from repositories.templates import get_template_metadata as repo_get_template_metadata
 from repositories.templates.versions import get_versions_summary
-from utils.localization import localize_object
+from services.locale_service import LocaleService
 
 
 def get_template_metadata(
@@ -41,7 +41,7 @@ def get_template_metadata(
     versions = [
         VersionSummary(
             id=v.id,
-            name=localize_object(v.name, locale),
+            name=LocaleService.localize_string(v.name, locale),
             slug=v.slug,
             is_current=v.is_current,
             created_at=v.created_at,
@@ -51,8 +51,8 @@ def get_template_metadata(
     ]
 
     # Localize template title and description
-    title = localize_object(template.title, locale) if isinstance(template.title, dict) else template.title
-    description = localize_object(template.description, locale) if isinstance(template.description, dict) else template.description
+    title = LocaleService.localize_string(template.title, locale)
+    description = LocaleService.localize_string(template.description, locale) if template.description else None
 
     return TemplateMetadataDTO(
         id=template.id,

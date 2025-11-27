@@ -14,8 +14,7 @@ SUPABASE_PUBLISHABLE_KEY = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 SUPABASE_SECRET_KEY = os.getenv("SUPABASE_SECRET_KEY")
 
 # Initialize service role Supabase client (for admin operations)
-# Use the secret/service role key for server-side operations, including JWT validation
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_SECRET_KEY)
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
 
 
 def create_authenticated_client(access_token: str) -> Client:

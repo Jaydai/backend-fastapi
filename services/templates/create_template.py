@@ -3,21 +3,22 @@ from dtos import CreateTemplateDTO, TemplateResponseDTO
 from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
 from services.templates import get_template_by_id
+from services.locale_service import LocaleService
 
 def create_template(
         client: Client,
         user_id: str,
         data: CreateTemplateDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO:
         # TODO: remove workspace_type ?
         workspace_type = "user"
         if data.organization_id:
             workspace_type = "organization"
 
-        title_dict = TemplateMapper.ensure_localized_dict(data.title, locale)
-        description_dict = TemplateMapper.ensure_localized_dict(data.description, locale) if data.description else None
-        content_dict = TemplateMapper.ensure_localized_dict(data.content, locale)
+        title_dict = LocaleService.ensure_localized_dict(data.title, locale)
+        description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
+        content_dict = LocaleService.ensure_localized_dict(data.content, locale)
 
         template = TemplateRepository.create_template(
             client,

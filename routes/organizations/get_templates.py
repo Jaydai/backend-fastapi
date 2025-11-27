@@ -19,8 +19,8 @@ async def get_organization_templates(
     request: Request,
     organization_id: str,
     published: bool | None = None,
-    locale: str = Query("en", description="Locale for localization")
 ) -> list[TemplateTitleResponseDTO]:
+    locale = request.state.locale
     try:
         # Fetch all templates for the organization (minimal data for tree building)
         templates = TemplateService.get_templates_titles(
