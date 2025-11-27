@@ -3,19 +3,20 @@ from dtos import UpdateTemplateDTO, TemplateResponseDTO
 from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
 from services.templates import get_template_by_id
+from services.locale_service import LocaleService
 
 def update_template(
         client: Client,
         template_id: str,
         data: UpdateTemplateDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO | None:
         template = TemplateRepository.get_template_by_id(client, template_id)
         if not template:
             return None
 
-        title_dict = TemplateMapper.ensure_localized_dict(data.title, locale) if data.title else None
-        description_dict = TemplateMapper.ensure_localized_dict(data.description, locale) if data.description else None
+        title_dict = LocaleService.ensure_localized_dict(data.title, locale) if data.title else None
+        description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
 
         content_updated = data.content is not None
         status_updated = data.status is not None
@@ -24,7 +25,7 @@ def update_template(
             if data.version_id:
                 version_update_data = {}
                 if content_updated:
-                    version_update_data["content"] = TemplateMapper.ensure_localized_dict(data.content, locale)
+                    version_update_data["content"] = LocaleService.ensure_localized_dict(data.content, locale)
                 if status_updated:
                     version_update_data["status"] = data.status
 
@@ -40,7 +41,7 @@ def update_template(
                     return None
             else:
                 if content_updated:
-                    content_dict = TemplateMapper.ensure_localized_dict(data.content, locale)
+                    content_dict = LocaleService.ensure_localized_dict(data.content, locale)
                     version = TemplateRepository.create_version(
                         client,
                         template_id,

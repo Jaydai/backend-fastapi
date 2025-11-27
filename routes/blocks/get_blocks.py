@@ -25,7 +25,7 @@ async def get_blocks(
     """
     try:
         client = request.state.supabase_client
-        locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
+        locale = request.state.locale
 
         logger.info(f"Fetching block titles with types={types}, published={published}")
 

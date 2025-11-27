@@ -20,7 +20,7 @@ async def get_version_by_slug(
 ) -> TemplateVersionResponseDTO:
     try:
         client = request.state.supabase_client
-        locale = request.headers.get("Accept-Language", "en").split(",")[0][:2]
+        locale = request.state.locale
 
         version = TemplateService.get_version_by_slug(client, template_id, slug, locale)
         if not version:

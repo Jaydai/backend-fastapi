@@ -3,7 +3,7 @@ from supabase import Client
 from dtos import BlockTitleResponseDTO
 from repositories.blocks import BlockBaseRepository
 from services.permissions import UserPermissionsService
-from utils import localize_object
+from services.locale_service import LocaleService
 
 class BlockTitleService:
     """Service for block title operations (list views)"""
@@ -11,7 +11,7 @@ class BlockTitleService:
     @staticmethod
     def get_titles(
         client: Client,
-        locale: str = "en",
+        locale: str = LocaleService.DEFAULT_LOCALE,
         organization_id: str | None = None,
         types: list[str] | None = None,
         published: bool | None = None,
@@ -58,6 +58,6 @@ class BlockTitleService:
 
         # Localize and convert to DTOs
         return [
-            BlockTitleResponseDTO(**localize_object(block.__dict__, locale, ["title"]))
+            BlockTitleResponseDTO(**LocaleService.localize_object(block.__dict__, locale, ["title"]))
             for block in blocks
         ]

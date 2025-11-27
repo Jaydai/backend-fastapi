@@ -98,7 +98,7 @@ class TemplateTitleService:
     @staticmethod
     def get_titles(
         client: Client,
-        locale: str = "en",
+        locale: str = LocaleService.DEFAULT_LOCALE,
         organization_id: str | None = None,
         folder_ids: list[str] | None = None,
         published: bool | None = None,

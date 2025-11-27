@@ -2,12 +2,13 @@ from supabase import Client
 from dtos import TemplateResponseDTO
 from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
+from services.locale_service import LocaleService
 
 
 def get_template_by_id(
     client: Client,
     template_id: str,
-    locale: str = "en"
+    locale: str = LocaleService.DEFAULT_LOCALE
 ) -> TemplateResponseDTO | None:
     template = TemplateRepository.get_template_by_id(client, template_id)
     if not template:

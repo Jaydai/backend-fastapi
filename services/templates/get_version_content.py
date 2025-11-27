@@ -3,7 +3,7 @@
 from supabase import Client
 from dtos import VersionContentDTO
 from repositories.templates.versions import get_version_by_slug
-from utils.localization import localize_object
+from services.locale_service import LocaleService
 
 
 def get_version_content(
@@ -33,9 +33,9 @@ def get_version_content(
         return None
 
     # Localize text fields
-    name = localize_object(version.name, locale) if isinstance(version.name, dict) else version.name
-    content = localize_object(version.content, locale) if isinstance(version.content, dict) else version.content
-    change_notes = localize_object(version.change_notes, locale) if isinstance(version.change_notes, dict) else version.change_notes
+    name = LocaleService.localize_string(version.name, locale)
+    content = LocaleService.localize_string(version.content, locale)
+    change_notes = LocaleService.localize_string(version.change_notes, locale) if version.change_notes else None
 
     return VersionContentDTO(
         id=version.id,

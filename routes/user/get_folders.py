@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 )
 async def get_user_folders(
     request: Request,
-    locale: str = Query("en", description="Locale for localization")
 ) -> list[FolderTitleResponseDTO]:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
+        locale = request.state.locale
 
         folders = FolderService.get_folders_titles(
             client=client,

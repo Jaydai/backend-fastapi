@@ -8,6 +8,7 @@ from .message_service import MessageService, ChatService
 from .onboarding_service import OnboardingService
 from .notification_service import NotificationService
 from .stats_service import StatsService
+from .locale_service import LocaleService
 
 
 from .invitation_service import InvitationService
@@ -24,4 +25,5 @@ __all__ = [
     "UserService",
     "EnrichmentService",
     "AuditService",
+    "LocaleService",
 ]

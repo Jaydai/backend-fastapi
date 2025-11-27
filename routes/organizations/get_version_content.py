@@ -20,7 +20,6 @@ async def get_organization_template_version(
     organization_id: str,
     template_id: str,
     slug: str = Path(..., description="Version slug (e.g., 'v1-draft', 'v2-production')"),
-    locale: str = Query("en", description="Locale for localization")
 ) -> VersionContentDTO:
     """
     Get specific version content by slug.
@@ -33,6 +32,7 @@ async def get_organization_template_version(
     The slug is a URL-friendly identifier generated from the version name
     (e.g., "Version 2.0" → "v1-version-2-0").
     """
+    locale = request.state.locale
     try:
         version = service_get_version_content(
             client=request.state.supabase_client,
