@@ -10,7 +10,7 @@ class LocaleService:
     """Centralized service for locale management and localization."""
 
     SUPPORTED_LOCALES = ["en", "fr"]
-    DEFAULT_LOCALE = "en"
+    DEFAULT_LOCALE = "fr"
 
     @staticmethod
     def extract_locale_from_request(request: Request) -> str:
