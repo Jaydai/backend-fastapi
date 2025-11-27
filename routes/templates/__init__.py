@@ -20,6 +20,6 @@ from . import (  # noqa: E402
 )
 
 # Include the versions sub-router for update and delete operations
-from .versions import router as versions_router
+from .versions import router as versions_router  # noqa: E402
 
 router.include_router(versions_router)

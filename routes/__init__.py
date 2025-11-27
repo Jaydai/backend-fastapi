@@ -1,7 +1,20 @@
 from fastapi import APIRouter
 
 from .audit import router as audit_router
+from .auth import router as auth_router
+from .batch import router as batch_router
+from .blocks import router as blocks_router
+from .chats import router as chats_router
+from .enrichment import router as enrichment_router
+from .folders import router as folders_router
+from .invitations import router as invitations_router
+from .messages import router as messages_router
+from .notifications import router as notifications_router
+from .onboarding import router as onboarding_router
+from .organizations import router as organization_router
 from .teams import router as teams_router
+from .templates import router as templates_router
+from .user import router as user_router
 
 router = APIRouter()
 router.include_router(auth_router)

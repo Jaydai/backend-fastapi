@@ -262,7 +262,7 @@ class TeamRepository:
     def build_team_tree(teams: list[Team]) -> list[TeamTreeNode]:
         """Build a hierarchical tree structure from a flat list of teams"""
         # Create a map of teams by ID
-        team_map = {team.id: team for team in teams}
+        {team.id: team for team in teams}
 
         # Create tree nodes
         nodes = {}

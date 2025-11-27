@@ -344,7 +344,7 @@ class AuditTimeSeriesService:
                 generated_at=datetime.now(),
             )
 
-        date_trunc = _get_date_trunc_sql(granularity)
+        _get_date_trunc_sql(granularity)
 
         # Get enriched messages with risk data grouped by date
         response = (

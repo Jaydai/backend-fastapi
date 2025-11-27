@@ -3,7 +3,7 @@ from fastapi import APIRouter
 router = APIRouter(prefix="/teams", tags=["teams"])
 
 # Import all route handlers
-from . import (
+from . import (  # noqa: E402
     add_team_member,
     create_team,
     delete_team,

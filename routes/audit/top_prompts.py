@@ -8,6 +8,8 @@ from fastapi import HTTPException, Query, Request
 from dtos.audit_dto import TopPromptsWithContextDTO
 from services.audit_service import AuditService
 
+from . import router
+
 logger = logging.getLogger(__name__)
 
 

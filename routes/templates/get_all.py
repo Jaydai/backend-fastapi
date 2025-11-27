@@ -1,5 +1,7 @@
 import logging
 
+from fastapi import HTTPException, Query, Request, status
+
 from dtos import TemplateTitleResponseDTO
 from services.template_service import TemplateService
 

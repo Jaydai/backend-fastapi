@@ -19,6 +19,6 @@ from . import (  # noqa: E402
 )
 
 # Import internal routes (no auth required)
-from .internal import import_message_rows
+from .internal import import_message_rows  # noqa: E402
 
 __all__ = ["router"]

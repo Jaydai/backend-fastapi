@@ -26,7 +26,6 @@ async def get_theme_distribution(
     Returns top themes and their current distribution
     """
     try:
-        user_id = request.state.user_id
 
         # TODO: Add permission check - verify user has admin/owner role in organization
 

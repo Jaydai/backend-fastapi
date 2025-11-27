@@ -48,7 +48,7 @@ class AuditRepository:
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
 
-            current_chat_ids = list(set([msg["chat_provider_id"] for msg in (current_messages.data or []) if msg.get("chat_provider_id")]))
+            current_chat_ids = list({msg["chat_provider_id"] for msg in (current_messages.data or []) if msg.get("chat_provider_id")})
 
             # Get quality stats for chats that have messages in current period
             current_data = []
@@ -71,7 +71,7 @@ class AuditRepository:
                 .lt("created_at", trend_end.isoformat()) \
                 .execute()
 
-            trend_chat_ids = list(set([msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")]))
+            trend_chat_ids = list({msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")})
 
             trend_data = []
             if trend_chat_ids:
@@ -133,7 +133,7 @@ class AuditRepository:
                 .execute()
 
             # Extract unique chat_provider_ids from messages in date range
-            chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
+            chat_provider_ids = list({msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")})
 
             # Work-related stats for chats that have messages in the date range
             work_data = []
@@ -171,7 +171,7 @@ class AuditRepository:
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
 
-            current_chat_ids = list(set([msg["chat_provider_id"] for msg in (current_messages.data or []) if msg.get("chat_provider_id")]))
+            current_chat_ids = list({msg["chat_provider_id"] for msg in (current_messages.data or []) if msg.get("chat_provider_id")})
 
             # Get themes for chats that have messages in current period
             current_data = []
@@ -195,7 +195,7 @@ class AuditRepository:
                 .lt("created_at", trend_end.isoformat()) \
                 .execute()
 
-            trend_chat_ids = list(set([msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")]))
+            trend_chat_ids = list({msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")})
 
             trend_data = []
             if trend_chat_ids:
@@ -233,7 +233,7 @@ class AuditRepository:
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
 
-            chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
+            chat_provider_ids = list({msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")})
 
             # Get intent stats for chats that have messages in date range
             if chat_provider_ids:
@@ -269,7 +269,7 @@ class AuditRepository:
                 .execute()
 
             # Extract unique chat_provider_ids from messages in date range
-            chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
+            chat_provider_ids = list({msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")})
 
             # Get quality scores for chats that have messages in the date range
             quality_data = []
@@ -317,7 +317,7 @@ class AuditRepository:
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
 
-            chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_in_range.data or []) if msg.get("chat_provider_id")]))
+            chat_provider_ids = list({msg["chat_provider_id"] for msg in (messages_in_range.data or []) if msg.get("chat_provider_id")})
 
             # Get top quality chats that have messages in date range
             if not chat_provider_ids:
@@ -389,7 +389,7 @@ class AuditRepository:
             # Get message content and user info
             if risks_response.data:
                 message_ids = [risk["message_provider_id"] for risk in risks_response.data]
-                risk_user_ids = list(set([risk["user_id"] for risk in risks_response.data]))
+                risk_user_ids = list({risk["user_id"] for risk in risks_response.data})
 
                 messages_response = (
                     client.table("messages")

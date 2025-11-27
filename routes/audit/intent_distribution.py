@@ -26,7 +26,6 @@ async def get_intent_distribution(
     Returns top intents and their current distribution
     """
     try:
-        user_id = request.state.user_id
 
         # TODO: Add permission check - verify user has admin/owner role in organization
 
