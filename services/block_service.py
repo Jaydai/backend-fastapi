@@ -38,7 +38,7 @@ class BlockService:
     @staticmethod
     def get_blocks_titles(
         client: Client,
-        locale: str = "en",
+        locale: str = LocaleService.DEFAULT_LOCALE,
         organization_id: str | None = None,
         types: list[str] | None = None,
         published: bool | None = None,

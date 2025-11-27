@@ -132,7 +132,7 @@ class TemplateService:
         client: Client,
         template_id: str,
         slug: str,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateVersionResponseDTO | None:
         version = TemplateVersionRepository.get_version_by_slug(client, template_id, slug)
         if not version:

@@ -3,12 +3,13 @@ from dtos import UpdateTemplateDTO, TemplateResponseDTO
 from repositories.template_repository import TemplateRepository
 from mappers.template_mapper import TemplateMapper
 from services.templates import get_template_by_id
+from services.locale_service import LocaleService
 
 def update_template(
         client: Client,
         template_id: str,
         data: UpdateTemplateDTO,
-        locale: str = "en"
+        locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO | None:
         template = TemplateRepository.get_template_by_id(client, template_id)
         if not template:
