@@ -10,9 +10,7 @@ from services import PermissionService
 def require_permission_in_organization(permission: PermissionEnum):
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(
-            request: Request, *args, organization_id: str = None, **kwargs
-        ):
+        async def wrapper(request: Request, *args, organization_id: str = None, **kwargs):
             user_id = request.state.user_id
             client = request.state.supabase_client
 
@@ -26,9 +24,7 @@ def require_permission_in_organization(permission: PermissionEnum):
                     detail="Organization ID is required",
                 )
 
-            if not PermissionService.user_has_permission_in_organization(
-                client, user_id, permission, organization_id
-            ):
+            if not PermissionService.user_has_permission_in_organization(client, user_id, permission, organization_id):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail=f"Permission denied in organization {organization_id}. Required: {permission.value}",

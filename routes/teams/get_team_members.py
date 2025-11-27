@@ -19,6 +19,4 @@ async def get_team_members(request: Request, team_id: str) -> list[TeamMemberDTO
 
     except Exception as e:
         logger.error(f"Error fetching members for team {team_id}: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to fetch team members: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to fetch team members: {str(e)}")

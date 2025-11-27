@@ -15,7 +15,7 @@ class QualityMetrics:
     context_score: int  # 0-5
     specificity_score: int  # 0-5
     actionability_score: int  # 0-5
-    complexity_score: Optional[int] = None  # 1-5, task complexity
+    complexity_score: int | None = None  # 1-5, task complexity
 
 
 @dataclass
@@ -25,8 +25,8 @@ class FeedbackDetail:
     summary: str
     strengths: list[str]
     improvements: list[str]
-    improved_prompt_example: Optional[str] = None
-    personalized_tip: Optional[str] = None  # Tailored advice based on skill level
+    improved_prompt_example: str | None = None
+    personalized_tip: str | None = None  # Tailored advice based on skill level
 
 
 @dataclass
@@ -59,16 +59,16 @@ class EnrichedChat:
     chat_provider_id: str | None = None
     message_provider_id: str | None = None
     is_work_related: bool = False
-    theme: Optional[str] = None
-    intent: Optional[str] = None
-    skill_level: Optional[str] = None  # beginner, intermediate, advanced, expert
-    domain_expertise: Optional[DomainExpertise] = None
-    quality_metrics: Optional[QualityMetrics] = None
-    feedback: Optional[FeedbackDetail] = None
-    productivity_indicators: Optional[ProductivityIndicators] = None
-    raw_response: Optional[dict] = None
-    processing_time_ms: Optional[int] = None
-    model_used: Optional[str] = None
+    theme: str | None = None
+    intent: str | None = None
+    skill_level: str | None = None  # beginner, intermediate, advanced, expert
+    domain_expertise: DomainExpertise | None = None
+    quality_metrics: QualityMetrics | None = None
+    feedback: FeedbackDetail | None = None
+    productivity_indicators: ProductivityIndicators | None = None
+    raw_response: dict | None = None
+    processing_time_ms: int | None = None
+    model_used: str | None = None
     user_override_quality: bool = False
     user_quality_score: int | None = None
 
@@ -90,9 +90,9 @@ class RiskCategory:
     level: str  # none, low, medium, high, critical
     score: float  # 0-100
     detected: bool
-    details: Optional[str] = None
-    confidence: Optional[float] = None  # 0-100: Detection confidence
-    suggested_redaction: Optional[str] = None  # How to safely redact this content
+    details: str | None = None
+    confidence: float | None = None  # 0-100: Detection confidence
+    suggested_redaction: str | None = None  # How to safely redact this content
 
 
 @dataclass
@@ -106,8 +106,8 @@ class EnrichedMessage:
     message_provider_id: str | None = None
     overall_risk_level: str = "none"
     overall_risk_score: float = 0.0
-    overall_confidence: Optional[float] = None  # Average confidence across detected risks
-    suggested_action: Optional[str] = None  # block, warn, review, or allow
+    overall_confidence: float | None = None  # Average confidence across detected risks
+    suggested_action: str | None = None  # block, warn, review, or allow
     risk_categories: dict[str, RiskCategory] = None  # Keys: pii, security, confidential, etc.
     risk_summary: list[str] = None
     detected_issues: list[RiskIssue] = None

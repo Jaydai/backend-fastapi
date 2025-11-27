@@ -35,7 +35,7 @@ class EnrichmentService:
 
     @staticmethod
     def enrich_chat(
-        client: Client, user_id: Optional[str], request: ChatEnrichmentRequestDTO
+        client: Client, user_id: str | None, request: ChatEnrichmentRequestDTO
     ) -> ChatEnrichmentResponseDTO:
         """Enrich a single chat with classification and quality assessment"""
         # Truncate messages for AI processing
@@ -58,7 +58,7 @@ class EnrichmentService:
 
     @staticmethod
     async def enrich_chat_batch(
-        client: Client, user_id: Optional[str], requests: list[ChatEnrichmentRequestDTO]
+        client: Client, user_id: str | None, requests: list[ChatEnrichmentRequestDTO]
     ) -> list[dict]:
         """Enrich multiple chats in parallel"""
         tasks = [EnrichmentService._enrich_chat_async(client, user_id, req) for req in requests]
@@ -77,14 +77,14 @@ class EnrichmentService:
         ]
 
     @staticmethod
-    async def _enrich_chat_async(client: Client, user_id: Optional[str], request: ChatEnrichmentRequestDTO):
+    async def _enrich_chat_async(client: Client, user_id: str | None, request: ChatEnrichmentRequestDTO):
         """Async wrapper for enrich_chat"""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, EnrichmentService.enrich_chat, client, user_id, request)
 
     @staticmethod
     def enrich_message(
-        client: Client, user_id: Optional[str], request: EnrichMessageRequestDTO
+        client: Client, user_id: str | None, request: EnrichMessageRequestDTO
     ) -> EnrichMessageResponseDTO:
         """Enrich a single message with risk assessment"""
         # Call risk assessment service
@@ -105,7 +105,7 @@ class EnrichmentService:
 
     @staticmethod
     def enrich_message_batch(
-        client: Client, user_id: Optional[str], requests: list[EnrichMessageRequestDTO]
+        client: Client, user_id: str | None, requests: list[EnrichMessageRequestDTO]
     ) -> list[dict]:
         """Enrich multiple messages sequentially"""
         results = []

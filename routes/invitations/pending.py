@@ -29,6 +29,4 @@ async def get_pending_invitations(request: Request) -> list[InvitationResponseDT
         raise
     except Exception as e:
         logger.error(f"Error getting pending invitations: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to get pending invitations: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to get pending invitations: {str(e)}")

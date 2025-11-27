@@ -27,6 +27,4 @@ async def update_pinned_blocks(request: Request, data: UpdatePinnedBlocksDTO):
         raise
     except Exception as e:
         logger.error(f"Error updating pinned blocks: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to update pinned blocks: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to update pinned blocks: {str(e)}")

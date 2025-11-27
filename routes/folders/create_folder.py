@@ -26,6 +26,4 @@ async def create_folder(request: Request, data: CreateFolderDTO) -> FolderRespon
         raise
     except Exception as e:
         logger.error(f"Error creating folder: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to create folder: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to create folder: {str(e)}")

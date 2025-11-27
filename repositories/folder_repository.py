@@ -67,9 +67,7 @@ class FolderRepository:
         )
 
     @staticmethod
-    def update_folder(
-        client, folder_id: str, title=None, description=None, parent_folder_id=None
-    ):
+    def update_folder(client, folder_id: str, title=None, description=None, parent_folder_id=None):
         """Update folder"""
         return update_folder(client, folder_id, title, description, parent_folder_id)
 

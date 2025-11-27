@@ -70,7 +70,5 @@ class UpdateInvitationStatusDTO(BaseModel):
     def validate_status(cls, v: str) -> str:
         valid_statuses = ["accepted", "declined"]
         if v not in valid_statuses:
-            raise ValueError(
-                f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
-            )
+            raise ValueError(f"Invalid status. Must be one of: {', '.join(valid_statuses)}")
         return v

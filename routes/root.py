@@ -7,7 +7,6 @@ from config import settings
 router = APIRouter()
 
 
-
 @router.get("/")
 async def root():
     """Root endpoint - API status"""

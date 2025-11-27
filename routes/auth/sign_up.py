@@ -30,6 +30,4 @@ async def sign_up(sign_up_dto: SignUpDTO, request: Request, response: Response):
     except Exception as e:
         error_message = str(e)
         logger.error(f"Sign up error: {error_message}")
-        raise HTTPException(
-            status_code=500, detail=f"Error during sign up: {error_message}"
-        )
+        raise HTTPException(status_code=500, detail=f"Error during sign up: {error_message}")

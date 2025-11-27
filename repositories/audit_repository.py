@@ -47,7 +47,6 @@ class AuditRepository:
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
-            )
 
             current_chat_ids = list(set([msg["chat_provider_id"] for msg in (current_messages.data or []) if msg.get("chat_provider_id")]))
 
@@ -71,7 +70,6 @@ class AuditRepository:
                 .gte("created_at", trend_start.isoformat()) \
                 .lt("created_at", trend_end.isoformat()) \
                 .execute()
-            )
 
             trend_chat_ids = list(set([msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")]))
 
@@ -133,7 +131,6 @@ class AuditRepository:
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
-            )
 
             # Extract unique chat_provider_ids from messages in date range
             chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
@@ -173,7 +170,6 @@ class AuditRepository:
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
-            )
 
             current_chat_ids = list(set([msg["chat_provider_id"] for msg in (current_messages.data or []) if msg.get("chat_provider_id")]))
 
@@ -198,7 +194,6 @@ class AuditRepository:
                 .gte("created_at", trend_start.isoformat()) \
                 .lt("created_at", trend_end.isoformat()) \
                 .execute()
-            )
 
             trend_chat_ids = list(set([msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")]))
 
@@ -237,7 +232,6 @@ class AuditRepository:
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
-            )
 
             chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
 
@@ -273,7 +267,6 @@ class AuditRepository:
                 .gte("created_at", start_date.isoformat()) \
                 .lte("created_at", end_date.isoformat()) \
                 .execute()
-            )
 
             # Extract unique chat_provider_ids from messages in date range
             chat_provider_ids = list(set([msg["chat_provider_id"] for msg in (messages_response.data or []) if msg.get("chat_provider_id")]))
@@ -296,7 +289,6 @@ class AuditRepository:
                 .lte("created_at", end_date.isoformat()) \
                 .in_("overall_risk_level", ["high", "critical"]) \
                 .execute()
-            )
 
             return {
                 "messages": messages_response.data,
@@ -342,7 +334,6 @@ class AuditRepository:
                 .order("quality_score", desc=True) \
                 .limit(limit) \
                 .execute()
-            )
 
             # Get message content for these chats
             if chats_response.data:
@@ -355,7 +346,6 @@ class AuditRepository:
                         .select("message_provider_id, content, created_at") \
                         .in_("message_provider_id", message_ids) \
                         .execute()
-                    )
 
                     # Add created_at from messages to chats
                     msg_dates = {msg["message_provider_id"]: msg["created_at"] for msg in (messages_response.data or [])}
@@ -395,7 +385,6 @@ class AuditRepository:
                 .order("overall_risk_score", desc=True) \
                 .limit(limit) \
                 .execute()
-            )
 
             # Get message content and user info
             if risks_response.data:
