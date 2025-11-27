@@ -276,9 +276,8 @@ class TemplateRepository:
             user_id = comment_data.get("user_id")
             user_info = users_map.get(user_id, {"name": "Unknown", "profile_picture_url": None})
 
-            content = comment_data.get("content")
-            if isinstance(content, dict):
-                content = content.get(locale) or content.get("en") or next(iter(content.values()), "")
+            # Use LocaleService for consistent localization
+            content = LocaleService.localize_string(comment_data.get("content"), locale)
 
             author = TemplateCommentAuthor(
                 id=user_id,
@@ -288,7 +287,7 @@ class TemplateRepository:
 
             return TemplateComment(
                 id=comment_data.get("id"),
-                text=content if isinstance(content, str) else "",
+                text=content,
                 parent_id=comment_data.get("parent_comment_id"),
                 version_id=comment_data.get("version_id"),
                 created_at=comment_data.get("created_at"),
