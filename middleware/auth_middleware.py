@@ -3,10 +3,10 @@ import logging
 from fastapi import Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
+from supabase import ClientOptions, create_client
 
 from core.supabase import SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL
 from services import AuthService
-from supabase import ClientOptions, create_client
 from utils.auth_helpers import ACCESS_COOKIE_KEY
 
 logger = logging.getLogger(__name__)

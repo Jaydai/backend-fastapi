@@ -1,5 +1,7 @@
 """Pinned folders service"""
 
+from supabase import Client
+
 from dtos import FolderResponseDTO, UpdatePinnedFoldersDTO
 from mappers.folder_mapper import FolderMapper
 from repositories.folders import get_folder_by_id, get_pinned_folder_ids
@@ -7,7 +9,6 @@ from repositories.folders import pin_folder as repo_pin_folder
 from repositories.folders import unpin_folder as repo_unpin_folder
 from repositories.folders import update_pinned_folders as repo_update_pinned_folders
 from services.locale_service import LocaleService
-from supabase import Client
 
 
 def get_pinned_folders(

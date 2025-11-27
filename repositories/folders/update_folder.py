@@ -1,7 +1,8 @@
 """Update folder"""
 
-from domains.entities import Folder
 from supabase import Client
+
+from domains.entities import Folder
 
 
 def update_folder(

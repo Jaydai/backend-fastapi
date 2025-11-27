@@ -1,3 +1,5 @@
+from supabase import Client
+
 from dtos import (
     CreateFolderDTO,
     FolderResponseDTO,

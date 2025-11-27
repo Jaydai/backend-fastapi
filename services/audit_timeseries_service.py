@@ -7,6 +7,8 @@ import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
 
+from supabase import Client
+
 from dtos.audit_dto import (
     AdoptionCurveDataDTO,
     AdoptionCurveResponseDTO,
@@ -24,7 +26,6 @@ from dtos.audit_dto import (
     TimeSeriesDataPointDTO,
 )
 from repositories.team_repository import TeamRepository
-from supabase import Client
 
 logger = logging.getLogger(__name__)
 

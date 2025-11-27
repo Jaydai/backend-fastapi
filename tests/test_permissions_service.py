@@ -17,10 +17,10 @@ import uuid
 
 import dotenv
 import pytest
+from supabase import Client, create_client
 
 from domains.enums import PermissionEnum, RoleEnum
 from services import PermissionService
-from supabase import Client, create_client
 
 # Load .env pour obtenir les clés Supabase
 dotenv.load_dotenv()

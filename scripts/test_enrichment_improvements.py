@@ -6,7 +6,6 @@ import os
 from typing import Any
 
 import requests
-
 from supabase import Client, ClientOptions, create_client
 
 LOGGER = logging.getLogger(__name__)

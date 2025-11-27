@@ -6,6 +6,8 @@ Orchestrates parallel data fetching and aggregation
 import logging
 from datetime import datetime, timedelta
 
+from supabase import Client
+
 from dtos.audit_dto import (
     IntentStatsWithContextDTO,
     OrganizationAuditResponseDTO,
@@ -18,7 +20,6 @@ from dtos.audit_dto import (
     UsageStatsWithContextDTO,
 )
 from repositories.audit_repository import AuditRepository
-from supabase import Client
 from utils.enrichment import (
     aggregate_intent_stats,
     aggregate_quality_stats,

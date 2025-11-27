@@ -1,7 +1,8 @@
+from supabase import Client
+
 from domains.entities import UserOrganizationRole
 from dtos import UpdateUserProfileDTO, UserProfileResponseDTO
 from repositories import UserRepository
-from supabase import Client
 
 
 class UserService:

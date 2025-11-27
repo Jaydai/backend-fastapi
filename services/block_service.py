@@ -1,3 +1,5 @@
+from supabase import Client
+
 from dtos import (
     BlockResponseDTO,
     BlockTitleResponseDTO,
@@ -9,7 +11,6 @@ from dtos import (
 from mappers.block_mapper import BlockMapper
 from repositories.block_repository import BlockRepository
 from services.locale_service import LocaleService
-from supabase import Client
 
 
 class BlockService:

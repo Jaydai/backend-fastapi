@@ -1,3 +1,5 @@
+from supabase import Client
+
 from domains.entities import Organization, OrganizationDetail, OrganizationInvitation, OrganizationMember
 from dtos import (
     InvitationResponseDTO,
@@ -6,7 +8,6 @@ from dtos import (
     OrganizationResponseDTO,
 )
 from repositories import OrganizationRepository
-from supabase import Client
 
 
 class OrganizationService:

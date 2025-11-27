@@ -1,5 +1,6 @@
-from domains.entities.onboarding_entities import OnboardingStatus
 from supabase import Client
+
+from domains.entities.onboarding_entities import OnboardingStatus
 
 
 class OnboardingRepository:

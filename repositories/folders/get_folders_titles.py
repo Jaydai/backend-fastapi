@@ -1,7 +1,8 @@
 """Get folder titles repository"""
 
-from domains.entities import FolderTitle
 from supabase import Client
+
+from domains.entities import FolderTitle
 
 
 def get_folders_titles(

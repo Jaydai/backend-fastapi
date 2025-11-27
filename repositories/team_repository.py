@@ -2,8 +2,9 @@
 Repository for team-related database operations
 """
 
-from domains.entities.team_entities import Team, TeamMember, TeamTreeNode, UserTeamPermission
 from supabase import Client
+
+from domains.entities.team_entities import Team, TeamMember, TeamTreeNode, UserTeamPermission
 
 
 class TeamRepository:

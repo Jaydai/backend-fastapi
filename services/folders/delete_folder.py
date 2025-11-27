@@ -1,7 +1,8 @@
 """Delete folder service"""
 
-from repositories.folders import delete_folder as repo_delete_folder
 from supabase import Client
+
+from repositories.folders import delete_folder as repo_delete_folder
 
 
 def delete_folder(client: Client, folder_id: str) -> bool:

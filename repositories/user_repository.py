@@ -1,5 +1,6 @@
-from domains.entities import UserOrganizationRole, UserProfile
 from supabase import Client
+
+from domains.entities import UserOrganizationRole, UserProfile
 
 
 class UserRepository:

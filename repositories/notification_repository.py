@@ -1,7 +1,8 @@
 from datetime import UTC, datetime
 
-from domains.entities.notification_entities import Notification, NotificationMetadata
 from supabase import Client
+
+from domains.entities.notification_entities import Notification, NotificationMetadata
 
 
 class NotificationRepository:

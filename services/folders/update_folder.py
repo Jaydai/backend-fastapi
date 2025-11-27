@@ -1,10 +1,11 @@
 """Update folder service"""
 
+from supabase import Client
+
 from dtos import FolderResponseDTO, UpdateFolderDTO
 from mappers.folder_mapper import FolderMapper
 from repositories.folders import update_folder as repo_update_folder
 from services.locale_service import LocaleService
-from supabase import Client
 
 
 def update_folder(

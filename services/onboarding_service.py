@@ -1,6 +1,7 @@
+from supabase import Client
+
 from dtos.onboarding_dto import OnboardingStatusResponseDTO, UpdateOnboardingDTO
 from repositories.onboarding_repository import OnboardingRepository
-from supabase import Client
 
 
 class OnboardingService:

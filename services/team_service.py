@@ -2,9 +2,10 @@
 Service layer for team management
 """
 
+from supabase import Client
+
 from dtos.team_dto import OrganizationTeamsResponseDTO, TeamDTO, TeamMemberDTO, TeamTreeNodeDTO
 from repositories.team_repository import TeamRepository
-from supabase import Client
 
 
 class TeamService:

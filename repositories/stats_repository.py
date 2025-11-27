@@ -1,5 +1,6 @@
-from domains.entities.message_entities import Chat, Message
 from supabase import Client
+
+from domains.entities.message_entities import Chat, Message
 
 
 class StatsRepository:

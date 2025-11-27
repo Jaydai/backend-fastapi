@@ -1,7 +1,8 @@
 """Get folder by ID"""
 
-from domains.entities import Folder
 from supabase import Client
+
+from domains.entities import Folder
 
 
 def get_folder_by_id(client: Client, folder_id: str) -> Folder | None:

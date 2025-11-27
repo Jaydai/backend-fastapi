@@ -1,5 +1,6 @@
-from domains.entities import OrganizationInvitation
 from supabase import Client
+
+from domains.entities import OrganizationInvitation
 
 
 class InvitationRepository:

@@ -1,3 +1,5 @@
+from supabase import Client
+
 from domains.entities import (
     Organization,
     OrganizationDetail,
@@ -5,7 +7,6 @@ from domains.entities import (
     OrganizationMember,
     UserOrganizationRole,
 )
-from supabase import Client
 
 
 class OrganizationRepository:

@@ -2,6 +2,8 @@ import calendar
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 
+from supabase import Client
+
 from domains.entities.stats_entities import (
     ChatStatistics,
     DailyStats,
@@ -29,7 +31,6 @@ from dtos.stats_dto import (
 )
 from mappers.stats_mapper import StatsMapper
 from repositories.stats_repository import StatsRepository
-from supabase import Client
 from utils.stats_helpers import (
     CO2_PER_KWH,
     ENERGY_COST_PER_INPUT_TOKEN,

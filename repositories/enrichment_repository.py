@@ -5,6 +5,8 @@ Database operations only - no business logic
 
 import logging
 
+from supabase import Client
+
 from domains.entities.enrichment_entities import (
     EnrichedChat,
     EnrichedMessage,
@@ -13,7 +15,6 @@ from domains.entities.enrichment_entities import (
     RiskCategory,
     RiskIssue,
 )
-from supabase import Client
 
 logger = logging.getLogger(__name__)
 

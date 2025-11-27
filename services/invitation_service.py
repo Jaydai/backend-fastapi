@@ -1,8 +1,9 @@
 import logging
 
+from supabase import Client
+
 from dtos import InvitationResponseDTO
 from repositories import InvitationRepository
-from supabase import Client
 
 from .user_service import UserService
 

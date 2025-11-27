@@ -14,7 +14,6 @@ from repositories import TemplateRepository, PermissionRepository, TemplateVersi
 from mappers.template_mapper import TemplateMapper
 from services.locale_service import LocaleService
 from services.templates import create_template, get_templates_titles, update_template
-from supabase import Client
 
 
 class TemplateService:

@@ -1,6 +1,8 @@
 import logging
 from datetime import UTC, datetime
 
+from supabase import Client
+
 from dtos import (
     ChatBatchResultDTO,
     ChatResponseDTO,
@@ -10,7 +12,6 @@ from dtos import (
     SaveMessageDTO,
 )
 from repositories import ChatRepository, MessageRepository
-from supabase import Client
 
 logger = logging.getLogger(__name__)
 

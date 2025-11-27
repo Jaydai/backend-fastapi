@@ -1,7 +1,8 @@
 """Block repository - handles pure database operations for blocks"""
 
-from domains.entities import Block, BlockTitle
 from supabase import Client
+
+from domains.entities import Block, BlockTitle
 
 
 class BlockBaseRepository:

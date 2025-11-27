@@ -3,7 +3,6 @@ from supabase import Client
 from datetime import datetime
 from domains.entities import Template, TemplateTitle, TemplateComment
 from services.locale_service import LocaleService
-from supabase import Client
 
 
 class TemplateRepository:

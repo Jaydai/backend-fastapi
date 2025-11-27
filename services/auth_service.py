@@ -1,7 +1,8 @@
+from supabase import Client
+
 from domains.entities import Session, User
 from dtos import OAuthSignIn, RefreshTokenDTO, SignInDTO, SignUpDTO
 from repositories import AuthRepository
-from supabase import Client
 
 
 class AuthService:

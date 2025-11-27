@@ -7,6 +7,8 @@ import logging
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 
+from supabase import Client
+
 from dtos.audit_dto import (
     ModelDistributionItemDTO,
     ModelDistributionResponseDTO,
@@ -21,7 +23,6 @@ from dtos.audit_dto import (
     UsageByHourDataPointDTO,
     UsageByHourResponseDTO,
 )
-from supabase import Client
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,11 @@
 """Block title service - handles business logic for block list operations"""
 
+from supabase import Client
+
 from dtos import BlockTitleResponseDTO
 from repositories.blocks import BlockBaseRepository
 from services.locale_service import LocaleService
 from services.permissions import UserPermissionsService
-from supabase import Client
 
 
 class BlockTitleService:

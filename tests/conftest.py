@@ -8,9 +8,9 @@ import uuid
 import dotenv
 import pytest
 from fastapi.testclient import TestClient
+from supabase import Client, create_client
 
 from main import app
-from supabase import Client, create_client
 
 dotenv.load_dotenv()
 

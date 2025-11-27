@@ -1,3 +1,5 @@
+from supabase import Client
+
 from dtos.notification_dto import (
     MarkAllReadResponseDTO,
     NotificationMetadataDTO,
@@ -5,7 +7,6 @@ from dtos.notification_dto import (
     NotificationStatsResponseDTO,
 )
 from repositories.notification_repository import NotificationRepository
-from supabase import Client
 
 
 class NotificationService:

@@ -43,6 +43,7 @@ ignore = [
 # Configuration du tri des imports (ruff utilise les règles isort via la règle "I")
 [tool.ruff.lint.isort]
 known-first-party = ["config", "core", "domains", "dtos", "mappers", "middleware", "repositories", "routes", "services", "utils"]
+known-third-party = ["fastapi", "starlette", "supabase", "pydantic", "pytest", "dotenv"]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
 [tool.ruff.format]

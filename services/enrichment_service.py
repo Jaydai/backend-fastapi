@@ -6,6 +6,8 @@ Orchestrates classification, risk assessment, and data persistence
 import asyncio
 import logging
 
+from supabase import Client
+
 from dtos.enrichment_dto import (
     ChatEnrichmentRequestDTO,
     ChatEnrichmentResponseDTO,
@@ -18,7 +20,6 @@ from dtos.enrichment_dto import (
 )
 from repositories.enrichment_repository import EnrichmentRepository
 from services.enrichment import classification_service, risk_assessment_service
-from supabase import Client
 from utils.enrichment import (
     classification_to_enriched_chat,
     classification_to_response_dto,
