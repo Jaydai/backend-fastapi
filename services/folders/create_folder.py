@@ -17,8 +17,8 @@ def create_folder(
     if data.organization_id:
         workspace_type = "organization"
 
-    title_dict = FolderMapper.ensure_localized_dict(data.title, locale)
-    description_dict = FolderMapper.ensure_localized_dict(data.description, locale) if data.description else None
+    title_dict = LocaleService.ensure_localized_dict(data.title, locale)
+    description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
 
     folder = repo_create_folder(
         client,

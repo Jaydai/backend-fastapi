@@ -109,9 +109,9 @@ class TemplateService:
                 return None
             content_dict = source_version.content
         else:
-            content_dict = TemplateMapper.ensure_localized_dict(data.content, locale) if data.content else {locale: ""}
+            content_dict = LocaleService.ensure_localized_dict(data.content, locale) if data.content else {locale: ""}
 
-        change_notes_dict = TemplateMapper.ensure_localized_dict(data.change_notes, locale) if data.change_notes else None
+        change_notes_dict = LocaleService.ensure_localized_dict(data.change_notes, locale) if data.change_notes else None
 
         version = TemplateRepository.create_version(
             client,

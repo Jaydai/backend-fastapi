@@ -16,9 +16,9 @@ def create_template(
         if data.organization_id:
             workspace_type = "organization"
 
-        title_dict = TemplateMapper.ensure_localized_dict(data.title, locale)
-        description_dict = TemplateMapper.ensure_localized_dict(data.description, locale) if data.description else None
-        content_dict = TemplateMapper.ensure_localized_dict(data.content, locale)
+        title_dict = LocaleService.ensure_localized_dict(data.title, locale)
+        description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
+        content_dict = LocaleService.ensure_localized_dict(data.content, locale)
 
         template = TemplateRepository.create_template(
             client,

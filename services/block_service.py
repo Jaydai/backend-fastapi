@@ -83,9 +83,9 @@ class BlockService:
         if data.organization_id:
             workspace_type = "organization"
 
-        title_dict = BlockMapper.ensure_localized_dict(data.title, locale)
-        description_dict = BlockMapper.ensure_localized_dict(data.description, locale) if data.description else None
-        content_dict = BlockMapper.ensure_localized_dict(data.content, locale)
+        title_dict = LocaleService.ensure_localized_dict(data.title, locale)
+        description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
+        content_dict = LocaleService.ensure_localized_dict(data.content, locale)
 
         block = BlockRepository.create_block(
             client,
@@ -109,9 +109,9 @@ class BlockService:
         locale: str = LocaleService.DEFAULT_LOCALE
     ) -> BlockResponseDTO | None:
         block_type = data.type.value if data.type else None
-        title_dict = BlockMapper.ensure_localized_dict(data.title, locale) if data.title else None
-        description_dict = BlockMapper.ensure_localized_dict(data.description, locale) if data.description else None
-        content_dict = BlockMapper.ensure_localized_dict(data.content, locale) if data.content else None
+        title_dict = LocaleService.ensure_localized_dict(data.title, locale) if data.title else None
+        description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
+        content_dict = LocaleService.ensure_localized_dict(data.content, locale) if data.content else None
 
         block = BlockRepository.update_block(
             client,

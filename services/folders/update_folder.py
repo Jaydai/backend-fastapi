@@ -13,8 +13,8 @@ def update_folder(
     locale: str = LocaleService.DEFAULT_LOCALE
 ) -> FolderResponseDTO | None:
     """Update an existing folder"""
-    title_dict = FolderMapper.ensure_localized_dict(data.title, locale) if data.title else None
-    description_dict = FolderMapper.ensure_localized_dict(data.description, locale) if data.description else None
+    title_dict = LocaleService.ensure_localized_dict(data.title, locale) if data.title else None
+    description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
 
     folder = repo_update_folder(
         client,

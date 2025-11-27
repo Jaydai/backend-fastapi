@@ -17,8 +17,6 @@ from services.folders import (
     pin_folder,
     unpin_folder,
     update_pinned_folders,
-    get_root_items,
-    get_folder_items,
 )
 from repositories.folder_repository import FolderRepository
 from mappers.folder_mapper import FolderMapper
@@ -112,25 +110,3 @@ class FolderService:
     ) -> dict:
         """Update pinned folders"""
         return update_pinned_folders(client, user_id, data)
-
-    @staticmethod
-    def get_root_items(
-        client: Client,
-        user_id: str,
-        locale: str = LocaleService.DEFAULT_LOCALE,
-        workspace_type: str | None = None,
-        organization_id: str | None = None
-    ) -> FolderWithItemsDTO:
-        """Get root items"""
-        return get_root_items(client, user_id, locale, workspace_type, organization_id)
-
-    @staticmethod
-    def get_folder_items(
-        client: Client,
-        folder_id: str,
-        locale: str = LocaleService.DEFAULT_LOCALE,
-        limit: int | None = None,
-        offset: int = 0
-    ) -> FolderWithItemsDTO:
-        """Get folder items"""
-        return get_folder_items(client, folder_id, locale, limit, offset)
