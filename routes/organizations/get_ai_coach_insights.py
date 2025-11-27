@@ -21,7 +21,6 @@ async def get_ai_coach_insights(request: Request, organization_id: str):
     - Personalized recommendations
     """
     try:
-        user_id = request.state.user_id
         client = request.state.supabase_client
 
         # Get all users in this organization first

@@ -93,7 +93,7 @@ async def delete_template_version(request: Request, template_id: str, version_id
             )
 
         # Delete the version
-        delete_response = (
+        (
             supabase_client.table("prompt_templates_versions")
             .delete()
             .eq("id", version_id)

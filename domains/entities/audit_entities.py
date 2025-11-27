@@ -127,8 +127,8 @@ class RiskyPrompt:
     content_full: str  # Full content
     created_at: datetime
     user_whitelist: bool = False
-    user_email: Optional[str] = None
-    user_name: Optional[str] = None
+    user_email: str | None = None
+    user_name: str | None = None
 
 
 @dataclass

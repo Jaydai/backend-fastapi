@@ -3,7 +3,6 @@ from repositories.onboarding_repository import OnboardingRepository
 from supabase import Client
 
 
-
 class OnboardingService:
     @staticmethod
     def get_onboarding_status(
