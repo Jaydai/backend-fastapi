@@ -28,9 +28,15 @@ dotenv.load_dotenv()
 # Client Supabase avec SERVICE ROLE pour les tests (bypass RLS)
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SECRET_KEY")
-supabase_admin: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+# Create client only if credentials are available (not in CI mock mode)
+if SUPABASE_URL and SUPABASE_SERVICE_KEY:
+    supabase_admin: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+else:
+    supabase_admin: Client = None  # type: ignore
 
 
+@pytest.mark.requires_supabase
 class TestPermissionsServiceLayer:
     """Tests de cohérence permissions au niveau service"""
 
