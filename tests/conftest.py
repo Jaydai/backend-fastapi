@@ -4,12 +4,12 @@ Configuration pytest pour les tests backend-fastapi
 
 import os
 import uuid
+from unittest.mock import patch
 
 import dotenv
 import pytest
 from fastapi.testclient import TestClient
 from supabase import Client, create_client
-from unittest.mock import patch, MagicMock
 
 from tests.mocks import MockSupabaseClient
 
@@ -55,6 +55,7 @@ def mock_auth_service(shared_test_storage):
     Mock AuthService to accept mock tokens and create_client to use service key
     """
     from supabase import create_client as original_create_client
+
     import middleware.auth_middleware
 
     original_get_current_user_id = AuthService.get_current_user_id
