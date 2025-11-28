@@ -91,6 +91,10 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             request.state.user_id = user_id
             request.state.supabase_client = authenticated_client
 
+            # Extract organization_id from X-Organization-Id header if present
+            organization_id = request.headers.get("X-Organization-Id") or request.headers.get("x-organization-id")
+            request.state.organization_id = organization_id
+
         except Exception:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,

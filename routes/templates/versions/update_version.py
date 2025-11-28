@@ -14,9 +14,13 @@ logger = logging.getLogger(__name__)
 @router.patch("/{template_id}/versions/{version_id}", status_code=status.HTTP_200_OK, response_model=UpdateTemplateVersionDTO)
 @require_permission_in_organization(PermissionEnum.TEMPLATE_UPDATE)
 
-async def update_template_version(
-    request: Request, template_id: str, version_id: int, update_data: UpdateTemplateVersionDTO = Body(...)
+async def update_version(
+    request: Request,
+    template_id: str,
+    version_id: int,
+    update_data: UpdateTemplateVersionDTO
 ) -> dict:
+    print(f"❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️ update_data: {update_data}")
     try:
         user_id = request.state.user_id
         supabase_client = request.state.supabase_client

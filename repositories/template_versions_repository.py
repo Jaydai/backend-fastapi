@@ -113,14 +113,19 @@ class TemplateVersionRepository:
 
         if not update_data:
             return None
+        
+        data_to_update = {k: v for k, v in update_data.items() if v is not None}
+        
 
         update_response = (
             client.table("prompt_templates_versions")
-            .update(update_data)
+            .update(data_to_update)
             .eq("id", version_id)
             .eq("template_id", template_id)
             .execute()
         )
+
+        print(f"❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️ update_response: {update_response}")
 
         if not update_response.data:
             return None

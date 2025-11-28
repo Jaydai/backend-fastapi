@@ -64,18 +64,23 @@ class TemplateVersionService:
     ) -> UpdateTemplateVersionDTO | None:
         """Update version fields (content, description, status, is_default, published, optimized_for)"""
         # Convert content and description to localized dicts if provided
+        if update_data.is_default is True:
+            version_id = TemplateVersionRepository.set_default_version(client, version_id, template_id)
+            if not version_id:
+                return None
         content_dict = LocaleService.ensure_localized_dict(update_data.content, locale) if update_data.content is not None else None
         description_dict = (
             LocaleService.ensure_localized_dict(update_data.description, locale) if update_data.description is not None else None
         )
 
-        if update_data.is_default is True:
-            version_id = TemplateVersionRepository.set_default_version(client, version_id, template_id)
-            if not version_id:
-                return None
-
-        update_data["content"] = content_dict
-        update_data["description"] = description_dict
+        update_data = {
+            "content": content_dict,
+            "description": description_dict,
+            "status": update_data.status,
+            "is_default": update_data.is_default,
+            "published": update_data.published,
+            "optimized_for": update_data.optimized_for,
+        }
 
         updated_version = TemplateVersionRepository.update_version(
             client,
