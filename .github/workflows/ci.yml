@@ -43,16 +43,16 @@ jobs:
         run: |
           ruff format --check .
 
-      - name: Run pytest
+      - name: Run pytest (Mock Mode)
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL_PROD }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY_PROD }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SECRET_KEY_PROD }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY_PROD }}
-          FRONTEND_URL: ${{ secrets.FRONTEND_URL_PROD }}
+          # Run tests in mock mode without real Supabase connection
+          # This avoids dependency on external services and prevents pollution of production data
+          TESTING_MODE: "true"
           ENVIRONMENT: test
+          # Don't set SUPABASE_URL to force mock mode
         run: |
-          python -m pytest tests/ -v --tb=short
+          # Use CI-specific pytest configuration that skips Supabase-dependent tests
+          python -m pytest -c pytest.ci.ini tests/
         continue-on-error: false
 
   docker-build:

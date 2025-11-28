@@ -56,8 +56,8 @@ class TestAuthEndpoints:
         assert response.status_code in [400, 422, 500]
 
     def test_sign_in_success(self):
-        # Use existing user vincent@jayd.ai
-        payload = {"email": "vincent@jayd.ai", "password": "test1234"}
+        # Use existing user vincent+1@jayd.ai
+        payload = {"email": "vincent+1@jayd.ai", "password": "test1234"}
         response = self.client.post("/auth/sign_in", json=payload)
 
         assert response.status_code == 200
@@ -65,7 +65,7 @@ class TestAuthEndpoints:
         assert "access_token" in response.cookies or "set-cookie" in response.headers
 
     def test_sign_in_wrong_password(self):
-        payload = {"email": "vincent@jayd.ai", "password": "wrongpassword"}
+        payload = {"email": "vincent+1@jayd.ai", "password": "wrongpassword"}
         response = self.client.post("/auth/sign_in", json=payload)
         assert response.status_code in [400, 401, 403]
 
@@ -81,7 +81,7 @@ class TestAuthEndpoints:
 
     def test_sign_out_success(self):
         # First sign in
-        sign_in_response = self.client.post("/auth/sign_in", json={"email": "vincent@jayd.ai", "password": "test1234"})
+        sign_in_response = self.client.post("/auth/sign_in", json={"email": "vincent+1@jayd.ai", "password": "test1234"})
 
         # Extract cookie values directly (secure cookies don't forward in TestClient)
         cookies = {
@@ -105,7 +105,7 @@ class TestAuthEndpoints:
 
     def test_refresh_token_success(self):
         # Sign in first to get refresh token
-        sign_in_response = self.client.post("/auth/sign_in", json={"email": "vincent@jayd.ai", "password": "test1234"})
+        sign_in_response = self.client.post("/auth/sign_in", json={"email": "vincent+1@jayd.ai", "password": "test1234"})
 
         # Extract cookie values directly (secure cookies don't forward in TestClient)
         cookies = {
@@ -130,7 +130,7 @@ class TestAuthEndpoints:
 
     def test_forgot_password_not_implemented(self):
         # This endpoint is marked as 501 Not Implemented
-        payload = {"email": "vincent@jayd.ai"}
+        payload = {"email": "vincent+1@jayd.ai"}
         response = self.client.post("/auth/forgot-password", json=payload)
         assert response.status_code == 501
 

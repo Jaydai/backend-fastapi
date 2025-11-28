@@ -45,7 +45,7 @@ class TestTemplatesEndpoints:
                 supabase_admin.table("prompt_templates").delete().eq("id", template_id).execute()
 
             # DO NOT delete the organization - we're reusing Jaydai organization
-            # DO NOT delete the user - we're reusing vincent@jayd.ai
+            # DO NOT delete the user - we're reusing vincent+1@jayd.ai
         except Exception as e:
             print(f"Cleanup warning: {e}")
 

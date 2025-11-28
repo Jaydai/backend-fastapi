@@ -45,7 +45,7 @@ class TestBlocksEndpoints:
                 supabase_admin.table("prompt_blocks").delete().eq("id", block_id).execute()
 
             # DO NOT delete the organization - we're reusing Jaydai organization
-            # DO NOT delete the user - we're reusing vincent@jayd.ai
+            # DO NOT delete the user - we're reusing vincent+1@jayd.ai
             # Role assignments will remain for the user
         except Exception as e:
             print(f"Cleanup warning: {e}")
@@ -255,6 +255,7 @@ class TestBlocksEndpoints:
         assert isinstance(blocks, list)
         assert all(b["type"] == "context" for b in blocks)
 
+    @pytest.mark.requires_supabase
     def test_get_blocks_with_filters(self):
         block1 = self.post("/blocks", json={"type": "context", "title": "User Block", "content": "Content"})
         self.block_ids_to_cleanup.append(block1.json()["id"])

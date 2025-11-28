@@ -34,6 +34,7 @@ class TestInvitationsEndpoints:
 
         yield
 
+    @pytest.mark.requires_supabase
     def test_get_pending_invitations_success(self):
         response = self.get("/invitations/pending")
 

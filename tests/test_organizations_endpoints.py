@@ -116,6 +116,7 @@ class TestOrganizationsEndpoints:
         response = client_no_auth.delete(f"/organizations/{self.org_id}")
         assert response.status_code in [401, 403, 501]
 
+    @pytest.mark.requires_supabase
     def test_get_organization_members_success(self):
         response = self.get(f"/organizations/{self.org_id}/members")
 
@@ -159,6 +160,7 @@ class TestOrganizationsEndpoints:
         )
         assert response.status_code in [401, 403, 501]
 
+    @pytest.mark.requires_supabase
     def test_update_member_role_success(self):
         payload = {"role": "admin"}
         response = self.patch(f"/organizations/{self.org_id}/members/{self.user_id}/role", json=payload)
@@ -209,6 +211,7 @@ class TestOrganizationsEndpoints:
             data = response.json()
             assert isinstance(data, list)
 
+    @pytest.mark.requires_supabase
     def test_get_organization_invitations_not_found(self):
         fake_id = str(uuid.uuid4())
         response = self.get(f"/organizations/{fake_id}/invitations")
