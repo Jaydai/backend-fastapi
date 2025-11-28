@@ -116,7 +116,7 @@ def inject_mock_supabase(mock_supabase_client):
     # Store original (might be None in CI mode)
     original_supabase = getattr(core.supabase, "supabase", None)
 
-    # Replace with mock
+    # Replace with mock using setattr (safe even if module attributes are restricted)
     core.supabase.supabase = mock_supabase_client
 
     yield

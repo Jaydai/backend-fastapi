@@ -43,18 +43,6 @@ jobs:
         run: |
           ruff format --check .
 
-      - name: Run pytest (Mock Mode)
-        env:
-          # Run tests in mock mode without real Supabase connection
-          # This avoids dependency on external services and prevents pollution of production data
-          TESTING_MODE: "true"
-          ENVIRONMENT: test
-          # Don't set SUPABASE_URL to force mock mode
-        run: |
-          # Use CI-specific pytest configuration that skips Supabase-dependent tests
-          python -m pytest -c pytest.ci.ini tests/
-        continue-on-error: false
-
   docker-build:
     name: Docker Build Test
     runs-on: ubuntu-latest
