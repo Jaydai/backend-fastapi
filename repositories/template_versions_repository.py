@@ -44,13 +44,18 @@ class TemplateVersionRepository:
 
     @staticmethod
     def get_version_by_id(client: Client, version_id: int) -> VersionDetails | None:
-        response = client.table("prompt_templates_versions").select("id, optimized_for, published, status, content").eq("id", version_id).execute()
-
+        response = client.table("prompt_templates_versions").select("id, optimized_for, published, status, description, content").eq("id", version_id).execute()
         if not response.data:
             return None
-
         data = response.data[0]
-        return VersionDetails(**data)
+        return VersionDetails(
+            id=data["id"],
+            optimized_for=data["optimized_for"],
+            published=data["published"],
+            status=data["status"],
+            description=data["description"],
+            content=data["content"],
+        )
 
     @staticmethod
     def create_version(

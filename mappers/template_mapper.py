@@ -67,6 +67,7 @@ class TemplateMapper:
         """Map version entity to TemplateVersionDTO for fetching version content"""
         return TemplateVersionDTO(
             id=version.id,
+            description=LocaleService.localize_string(version.description, locale) if version.description else None,
             content=LocaleService.localize_string(version.content, locale),
             status=version.status,
             published=version.published,

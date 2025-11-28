@@ -41,6 +41,7 @@ class VersionSummary:
 class VersionDetails:
     id: int
     content: dict[str, str]
+    description: dict[str, str] | None
     status: str
     published: bool
     optimized_for: list[str] | None

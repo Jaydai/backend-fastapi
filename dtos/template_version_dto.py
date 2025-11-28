@@ -12,6 +12,7 @@ class TemplateVersionDTO(BaseModel):
     published: bool
     optimized_for: list[str] | None = None
     content: str
+    description: str | None = None
 
 
 class UpdateTemplateVersionDTO(BaseModel):
