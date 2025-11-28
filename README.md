@@ -31,8 +31,12 @@ ruff format .
 
 #### Exécuter les tests
 
+Ce projet supporte deux modes de test :
+
+**1. Mode local avec Supabase (recommandé pour développement)**
 ```bash
-# Exécuter tous les tests
+# Exécuter tous les tests avec connexion Supabase réelle
+# Nécessite .env avec SUPABASE_URL et SUPABASE_SECRET_KEY
 python3 -m pytest -v
 
 # Exécuter un fichier de tests spécifique
@@ -41,6 +45,20 @@ python3 -m pytest tests/test_locale_service.py -v
 # Exécuter les tests avec coverage
 python3 -m pytest --cov=routes --cov=services --cov=repositories --cov=mappers
 ```
+
+**2. Mode Mock (utilisé en CI, pas de connexion Supabase)**
+```bash
+# Exécuter les tests en mode mock uniquement (skip tests nécessitant Supabase)
+# Pas besoin de .env, utilise des mocks
+python3 -m pytest -c pytest.ci.ini tests/
+
+# Les tests marqués @pytest.mark.requires_supabase seront skippés
+```
+
+**Markers de tests disponibles :**
+- `@pytest.mark.requires_supabase` : Tests nécessitant une vraie connexion Supabase (skippés en CI)
+- `@pytest.mark.integration` : Tests d'intégration nécessitant Supabase
+- `@pytest.mark.slow` : Tests lents (peuvent être skippés avec `-m "not slow"`)
 
 #### Workflow recommandé avant commit
 

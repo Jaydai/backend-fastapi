@@ -17,7 +17,12 @@ SUPABASE_PUBLISHABLE_KEY = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 SUPABASE_SECRET_KEY = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 # Initialize service role Supabase client (for admin operations)
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+# In test mode without SUPABASE_URL, this will be replaced by mock in conftest.py
+if SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+else:
+    # Placeholder for testing mode - will be replaced by mock in conftest.py
+    supabase: Client = None  # type: ignore
 
 
 def create_authenticated_client(access_token: str) -> Client:
@@ -31,6 +36,9 @@ def create_authenticated_client(access_token: str) -> Client:
     Returns:
         Authenticated Supabase client
     """
+    if not SUPABASE_URL or not SUPABASE_PUBLISHABLE_KEY:
+        # In test mode, return the mock client
+        return supabase  # type: ignore
     options = ClientOptions()
     options.headers = {"Authorization": f"Bearer {access_token}"}
     return create_client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, options)
