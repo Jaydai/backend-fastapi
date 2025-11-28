@@ -113,8 +113,8 @@ def inject_mock_supabase(mock_supabase_client):
 
     import core.supabase
 
-    # Store original
-    original_supabase = core.supabase.supabase
+    # Store original (might be None in CI mode)
+    original_supabase = getattr(core.supabase, "supabase", None)
 
     # Replace with mock
     core.supabase.supabase = mock_supabase_client
