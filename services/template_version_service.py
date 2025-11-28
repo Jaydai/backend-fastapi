@@ -77,7 +77,7 @@ class TemplateVersionService:
 
         # Create entity for repository
         version_update = TemplateVersionUpdate(
-            name=None,  # Not updatable via this endpoint
+            name=update_data.name,
             content=content_dict,
             description=description_dict,
             status=update_data.status,
@@ -87,7 +87,7 @@ class TemplateVersionService:
         )
 
         # Only call update if there's something to update
-        has_updates = any([content_dict, description_dict, update_data.status, update_data.published, update_data.optimized_for])
+        has_updates = any([update_data.name, content_dict, description_dict, update_data.status, update_data.published, update_data.optimized_for])
         if has_updates:
             updated = TemplateVersionRepository.update_version(
                 client,
@@ -100,4 +100,21 @@ class TemplateVersionService:
 
         # Return the original update_data as confirmation
         return update_data
+
+    @staticmethod
+    def delete_version(client: Client, version_id: int, template_id: str) -> dict:
+        """Delete a template version. Cannot delete the default version."""
+        # Check if version exists and is not default
+        version = TemplateVersionRepository.get_version_details(client, version_id, template_id)
+        if not version:
+            return {"error": "not_found"}
+
+        if version.get("is_default"):
+            return {"error": "is_default"}
+
+        success = TemplateVersionRepository.delete_version(client, version_id, template_id)
+        if not success:
+            return {"error": "delete_failed"}
+
+        return {"success": True}
 

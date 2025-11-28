@@ -127,3 +127,32 @@ class TemplateVersionRepository:
         )
 
         return bool(update_response.data)
+
+    @staticmethod
+    def get_version_details(client: Client, version_id: int, template_id: str) -> dict | None:
+        """Get version details including is_default status."""
+        response = (
+            client.table("prompt_templates_versions")
+            .select("id, name, is_default")
+            .eq("id", version_id)
+            .eq("template_id", template_id)
+            .execute()
+        )
+
+        if not response.data:
+            return None
+
+        return response.data[0]
+
+    @staticmethod
+    def delete_version(client: Client, version_id: int, template_id: str) -> bool:
+        """Delete a template version."""
+        response = (
+            client.table("prompt_templates_versions")
+            .delete()
+            .eq("id", version_id)
+            .eq("template_id", template_id)
+            .execute()
+        )
+
+        return bool(response.data)

@@ -13,6 +13,7 @@ class TemplateVersionContentDTO(BaseModel):
 
 
 class UpdateTemplateVersionDTO(BaseModel):
+    name: str | None = None
     content: str | None = None
     description: str | None = None
     status: str | None = None
