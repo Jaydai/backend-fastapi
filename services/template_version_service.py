@@ -1,6 +1,6 @@
 from supabase import Client
 
-from domains.entities import TemplateVersion, VersionSummary
+from domains.entities import TemplateVersionUpdate, VersionSummary
 from dtos import CreateTemplateVersionDTO, CreateVersionDTO, TemplateVersionContentDTO, UpdateTemplateVersionDTO
 from mappers.template_mapper import TemplateMapper
 from repositories import TemplateVersionRepository
@@ -63,33 +63,41 @@ class TemplateVersionService:
         locale: str = LocaleService.DEFAULT_LOCALE,
     ) -> UpdateTemplateVersionDTO | None:
         """Update version fields (content, description, status, is_default, published, optimized_for)"""
-        # Convert content and description to localized dicts if provided
+        # Handle setting as default first
         if update_data.is_default is True:
-            version_id = TemplateVersionRepository.set_default_version(client, version_id, template_id)
-            if not version_id:
+            result = TemplateVersionRepository.set_default_version(client, version_id, template_id)
+            if not result:
                 return None
+
+        # Convert content and description to localized dicts if provided
         content_dict = LocaleService.ensure_localized_dict(update_data.content, locale) if update_data.content is not None else None
         description_dict = (
             LocaleService.ensure_localized_dict(update_data.description, locale) if update_data.description is not None else None
         )
 
-        update_data = {
-            "content": content_dict,
-            "description": description_dict,
-            "status": update_data.status,
-            "is_default": update_data.is_default,
-            "published": update_data.published,
-            "optimized_for": update_data.optimized_for,
-        }
-
-        updated_version = TemplateVersionRepository.update_version(
-            client,
-            version_id,
-            template_id,
-            update_data
+        # Create entity for repository
+        version_update = TemplateVersionUpdate(
+            name=None,  # Not updatable via this endpoint
+            content=content_dict,
+            description=description_dict,
+            status=update_data.status,
+            is_default=None,  # Already handled above
+            published=update_data.published,
+            optimized_for=update_data.optimized_for,
         )
 
-        if not updated_version:
-            return None
-        return TemplateMapper.update_version_entity_to_dto(updated_version, locale)
+        # Only call update if there's something to update
+        has_updates = any([content_dict, description_dict, update_data.status, update_data.published, update_data.optimized_for])
+        if has_updates:
+            updated = TemplateVersionRepository.update_version(
+                client,
+                version_id,
+                template_id,
+                version_update
+            )
+            if not updated:
+                return None
+
+        # Return the original update_data as confirmation
+        return update_data
 

@@ -1,5 +1,6 @@
 from supabase import Client
 
+from domains.entities import TemplateVersionUpdate
 from dtos import (
     CreateTemplateDTO,
     TemplateCountsResponseDTO,
@@ -133,21 +134,24 @@ class TemplateService:
 
         if content_updated or status_updated:
             if data.version_id:
-                version_update_data = {}
-                if content_updated:
-                    version_update_data["content"] = LocaleService.ensure_localized_dict(data.content, locale)
-                if status_updated:
-                    version_update_data["status"] = data.status
+                version_update = TemplateVersionUpdate(
+                    name=None,
+                    content=LocaleService.ensure_localized_dict(data.content, locale) if content_updated else None,
+                    description=None,
+                    status=data.status if status_updated else None,
+                    is_default=None,
+                    published=None,
+                    optimized_for=None,
+                )
 
-                version = TemplateRepository.update_version(
+                success = TemplateVersionRepository.update_version(
                     client,
                     data.version_id,
                     template_id,
-                    content=version_update_data.get("content"),
-                    status=version_update_data.get("status"),
+                    version_update,
                 )
 
-                if not version:
+                if not success:
                     return None
             else:
                 if content_updated:
@@ -184,7 +188,7 @@ class TemplateService:
         if data.is_pinned is not None:
             TemplateRepository.update_pinned_status(client, template.user_id, template_id, data.is_pinned)
 
-        return TemplateService.get_template_by_id(client, template_id, locale)
+        return TemplateService.get_template_by_id(client, template_id, locale=locale)
 
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:

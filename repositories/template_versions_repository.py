@@ -1,5 +1,7 @@
 """Template version repository - handles version database operations"""
 
+from dataclasses import asdict
+
 from supabase import Client
 
 from domains.entities import TemplateVersion, TemplateVersionUpdate, VersionContent, VersionSummary
@@ -108,26 +110,20 @@ class TemplateVersionRepository:
         version_id: int,
         template_id: str,
         update_data: TemplateVersionUpdate
-    ) -> TemplateVersionUpdate | None:
-        """Update version fields. Handles is_default by unsetting other versions first."""
+    ) -> bool:
+        """Update version fields."""
+        # Convert dataclass to dict and filter out None values
+        data_dict = {k: v for k, v in asdict(update_data).items() if v is not None}
 
-        if not update_data:
-            return None
-        
-        data_to_update = {k: v for k, v in update_data.items() if v is not None}
-        
+        if not data_dict:
+            return False
 
         update_response = (
             client.table("prompt_templates_versions")
-            .update(data_to_update)
+            .update(data_dict)
             .eq("id", version_id)
             .eq("template_id", template_id)
             .execute()
         )
 
-        print(f"❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️ update_response: {update_response}")
-
-        if not update_response.data:
-            return None
-
-        return update_data
+        return bool(update_response.data)
