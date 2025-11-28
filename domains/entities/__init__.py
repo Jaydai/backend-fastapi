@@ -1,6 +1,6 @@
 from .auth_entities import Session, User
-from .block_entities import Block
-from .folder_entities import Folder, FolderWithItems
+from .block_entities import Block, BlockTitle
+from .folder_entities import Folder, FolderWithItems, FolderTitle
 from .message_entities import Chat, Message
 from .organizations import (
     Organization,
@@ -14,7 +14,6 @@ from .template_entities import (
     TemplateComment,
     TemplateCommentAuthor,
     TemplateTitle,
-    TemplateWithVersions,
 )
 from .template_version_entities import TemplateVersion, VersionContent, VersionSummary
 from .user_entities import UserProfile

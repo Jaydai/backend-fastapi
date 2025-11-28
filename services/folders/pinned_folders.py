@@ -11,7 +11,7 @@ from repositories.folders import update_pinned_folders as repo_update_pinned_fol
 from services.locale_service import LocaleService
 
 
-def get_pinned_folders(
+def get_pinned_folder_ids(
     client: Client, user_id: str, locale: str = LocaleService.DEFAULT_LOCALE
 ) -> list[FolderResponseDTO]:
     """Get all pinned folders for a user"""

@@ -12,7 +12,7 @@ from services.folders import (
     create_folder,
     delete_folder,
     get_folder_by_id,
-    get_pinned_folders,
+    get_pinned_folder_ids,
     pin_folder,
     unpin_folder,
     update_folder,
@@ -91,11 +91,11 @@ class FolderService:
         return delete_folder(client, folder_id)
 
     @staticmethod
-    def get_pinned_folders(
+    def get_pinned_folder_ids(
         client: Client, user_id: str, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> list[FolderResponseDTO]:
         """Get pinned folders"""
-        return get_pinned_folders(client, user_id, locale)
+        return get_pinned_folder_ids(client, user_id, locale)
 
     @staticmethod
     def pin_folder(client: Client, user_id: str, folder_id: str) -> dict:

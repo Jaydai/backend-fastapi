@@ -203,7 +203,7 @@ class TestFoldersEndpoints:
         data = response.json()
         assert data["pinned"] is False
 
-    def test_get_pinned_folders(self):
+    def test_get_pinned_folder_ids(self):
         create_response1 = self.post("/folders", json={"title": "Pinned 1"})
         folder_id1 = create_response1.json()["id"]
         self.folder_ids_to_cleanup.append(folder_id1)

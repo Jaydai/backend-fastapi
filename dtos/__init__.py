@@ -53,13 +53,14 @@ from .permission_dto import (
 )
 from .template_dto import (
     CreateTemplateDTO,
+    UpdateTemplateDTO,
+    UsageResponseDTO,
     CreateVersionDTO,
     OrganizationTemplateTitleDTO,
     TemplateCommentAuthorDTO,
     TemplateCommentDTO,
     TemplateCountsResponseDTO,
     TemplateListItemDTO,
-    TemplateMetadataDTO,
     TemplateResponseDTO,
     TemplateTitleResponseDTO,
     VersionSummary,

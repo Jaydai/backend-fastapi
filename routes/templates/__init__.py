@@ -7,7 +7,6 @@ from . import (  # noqa: E402
     create_version,
     delete_template,
     get_template_by_id,
-    get_version_by_slug,
     get_versions,
     set_default_version,
     track_usage,

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/pinned", response_model=list[FolderResponseDTO], status_code=status.HTTP_200_OK)
-async def get_pinned_folders(request: Request) -> list[FolderResponseDTO]:
+async def get_pinned_folder_ids(request: Request) -> list[FolderResponseDTO]:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
@@ -19,7 +19,7 @@ async def get_pinned_folders(request: Request) -> list[FolderResponseDTO]:
 
         logger.info(f"User {user_id} getting pinned folders")
 
-        folders = FolderService.get_pinned_folders(client, user_id, locale)
+        folders = FolderService.get_pinned_folder_ids(client, user_id, locale)
 
         return folders
     except HTTPException:
