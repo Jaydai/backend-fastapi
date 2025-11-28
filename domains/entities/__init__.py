@@ -15,7 +15,7 @@ from .template_entities import (
     TemplateCommentAuthor,
     TemplateTitle,
 )
-from .template_version_entities import TemplateVersion, VersionContent, VersionSummary
+from .template_version_entities import TemplateVersion, TemplateVersionUpdate, VersionContent, VersionSummary
 from .user_entities import UserProfile
 
 __all__ = [
@@ -24,6 +24,7 @@ __all__ = [
     "ROLE_PERMISSIONS",
     "UserOrganizationRole",
     "Template",
+    "TemplateVersionUpdate",
     "VersionSummary",
     "VersionContent",
     "TemplateVersion",

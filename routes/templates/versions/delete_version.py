@@ -44,7 +44,7 @@ async def delete_template_version(request: Request, template_id: str, version_id
         # First, check if the version exists and get its details
         version_response = (
             supabase_client.table("prompt_templates_versions")
-            .select("id, template_id, name, is_current")
+            .select("id, template_id, name, is_default")
             .eq("id", version_id)
             .eq("template_id", template_id)
             .single()
@@ -57,7 +57,7 @@ async def delete_template_version(request: Request, template_id: str, version_id
         version = version_response.data
 
         # Prevent deletion of the current/default version
-        if version.get("is_current"):
+        if version.get("is_default"):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot delete the current version. Please set another version as current first.",

@@ -1,10 +1,11 @@
-from domains.entities import Template, TemplateComment, TemplateCommentAuthor, VersionContent, VersionSummary
+from domains.entities import Template, TemplateComment, TemplateCommentAuthor, TemplateVersionUpdate, VersionContent, VersionSummary
 from dtos import (
     TemplateCommentAuthorDTO,
     TemplateCommentDTO,
     TemplateListItemDTO,
     TemplateResponseDTO,
     TemplateVersionContentDTO,
+    UpdateTemplateVersionDTO,
 )
 from services.locale_service import LocaleService
 
@@ -38,7 +39,7 @@ class TemplateMapper:
                 id=v.id,
                 name=LocaleService.localize_string(v.name, locale),
                 slug=v.slug,
-                is_current=v.is_current,
+                is_default=v.is_default,
                 status=v.status,
                 optimized_for=v.optimized_for,
                 published=v.published,
@@ -68,6 +69,17 @@ class TemplateMapper:
     ) -> TemplateVersionContentDTO:
         """Map version entity to TemplateVersionContentDTO for fetching version content"""
         return TemplateVersionContentDTO(id=version.id, content=LocaleService.localize_string(version.content, locale))
+
+    @staticmethod
+    def update_version_entity_to_dto(version: TemplateVersionUpdate, locale: str = LocaleService.DEFAULT_LOCALE) -> UpdateTemplateVersionDTO:
+        return UpdateTemplateVersionDTO(
+            content=LocaleService.localize_string(version.content, locale),
+            description=LocaleService.localize_string(version.description, locale),
+            status=version.status,
+            is_default=version.is_default,
+            published=version.published,
+            optimized_for=version.optimized_for,
+        )
 
     @staticmethod
     def comment_author_entity_to_dto(author: TemplateCommentAuthor) -> TemplateCommentAuthorDTO:

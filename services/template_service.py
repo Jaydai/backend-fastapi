@@ -104,7 +104,7 @@ class TemplateService:
                 user_id,
                 content_dict,
                 name="1.0",
-                change_notes=None,
+                description=None,
                 status="draft" if workspace_type != "user" else "published",
                 optimized_for=data.optimized_for,
             )
@@ -157,7 +157,7 @@ class TemplateService:
                         template_id,
                         template.user_id,
                         content_dict,
-                        change_notes=None,
+                        description=None,
                         status=data.status or "draft",
                     )
                     TemplateRepository.update_template(

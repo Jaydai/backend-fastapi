@@ -227,9 +227,9 @@ BEGIN
             version_number,
             content,
             author_id,
-            is_current,
+            is_default,
             status,
-            change_notes,
+            description,
             usage_count
         ) VALUES (
             NEW.id,
@@ -312,12 +312,12 @@ CREATE OR REPLACE FUNCTION "public"."ensure_single_current_version"() RETURNS "t
     AS $$
 BEGIN
     -- If this version is being set as current, unset all other current versions for this template
-    IF NEW.is_current = true THEN
+    IF NEW.is_default = true THEN
         UPDATE public.prompt_templates_versions 
-        SET is_current = false, updated_at = now()
+        SET is_default = false, updated_at = now()
         WHERE template_id = NEW.template_id 
         AND id != NEW.id 
-        AND is_current = true;
+        AND is_default = true;
     END IF;
     
     RETURN NEW;
@@ -669,7 +669,7 @@ CREATE OR REPLACE FUNCTION "public"."update_current_version_id"() RETURNS "trigg
     LANGUAGE "plpgsql"
     AS $$
 BEGIN
-    IF NEW.is_current = TRUE THEN
+    IF NEW.is_default = TRUE THEN
         -- Update the template's current_version_id to point to this version
         UPDATE prompt_templates 
         SET current_version_id = NEW.id
@@ -1407,10 +1407,10 @@ CREATE TABLE IF NOT EXISTS "public"."prompt_templates_versions" (
     "author_id" "uuid" NOT NULL,
     "usage_count" bigint DEFAULT 0 NOT NULL,
     "parent_version_id" bigint,
-    "change_notes" "jsonb" DEFAULT '{"en": "", "fr": ""}'::"jsonb",
+    "description" "jsonb" DEFAULT '{"en": "", "fr": ""}'::"jsonb",
     "status" "text" DEFAULT 'draft'::"text" NOT NULL,
     "template_id" "uuid",
-    "is_current" boolean DEFAULT false,
+    "is_default" boolean DEFAULT false,
     "optimized_for" "text"[],
     "published" boolean DEFAULT false,
     "slug" "text" NOT NULL

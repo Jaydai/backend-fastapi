@@ -17,4 +17,6 @@ from . import (  # noqa: E402
     remove_member,
     update,
     update_member_role,
+    get_folders,
+    get_templates
 )

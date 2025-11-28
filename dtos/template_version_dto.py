@@ -12,13 +12,13 @@ class TemplateVersionContentDTO(BaseModel):
     content: str
 
 
-class UpdateVersionStatusDTO(BaseModel):
-    """DTO for updating version status fields"""
-
-    template_id: str
-    published: bool | None = None
+class UpdateTemplateVersionDTO(BaseModel):
+    content: str | None = None
+    description: str | None = None
     status: str | None = None
-    is_current: bool | None = None
+    is_default: bool | None = None
+    published: bool | None = None
+    optimized_for: list[str] | None = None
 
 
 class VersionSlugResponseDTO(BaseModel):

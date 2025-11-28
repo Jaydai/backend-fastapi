@@ -32,7 +32,7 @@ class UpdateTemplateDTO(BaseModel):
 class CreateVersionDTO(BaseModel):
     content: str | None = None
     name: str | None = None
-    change_notes: str | None = None
+    description: str | None = None
     status: str | None = None
     copy_from_version_id: int | None = None
     optimized_for: list[str] | None = None

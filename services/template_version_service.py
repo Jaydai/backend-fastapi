@@ -1,7 +1,7 @@
 from supabase import Client
 
-from domains.entities import VersionSummary
-from dtos import CreateTemplateVersionDTO, CreateVersionDTO, TemplateVersionContentDTO
+from domains.entities import TemplateVersion, VersionSummary
+from dtos import CreateTemplateVersionDTO, CreateVersionDTO, TemplateVersionContentDTO, UpdateTemplateVersionDTO
 from mappers.template_mapper import TemplateMapper
 from repositories import TemplateVersionRepository
 from services.locale_service import LocaleService
@@ -37,8 +37,8 @@ class TemplateVersionService:
         else:
             content_dict = LocaleService.ensure_localized_dict(data.content, locale) if data.content else {locale: ""}
 
-        change_notes_dict = (
-            LocaleService.ensure_localized_dict(data.change_notes, locale) if data.change_notes else None
+        description_dict = (
+            LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
         )
 
         version = TemplateVersionRepository.create_version(
@@ -47,7 +47,7 @@ class TemplateVersionService:
             user_id,
             content_dict,
             name=data.name,
-            change_notes=change_notes_dict,
+            description=description_dict,
             status=data.status or "draft",
             optimized_for=data.optimized_for,
         )
@@ -55,25 +55,36 @@ class TemplateVersionService:
         return TemplateMapper.version_entity_to_dto(version, locale)
 
     @staticmethod
-    def update_version_status(
+    def update_version(
         client: Client,
         version_id: int,
         template_id: str,
-        published: bool | None = None,
-        status: str | None = None,
-        is_current: bool | None = None,
+        update_data: UpdateTemplateVersionDTO,
         locale: str = LocaleService.DEFAULT_LOCALE,
-    ) -> TemplateVersionContentDTO | None:
-        """Update version status fields and optionally set as current"""
-        version = TemplateVersionRepository.update_version_status(
-            client, version_id, template_id, published=published, status=status, is_current=is_current
+    ) -> UpdateTemplateVersionDTO | None:
+        """Update version fields (content, description, status, is_default, published, optimized_for)"""
+        # Convert content and description to localized dicts if provided
+        content_dict = LocaleService.ensure_localized_dict(update_data.content, locale) if update_data.content is not None else None
+        description_dict = (
+            LocaleService.ensure_localized_dict(update_data.description, locale) if update_data.description is not None else None
         )
 
-        if not version:
+        if update_data.is_default is True:
+            version_id = TemplateVersionRepository.set_default_version(client, version_id, template_id)
+            if not version_id:
+                return None
+
+        update_data["content"] = content_dict
+        update_data["description"] = description_dict
+
+        updated_version = TemplateVersionRepository.update_version(
+            client,
+            version_id,
+            template_id,
+            update_data
+        )
+
+        if not updated_version:
             return None
+        return TemplateMapper.update_version_entity_to_dto(updated_version, locale)
 
-        # If setting as current, also update the template's current_version_id
-        if is_current is True:
-            client.table("prompt_templates").update({"current_version_id": version_id}).eq("id", template_id).execute()
-
-        return TemplateMapper.version_entity_to_content_dto(version, locale)
