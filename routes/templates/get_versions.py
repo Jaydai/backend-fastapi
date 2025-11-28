@@ -1,9 +1,11 @@
-from fastapi import HTTPException, Request, status
 import logging
 
-from . import router
-from services.template_service import TemplateService
+from fastapi import HTTPException, Request, status
+
 from dtos import CreateTemplateVersionDTO
+from services.template_service import TemplateService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 @router.get("/{template_id}/versions", response_model=list[CreateTemplateVersionDTO], status_code=status.HTTP_200_OK)
 async def get_template_versions(
     request: Request,
-    template_id: str  # UUID
+    template_id: str,  # UUID
 ) -> list[CreateTemplateVersionDTO]:
     try:
         user_id = request.state.user_id
@@ -28,6 +30,5 @@ async def get_template_versions(
     except Exception as e:
         logger.error(f"Error fetching template versions: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch template versions: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch template versions: {str(e)}"
         )

@@ -1,10 +1,13 @@
 """Organization audit endpoint"""
-from fastapi import HTTPException, Request, Query
-from . import router
+
+import logging
+
+from fastapi import HTTPException, Query, Request
+
 from dtos.audit_dto import OrganizationAuditResponseDTO
 from services.audit_service import AuditService
-import logging
-from typing import Optional
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -13,9 +16,9 @@ logger = logging.getLogger(__name__)
 async def get_organization_audit(
     request: Request,
     organization_id: str,
-    start_date: Optional[str] = Query(default=None, description="Start date (YYYY-MM-DD)"),
-    end_date: Optional[str] = Query(default=None, description="End date (YYYY-MM-DD)"),
-    days: int = Query(default=30, ge=1, le=365, description="Number of days to look back")
+    start_date: str | None = Query(default=None, description="Start date (YYYY-MM-DD)"),
+    end_date: str | None = Query(default=None, description="End date (YYYY-MM-DD)"),
+    days: int = Query(default=30, ge=1, le=365, description="Number of days to look back"),
 ):
     """
     Get comprehensive organization audit with quality, risk, usage, and user statistics
@@ -30,12 +33,7 @@ async def get_organization_audit(
         # For now, assuming authentication middleware handles this
 
         result = await AuditService.get_organization_audit(
-            request.state.supabase_client,
-            user_id,
-            organization_id,
-            start_date,
-            end_date,
-            days
+            request.state.supabase_client, user_id, organization_id, start_date, end_date, days
         )
 
         return result

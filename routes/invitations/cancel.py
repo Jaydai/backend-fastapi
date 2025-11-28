@@ -1,8 +1,10 @@
-from fastapi import HTTPException, Request, status
 import logging
 
-from . import router
+from fastapi import HTTPException, Request, status
+
 from services.invitation_service import InvitationService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,7 @@
 """Delete folder service"""
+
 from supabase import Client
+
 from repositories.folders import delete_folder as repo_delete_folder
 
 

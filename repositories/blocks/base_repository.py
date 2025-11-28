@@ -1,6 +1,9 @@
 """Block repository - handles pure database operations for blocks"""
+
 from supabase import Client
+
 from domains.entities import Block, BlockTitle
+
 
 class BlockBaseRepository:
     """Base repository for block database operations"""
@@ -14,7 +17,7 @@ class BlockBaseRepository:
         user_id: str | None = None,
         or_conditions: list[str] | None = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[BlockTitle]:
         """
         Get block titles with filtering.
@@ -48,10 +51,7 @@ class BlockBaseRepository:
     @staticmethod
     def get_block_by_id(client: Client, block_id: str) -> Block | None:
         """Get a single block by ID"""
-        response = client.table("prompt_blocks")\
-            .select("*")\
-            .eq("id", block_id)\
-            .execute()
+        response = client.table("prompt_blocks").select("*").eq("id", block_id).execute()
 
         if not response.data:
             return None
@@ -69,7 +69,7 @@ class BlockBaseRepository:
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
-            usage_count=data.get("usage_count", 0)
+            usage_count=data.get("usage_count", 0),
         )
 
     @staticmethod
@@ -82,7 +82,7 @@ class BlockBaseRepository:
         content: dict[str, str],
         published: bool,
         organization_id: str | None,
-        workspace_type: str
+        workspace_type: str,
     ) -> Block:
         """Create a new block"""
         block_data = {
@@ -93,7 +93,7 @@ class BlockBaseRepository:
             "content": content,
             "published": published,
             "organization_id": organization_id,
-            "workspace_type": workspace_type
+            "workspace_type": workspace_type,
         }
 
         response = client.table("prompt_blocks").insert(block_data).execute()
@@ -111,7 +111,7 @@ class BlockBaseRepository:
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
-            usage_count=data.get("usage_count", 0)
+            usage_count=data.get("usage_count", 0),
         )
 
     @staticmethod
@@ -122,7 +122,7 @@ class BlockBaseRepository:
         title: dict[str, str] | None = None,
         description: dict[str, str] | None = None,
         content: dict[str, str] | None = None,
-        published: bool | None = None
+        published: bool | None = None,
     ) -> Block | None:
         """Update block fields"""
         update_data = {}
@@ -137,10 +137,7 @@ class BlockBaseRepository:
         if published is not None:
             update_data["published"] = published
 
-        response = client.table("prompt_blocks")\
-            .update(update_data)\
-            .eq("id", block_id)\
-            .execute()
+        response = client.table("prompt_blocks").update(update_data).eq("id", block_id).execute()
 
         if not response.data:
             return None
@@ -158,7 +155,7 @@ class BlockBaseRepository:
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
-            usage_count=data.get("usage_count", 0)
+            usage_count=data.get("usage_count", 0),
         )
 
     @staticmethod
@@ -170,11 +167,7 @@ class BlockBaseRepository:
     @staticmethod
     def get_pinned_block_ids(client: Client, user_id: str) -> list[str]:
         """Get list of pinned block IDs for a user"""
-        response = client.table("users_metadata")\
-            .select("pinned_block_ids")\
-            .eq("user_id", user_id)\
-            .single()\
-            .execute()
+        response = client.table("users_metadata").select("pinned_block_ids").eq("user_id", user_id).single().execute()
 
         if not response.data:
             return []
@@ -185,9 +178,6 @@ class BlockBaseRepository:
     @staticmethod
     def update_pinned_blocks(client: Client, user_id: str, block_ids: list[str]) -> list[str]:
         """Update pinned blocks for a user"""
-        client.table("users_metadata")\
-            .update({"pinned_block_ids": block_ids})\
-            .eq("user_id", user_id)\
-            .execute()
+        client.table("users_metadata").update({"pinned_block_ids": block_ids}).eq("user_id", user_id).execute()
 
         return block_ids

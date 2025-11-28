@@ -1,10 +1,10 @@
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable
 
 from fastapi import HTTPException, Request, status
 
-from services import PermissionService
 from domains.enums import PermissionEnum
+from services import PermissionService
 
 
 def require_permission_in_organization(permission: PermissionEnum):

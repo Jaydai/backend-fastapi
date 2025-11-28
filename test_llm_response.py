@@ -1,5 +1,7 @@
 """Quick test to see what OpenAI actually returns"""
+
 import json
+
 from openai import OpenAI
 
 client = OpenAI()
@@ -11,18 +13,12 @@ Return JSON with risk assessment."""
 response = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
-        {
-            "role": "system",
-            "content": "You are a security risk assessment expert. Respond only with valid JSON."
-        },
-        {
-            "role": "user",
-            "content": prompt
-        }
+        {"role": "system", "content": "You are a security risk assessment expert. Respond only with valid JSON."},
+        {"role": "user", "content": prompt},
     ],
     temperature=0.3,
     max_tokens=1000,
-    response_format={"type": "json_object"}
+    response_format={"type": "json_object"},
 )
 
 content = response.choices[0].message.content

@@ -2,20 +2,20 @@
 Set Default Template Version Route
 Sets a specific version as the current/default version
 """
-from fastapi import HTTPException, Request, status
+
 import logging
 
-from . import router
-from services import PermissionService
+from fastapi import HTTPException, Request, status
+
 from domains.enums import PermissionEnum
+from services import PermissionService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
 
-@router.post(
-    "/{template_id}/set-default",
-    status_code=status.HTTP_200_OK
-)
+@router.post("/{template_id}/set-default", status_code=status.HTTP_200_OK)
 async def set_default_version(
     request: Request,
     template_id: str,
@@ -47,13 +47,10 @@ async def set_default_version(
 
         if not version_id:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="version_id is required in request body"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="version_id is required in request body"
             )
 
-        logger.info(
-            f"User {user_id} attempting to set version {version_id} as default for template {template_id}"
-        )
+        logger.info(f"User {user_id} attempting to set version {version_id} as default for template {template_id}")
 
         # Check if version exists and belongs to this template
         version_response = (
@@ -66,10 +63,7 @@ async def set_default_version(
         )
 
         if not version_response.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Template version not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template version not found")
 
         # Check if user has permission (template owner or organization admin)
         template_response = (
@@ -81,10 +75,7 @@ async def set_default_version(
         )
 
         if not template_response.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Template not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
 
         template = template_response.data
 
@@ -94,25 +85,21 @@ async def set_default_version(
         # If template belongs to an organization, check organization permissions using new system
         if not has_permission and template.get("organization_id"):
             has_permission = PermissionService.user_has_permission_in_organization(
-                supabase_client,
-                user_id,
-                PermissionEnum.TEMPLATE_UPDATE,
-                template["organization_id"]
+                supabase_client, user_id, PermissionEnum.TEMPLATE_UPDATE, template["organization_id"]
             )
 
         if not has_permission:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have permission to update this template"
+                status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permission to update this template"
             )
 
         # Unset all other versions as current
-        supabase_client.table("prompt_templates_versions").update({
-            "is_current": False
-        }).eq("template_id", template_id).execute()
+        supabase_client.table("prompt_templates_versions").update({"is_current": False}).eq(
+            "template_id", template_id
+        ).execute()
 
         # Set this version as current
-        version_update_response = (
+        (
             supabase_client.table("prompt_templates_versions")
             .update({"is_current": True})
             .eq("id", version_id)
@@ -121,34 +108,25 @@ async def set_default_version(
         )
 
         # Update the template's current_version_id
-        template_update_response = (
+        (
             supabase_client.table("prompt_templates")
             .update({"current_version_id": version_id})
             .eq("id", template_id)
             .execute()
         )
 
-        logger.info(
-            f"Successfully set version {version_id} as default for template {template_id} by user {user_id}"
-        )
+        logger.info(f"Successfully set version {version_id} as default for template {template_id} by user {user_id}")
 
         return {
             "success": True,
             "message": f"Version {version_response.data['name']} set as default",
-            "data": {
-                "template_id": template_id,
-                "current_version_id": version_id
-            }
+            "data": {"template_id": template_id, "current_version_id": version_id},
         }
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Failed to set default version for template {template_id}: {e}",
-            exc_info=True
-        )
+        logger.error(f"Failed to set default version for template {template_id}: {e}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to set default version: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to set default version: {str(e)}"
         )

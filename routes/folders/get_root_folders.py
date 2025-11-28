@@ -1,16 +1,20 @@
-from fastapi import Request, Query, HTTPException, status
 import logging
-from . import router
-from services.folder_service import FolderService
+
+from fastapi import HTTPException, Query, Request, status
+
 from dtos import FolderResponseDTO
+from services.folder_service import FolderService
+
+from . import router
 
 logger = logging.getLogger(__name__)
+
 
 @router.get("/root", response_model=list[FolderResponseDTO], status_code=status.HTTP_200_OK)
 async def get_root_folders(
     request: Request,
     workspace_type: str | None = Query(None, description="Workspace: user, organization"),
-    organization_id: str | None = None
+    organization_id: str | None = None,
 ) -> list[FolderResponseDTO]:
     """
     Get only root-level folders (without nested items).
@@ -23,14 +27,7 @@ async def get_root_folders(
 
         logger.info(f"User {user_id} getting root folders (workspace_type={workspace_type})")
 
-        folders = FolderService.get_folders(
-            client,
-            user_id,
-            locale,
-            workspace_type,
-            organization_id,
-            "root"
-        )
+        folders = FolderService.get_folders(client, user_id, locale, workspace_type, organization_id, "root")
 
         return folders
     except HTTPException:

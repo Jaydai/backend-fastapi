@@ -1,9 +1,13 @@
 """Enrich multiple messages endpoint"""
+
+import logging
+
 from fastapi import HTTPException, Request
-from . import router
+
 from dtos.enrichment_dto import EnrichMessageBatchRequestDTO
 from services.enrichment_service import EnrichmentService
-import logging
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +23,8 @@ async def enrich_message_batch(request: Request, dto: EnrichMessageBatchRequestD
 
     try:
         # Allow unauthenticated access for scripts - user_id will be None
-        user_id = getattr(request.state, 'user_id', None)
-        results = EnrichmentService.enrich_message_batch(
-            request.state.supabase_client,
-            user_id,
-            dto.messages
-        )
+        user_id = getattr(request.state, "user_id", None)
+        results = EnrichmentService.enrich_message_batch(request.state.supabase_client, user_id, dto.messages)
         return {"results": results}
     except HTTPException:
         raise

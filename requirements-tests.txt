@@ -15,6 +15,9 @@ fastapi[all]>=0.100.0
 # Supabase (déjà dans requirements.txt mais on le garde pour clarté)
 supabase>=1.0.0
 
+# OpenAI (needed by enrichment services)
+openai>=1.0.0
+
 # Faker pour générer des données de test
 faker>=19.0.0
 

@@ -1,16 +1,15 @@
 """Create folder service"""
+
 from supabase import Client
+
 from dtos import CreateFolderDTO, FolderResponseDTO
-from repositories.folders import create_folder as repo_create_folder
 from mappers.folder_mapper import FolderMapper
+from repositories.folders import create_folder as repo_create_folder
 from services.locale_service import LocaleService
 
 
 def create_folder(
-    client: Client,
-    user_id: str,
-    data: CreateFolderDTO,
-    locale: str = LocaleService.DEFAULT_LOCALE
+    client: Client, user_id: str, data: CreateFolderDTO, locale: str = LocaleService.DEFAULT_LOCALE
 ) -> FolderResponseDTO:
     """Create a new folder"""
     workspace_type = "user"
@@ -21,13 +20,7 @@ def create_folder(
     description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
 
     folder = repo_create_folder(
-        client,
-        user_id,
-        title_dict,
-        description_dict,
-        data.parent_folder_id,
-        data.organization_id,
-        workspace_type
+        client, user_id, title_dict, description_dict, data.parent_folder_id, data.organization_id, workspace_type
     )
 
     return FolderMapper.entity_to_response_dto(folder, locale)

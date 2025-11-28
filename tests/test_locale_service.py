@@ -3,15 +3,13 @@ Tests for the centralized LocaleService.
 
 This ensures the locale management is working correctly across the application.
 """
-import pytest
-import sys
-from pathlib import Path
+
 import importlib.util
+from pathlib import Path
 
 # Direct import to avoid openai dependency issue
 spec = importlib.util.spec_from_file_location(
-    "locale_service",
-    Path(__file__).parent.parent / "services" / "locale_service.py"
+    "locale_service", Path(__file__).parent.parent / "services" / "locale_service.py"
 )
 locale_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(locale_module)
@@ -20,6 +18,7 @@ LocaleService = locale_module.LocaleService
 
 class MockRequest:
     """Mock FastAPI Request for testing."""
+
     def __init__(self, headers: dict):
         self.headers = headers
 
@@ -155,11 +154,7 @@ class TestLocaleServiceObjectLocalization:
 
     def test_localize_object_dict(self):
         """Should localize specific fields in a dict."""
-        obj = {
-            "id": 1,
-            "title": {"en": "Hello", "fr": "Bonjour"},
-            "description": {"en": "World", "fr": "Monde"}
-        }
+        obj = {"id": 1, "title": {"en": "Hello", "fr": "Bonjour"}, "description": {"en": "World", "fr": "Monde"}}
         result = LocaleService.localize_object(obj, "fr", ["title", "description"])
         assert result["title"] == "Bonjour"
         assert result["description"] == "Monde"
@@ -176,7 +171,7 @@ class TestLocaleServiceObjectLocalization:
         """Should localize all objects in a list."""
         items = [
             {"id": 1, "title": {"en": "Hello", "fr": "Bonjour"}},
-            {"id": 2, "title": {"en": "World", "fr": "Monde"}}
+            {"id": 2, "title": {"en": "World", "fr": "Monde"}},
         ]
         result = LocaleService.localize_list(items, "fr", ["title"])
         assert len(result) == 2

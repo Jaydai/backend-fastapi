@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class Template:
     id: str
@@ -22,6 +23,7 @@ class TemplateCommentAuthor:
     name: str
     avatar: str | None
 
+
 @dataclass
 class TemplateComment:
     id: int
@@ -32,6 +34,7 @@ class TemplateComment:
     author: TemplateCommentAuthor
     mentions: list
     replies: list
+
 
 @dataclass
 class TemplateTitle:

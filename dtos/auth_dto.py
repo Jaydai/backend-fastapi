@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
 
 
 class SignInDTO(BaseModel):
@@ -22,8 +21,9 @@ class OAuthSignIn(BaseModel):
 class RefreshTokenDTO(BaseModel):
     refresh_token: str
 
+
 class UserMeResponseDTO(BaseModel):
     user_id: str
     name: str
     data_collection: bool
-    profile_picture_url: Optional[str]
+    profile_picture_url: str | None

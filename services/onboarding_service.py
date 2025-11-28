@@ -1,19 +1,24 @@
 from supabase import Client
-from repositories.onboarding_repository import OnboardingRepository
+
 from dtos.onboarding_dto import OnboardingStatusResponseDTO, UpdateOnboardingDTO
+from repositories.onboarding_repository import OnboardingRepository
+
 
 class OnboardingService:
     @staticmethod
     def get_onboarding_status(client: Client, user_id: str) -> OnboardingStatusResponseDTO:
         entity = OnboardingRepository.get_user_metadata(client, user_id)
 
-        has_completed = bool(
-            entity.job_type and
-            entity.job_industry and
-            entity.job_seniority and
-            entity.interests and
-            entity.signup_source
-        ) or entity.onboarding_dismissed
+        has_completed = (
+            bool(
+                entity.job_type
+                and entity.job_industry
+                and entity.job_seniority
+                and entity.interests
+                and entity.signup_source
+            )
+            or entity.onboarding_dismissed
+        )
 
         return OnboardingStatusResponseDTO(
             has_completed_onboarding=has_completed,
@@ -29,14 +34,12 @@ class OnboardingService:
             first_template_created=entity.first_template_created,
             first_template_used=entity.first_template_used,
             first_block_created=entity.first_block_created,
-            keyboard_shortcut_used=entity.keyboard_shortcut_used
+            keyboard_shortcut_used=entity.keyboard_shortcut_used,
         )
 
     @staticmethod
     def update_onboarding(
-        client: Client,
-        user_id: str,
-        update_data: UpdateOnboardingDTO
+        client: Client, user_id: str, update_data: UpdateOnboardingDTO
     ) -> OnboardingStatusResponseDTO:
         update_dict = {}
         for field, value in update_data.model_dump(exclude_none=True).items():

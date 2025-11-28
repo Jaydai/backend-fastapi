@@ -1,5 +1,7 @@
 """Create folder"""
+
 from supabase import Client
+
 from domains.entities import Folder
 
 
@@ -10,7 +12,7 @@ def create_folder(
     description: dict[str, str] | None,
     parent_folder_id: str | None,
     organization_id: str | None,
-    workspace_type: str
+    workspace_type: str,
 ) -> Folder:
     """Create a new folder"""
     folder_data = {
@@ -19,7 +21,7 @@ def create_folder(
         "description": description,
         "parent_folder_id": parent_folder_id,
         "organization_id": organization_id,
-        "workspace_type": workspace_type
+        "workspace_type": workspace_type,
     }
 
     response = client.table("prompt_folders").insert(folder_data).execute()
@@ -34,5 +36,5 @@ def create_folder(
         parent_folder_id=data.get("parent_folder_id"),
         workspace_type=data["workspace_type"],
         created_at=data["created_at"],
-        updated_at=data.get("updated_at")
+        updated_at=data.get("updated_at"),
     )

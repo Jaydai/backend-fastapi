@@ -1,9 +1,11 @@
-from fastapi import HTTPException, Request, Query, status
 import logging
 
-from . import router
-from services.template_service import TemplateService
+from fastapi import HTTPException, Query, Request, status
+
 from dtos import TemplateListItemDTO
+from services.template_service import TemplateService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +17,7 @@ async def search_templates(
     tags: str | None = Query(None, description="Comma-separated tags"),
     include_public: bool = True,
     limit: int = Query(50, le=100),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
 ) -> list[TemplateListItemDTO]:
     try:
         user_id = request.state.user_id
@@ -27,14 +29,7 @@ async def search_templates(
         tag_list = [t.strip() for t in tags.split(",")] if tags else None
 
         templates = TemplateService.search_templates(
-            client,
-            user_id,
-            q,
-            locale,
-            tag_list,
-            include_public,
-            limit,
-            offset
+            client, user_id, q, locale, tag_list, include_public, limit, offset
         )
 
         logger.info(f"Returning {len(templates)} search results")
@@ -43,6 +38,5 @@ async def search_templates(
     except Exception as e:
         logger.error(f"Error searching templates: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to search templates: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to search templates: {str(e)}"
         )

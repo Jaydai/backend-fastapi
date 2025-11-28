@@ -1,17 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
+
+from fastapi import HTTPException, Request, status
+
+from dtos import FolderResponseDTO, UpdateFolderDTO
 from services.folder_service import FolderService
-from dtos import UpdateFolderDTO, FolderResponseDTO
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.patch("/{folder_id}", response_model=FolderResponseDTO, status_code=status.HTTP_200_OK)
-async def update_folder(
-    request: Request,
-    folder_id: str,
-    data: UpdateFolderDTO
-) -> FolderResponseDTO:
+async def update_folder(request: Request, folder_id: str, data: UpdateFolderDTO) -> FolderResponseDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

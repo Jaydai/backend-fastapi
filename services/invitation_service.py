@@ -1,9 +1,11 @@
-from domains.entities import OrganizationInvitation
+import logging
+
+from supabase import Client
+
 from dtos import InvitationResponseDTO
 from repositories import InvitationRepository
+
 from .user_service import UserService
-from supabase import Client
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +24,7 @@ class InvitationService:
                 status=inv.status,
                 role=inv.role,
                 organization_name=inv.organization_name,
-                created_at=inv.created_at
+                created_at=inv.created_at,
             )
             for inv in invitations
         ]
@@ -40,7 +42,7 @@ class InvitationService:
             status=invitation.status,
             role=invitation.role,
             organization_name=invitation.organization_name,
-            created_at=invitation.created_at
+            created_at=invitation.created_at,
         )
 
     @staticmethod
@@ -54,7 +56,9 @@ class InvitationService:
         return result is not None
 
     @staticmethod
-    def update_invitation_status(client: Client, invitation_id: str, user_id: str, new_status: str) -> InvitationResponseDTO:
+    def update_invitation_status(
+        client: Client, invitation_id: str, user_id: str, new_status: str
+    ) -> InvitationResponseDTO:
         logger.info(f"User {user_id} updating invitation {invitation_id} to status {new_status}")
 
         invitation = InvitationRepository.get_invitation_by_id(client, invitation_id)
@@ -69,26 +73,15 @@ class InvitationService:
             if not invitation.can_be_accepted():
                 raise ValueError("This invitation cannot be accepted")
 
-            UserService.create_user_organization_role(
-                client,
-                user_id,
-                invitation.organization_id,
-                invitation.role
-            )
+            UserService.create_user_organization_role(client, user_id, invitation.organization_id, invitation.role)
         elif new_status == "declined":
             if not invitation.can_be_declined():
                 raise ValueError("This invitation cannot be declined")
 
-        updated_invitation = InvitationRepository.update_invitation_status(
-            client,
-            invitation,
-            new_status
-        )
+        updated_invitation = InvitationRepository.update_invitation_status(client, invitation, new_status)
 
         if not updated_invitation:
-            raise ValueError(
-                f"Failed to update invitation. It may have already been processed or is no longer valid."
-            )
+            raise ValueError("Failed to update invitation. It may have already been processed or is no longer valid.")
 
         logger.info(f"User {user_id} successfully updated invitation {invitation_id} to {new_status}")
 
@@ -99,5 +92,5 @@ class InvitationService:
             status=updated_invitation.status,
             role=updated_invitation.role,
             organization_name=updated_invitation.organization_name,
-            created_at=updated_invitation.created_at
+            created_at=updated_invitation.created_at,
         )

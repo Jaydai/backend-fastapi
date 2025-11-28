@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
-from ..permission_entities import UserOrganizationRole
 
+from ..permission_entities import UserOrganizationRole
 
 OrganizationType = Literal["company", "standard"]
 

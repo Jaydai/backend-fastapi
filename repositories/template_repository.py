@@ -1,8 +1,12 @@
 """Template repository - handles pure database operations for templates"""
-from supabase import Client
+
 from datetime import datetime
-from domains.entities import Template, TemplateTitle, TemplateComment
+
+from supabase import Client
+
+from domains.entities import Template, TemplateComment, TemplateTitle
 from services.locale_service import LocaleService
+
 
 class TemplateRepository:
     """Base repository for template database operations"""
@@ -14,7 +18,7 @@ class TemplateRepository:
         organization_id: str | None = None,
         published: bool | None = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[TemplateTitle]:
         query = client.table("prompt_templates").select("id, title, folder_id")
         if user_id:
@@ -29,14 +33,10 @@ class TemplateRepository:
         templates = [TemplateTitle(**item) for item in templates_data]
         return templates
 
-
     @staticmethod
     def get_template_by_id(client: Client, template_id: str) -> Template | None:
-        response = client.table("prompt_templates")\
-            .select("*")\
-            .eq("id", template_id)\
-            .execute()
-            
+        response = client.table("prompt_templates").select("*").eq("id", template_id).execute()
+
         if not response.data:
             return None
 
@@ -54,7 +54,7 @@ class TemplateRepository:
             usage_count=data.get("usage_count", 0),
             last_used_at=data.get("last_used_at"),
             current_version_id=data.get("current_version_id"),
-            published=data.get("published", False)
+            published=data.get("published", False),
         )
 
     @staticmethod
@@ -66,7 +66,7 @@ class TemplateRepository:
         folder_id: str | None,
         organization_id: str | None,
         tags: list[str] | None,
-        workspace_type: str
+        workspace_type: str,
     ) -> Template:
         template_data = {
             "user_id": user_id,
@@ -75,15 +75,13 @@ class TemplateRepository:
             "folder_id": folder_id,
             "organization_id": organization_id,
             "tags": tags or [],
-            "workspace_type": workspace_type
+            "workspace_type": workspace_type,
         }
         response = client.table("prompt_templates").insert(template_data).execute()
         if len(response.data or []) == 0:
             return None
         data = response.data[0]
         return Template(data)
-       
-
 
     @staticmethod
     def update_template(
@@ -93,7 +91,7 @@ class TemplateRepository:
         description: dict[str, str] | None = None,
         folder_id: str | None = None,
         tags: list[str] | None = None,
-        current_version_id: int | None = None
+        current_version_id: int | None = None,
     ) -> bool:
         update_data = {}
         if title is not None:
@@ -107,10 +105,7 @@ class TemplateRepository:
         if current_version_id is not None:
             update_data["current_version_id"] = current_version_id
 
-        response = client.table("prompt_templates")\
-            .update(update_data)\
-            .eq("id", template_id)\
-            .execute()
+        response = client.table("prompt_templates").update(update_data).eq("id", template_id).execute()
 
         if len(response.data or []) == 0:
             return None
@@ -118,22 +113,15 @@ class TemplateRepository:
 
         return Template(data)
 
-
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:
-        response = client.table("prompt_templates")\
-        .delete()\
-        .eq("id", template_id)\
-        .execute()
+        response = client.table("prompt_templates").delete().eq("id", template_id).execute()
 
         return len(response.data or []) > 0
 
     @staticmethod
     def increment_usage(client: Client, template_id: str) -> int:
-        response = client.table("prompt_templates")\
-        .select("usage_count")\
-        .eq("id", template_id)\
-        .execute()
+        response = client.table("prompt_templates").select("usage_count").eq("id", template_id).execute()
 
         if not response.data:
             return 0
@@ -141,28 +129,17 @@ class TemplateRepository:
         current_count = response.data[0].get("usage_count", 0)
         new_count = current_count + 1
 
-        client.table("prompt_templates")\
-            .update({
-                "usage_count": new_count,
-                "last_used_at": datetime.utcnow().isoformat()
-            })\
-            .eq("id", template_id)\
-            .execute()
+        client.table("prompt_templates").update(
+            {"usage_count": new_count, "last_used_at": datetime.utcnow().isoformat()}
+        ).eq("id", template_id).execute()
 
         return new_count
 
     @staticmethod
-    def update_pinned_status(
-        client: Client,
-        user_id: str,
-        template_id: str,
-        is_pinned: bool
-    ) -> bool:
-        response = client.table("users_metadata")\
-        .select("pinned_template_ids")\
-        .eq("user_id", user_id)\
-        .single()\
-        .execute()
+    def update_pinned_status(client: Client, user_id: str, template_id: str, is_pinned: bool) -> bool:
+        response = (
+            client.table("users_metadata").select("pinned_template_ids").eq("user_id", user_id).single().execute()
+        )
 
         if not response.data:
             return False
@@ -174,17 +151,13 @@ class TemplateRepository:
         elif not is_pinned and template_id in current_pinned:
             current_pinned.remove(template_id)
 
-        client.table("users_metadata")\
-            .update({"pinned_template_ids": current_pinned})\
-            .eq("user_id", user_id)\
-            .execute()
+        client.table("users_metadata").update({"pinned_template_ids": current_pinned}).eq("user_id", user_id).execute()
 
         return True
 
-
     @staticmethod
     def get_user_templates_count(client: Client, user_id: str) -> int:
-        query = client.table("prompt_templates").select("id").eq("organization_id", organization_id)
+        query = client.table("prompt_templates").select("id").eq("user_id", user_id)
         response = query.execute()
         return len(response.data or [])
 
@@ -194,7 +167,6 @@ class TemplateRepository:
         response = query.execute()
         return len(response.data or [])
 
-
     @staticmethod
     def search_templates(
         client: Client,
@@ -203,7 +175,7 @@ class TemplateRepository:
         tags: list[str] | None = None,
         include_public: bool = True,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[Template]:
         # Search only user's own templates
         query_builder = client.table("prompt_templates").select("*").eq("user_id", user_id)
@@ -214,53 +186,65 @@ class TemplateRepository:
         if tags:
             query_builder = query_builder.contains("tags", tags)
 
-        query_builder = query_builder.order("usage_count", desc=True).order("created_at", desc=True).range(offset, offset + limit - 1)
+        query_builder = (
+            query_builder.order("usage_count", desc=True)
+            .order("created_at", desc=True)
+            .range(offset, offset + limit - 1)
+        )
 
         response = query_builder.execute()
 
         templates = []
         for data in response.data or []:
-            templates.append(Template(
-                id=data["id"],
-                title=data.get("title", {}),
-                description=data.get("description"),
-                folder_id=data.get("folder_id"),
-                organization_id=data.get("organization_id"),
+            templates.append(
+                Template(
+                    id=data["id"],
+                    title=data.get("title", {}),
+                    description=data.get("description"),
+                    folder_id=data.get("folder_id"),
+                    organization_id=data.get("organization_id"),
                     user_id=data["user_id"],
-                workspace_type=data["workspace_type"],
-                created_at=data["created_at"],
-                updated_at=data.get("updated_at"),
-                tags=data.get("tags"),
-                usage_count=data.get("usage_count", 0),
-                last_used_at=data.get("last_used_at"),
-                current_version_id=data.get("current_version_id"),
-                is_free=data.get("is_free", True),
-                published=data.get("published", False)
-            ))
+                    workspace_type=data["workspace_type"],
+                    created_at=data["created_at"],
+                    updated_at=data.get("updated_at"),
+                    tags=data.get("tags"),
+                    usage_count=data.get("usage_count", 0),
+                    last_used_at=data.get("last_used_at"),
+                    current_version_id=data.get("current_version_id"),
+                    is_free=data.get("is_free", True),
+                    published=data.get("published", False),
+                )
+            )
 
         return templates
 
     @staticmethod
-    def get_comments(client: Client, template_id: str, locale: str = LocaleService.DEFAULT_LOCALE) -> list[TemplateComment]:
+    def get_comments(
+        client: Client, template_id: str, locale: str = LocaleService.DEFAULT_LOCALE
+    ) -> list[TemplateComment]:
         from domains.entities import TemplateComment, TemplateCommentAuthor
 
-        parent_comments_response = client.table("prompt_templates_comments")\
-            .select("*")\
-            .eq("template_id", template_id)\
-            .is_("parent_comment_id", "null")\
-            .order("created_at", desc=True)\
+        parent_comments_response = (
+            client.table("prompt_templates_comments")
+            .select("*")
+            .eq("template_id", template_id)
+            .is_("parent_comment_id", "null")
+            .order("created_at", desc=True)
             .execute()
+        )
 
         parent_comments_data = parent_comments_response.data or []
 
         all_user_ids = [c.get("user_id") for c in parent_comments_data if c.get("user_id")]
 
         for parent_comment in parent_comments_data:
-            replies_response = client.table("prompt_templates_comments")\
-                .select("*")\
-                .eq("parent_comment_id", parent_comment["id"])\
-                .order("created_at")\
+            replies_response = (
+                client.table("prompt_templates_comments")
+                .select("*")
+                .eq("parent_comment_id", parent_comment["id"])
+                .order("created_at")
                 .execute()
+            )
 
             replies_data = replies_response.data or []
             parent_comment["_replies"] = replies_data
@@ -271,10 +255,12 @@ class TemplateRepository:
 
         users_map = {}
         if all_user_ids:
-            users_resp = client.table("users_metadata")\
-                .select("user_id, name, email, profile_picture_url, metadata")\
-                .in_("user_id", list(set(all_user_ids)))\
+            users_resp = (
+                client.table("users_metadata")
+                .select("user_id, name, email, profile_picture_url, metadata")
+                .in_("user_id", list(set(all_user_ids)))
                 .execute()
+            )
 
             for u in users_resp.data or []:
                 meta = u.get("metadata") or {}
@@ -291,9 +277,7 @@ class TemplateRepository:
             content = LocaleService.localize_string(comment_data.get("content"), locale)
 
             author = TemplateCommentAuthor(
-                id=user_id,
-                name=user_info.get("name", "Unknown"),
-                avatar=user_info.get("profile_picture_url")
+                id=user_id, name=user_info.get("name", "Unknown"), avatar=user_info.get("profile_picture_url")
             )
 
             return TemplateComment(
@@ -304,7 +288,7 @@ class TemplateRepository:
                 created_at=comment_data.get("created_at"),
                 author=author,
                 mentions=comment_data.get("mentions", []),
-                replies=[]
+                replies=[],
             )
 
         comments = []

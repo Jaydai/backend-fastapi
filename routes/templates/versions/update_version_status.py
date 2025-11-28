@@ -1,18 +1,18 @@
-from fastapi import HTTPException, Request, status
 import logging
 
-from . import router
+from fastapi import HTTPException, Request, status
+
+from dtos import TemplateVersionContentDTO, UpdateVersionStatusDTO
 from services.template_version_service import TemplateVersionService
-from dtos import UpdateVersionStatusDTO, TemplateVersionContentDTO
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
 
 @router.patch("/versions/{version_id}/status", response_model=TemplateVersionContentDTO, status_code=status.HTTP_200_OK)
 async def update_version_status(
-    request: Request,
-    version_id: int,
-    data: UpdateVersionStatusDTO
+    request: Request, version_id: int, data: UpdateVersionStatusDTO
 ) -> TemplateVersionContentDTO:
     """Update version status fields (published, status, is_current)"""
     try:
@@ -29,14 +29,11 @@ async def update_version_status(
             published=data.published,
             status=data.status,
             is_current=data.is_current,
-            locale=locale
+            locale=locale,
         )
 
         if not version:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Version {version_id} not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Version {version_id} not found")
 
         logger.info(f"Version {version_id} status updated successfully")
         return version
@@ -46,6 +43,5 @@ async def update_version_status(
     except Exception as e:
         logger.error(f"Error updating version status: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update version status: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update version status: {str(e)}"
         )

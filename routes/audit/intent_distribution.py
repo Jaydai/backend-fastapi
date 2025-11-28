@@ -1,10 +1,13 @@
 """Intent distribution endpoint for time-series analytics"""
-from fastapi import HTTPException, Request, Query
-from . import router
+
+import logging
+
+from fastapi import HTTPException, Query, Request
+
 from dtos.audit_dto import IntentTimelineResponseDTO
 from services.audit_timeseries_service import AuditTimeSeriesService
-import logging
-from typing import Optional, List
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -13,28 +16,20 @@ logger = logging.getLogger(__name__)
 async def get_intent_distribution(
     request: Request,
     organization_id: str,
-    start_date: Optional[str] = Query(default=None, description="Start date (YYYY-MM-DD)"),
-    end_date: Optional[str] = Query(default=None, description="End date (YYYY-MM-DD)"),
+    start_date: str | None = Query(default=None, description="Start date (YYYY-MM-DD)"),
+    end_date: str | None = Query(default=None, description="End date (YYYY-MM-DD)"),
     days: int = Query(default=30, ge=1, le=365, description="Number of days to look back"),
-    team_ids: Optional[List[str]] = Query(default=None, description="Filter by team IDs")
+    team_ids: list[str] | None = Query(default=None, description="Filter by team IDs"),
 ):
     """
     Get intent distribution for the date range
     Returns top intents and their current distribution
     """
     try:
-        user_id = request.state.user_id
-
         # TODO: Add permission check - verify user has admin/owner role in organization
 
         result = await AuditTimeSeriesService.get_intent_distribution(
-            request.state.supabase_client,
-            organization_id,
-            start_date,
-            end_date,
-            days,
-            team_ids or [],
-            top_n=10
+            request.state.supabase_client, organization_id, start_date, end_date, days, team_ids or [], top_n=10
         )
 
         return result

@@ -2,13 +2,21 @@
 Aggregation Utilities for Audit Data
 Handles statistical calculations and data aggregation
 """
+
 from collections import Counter, defaultdict
 from datetime import datetime
-from domains.entities.audit_entities import (
-    QualityStats, RiskStats, UsageStats,
-    ThemeStats, IntentStats, TopUser, TopPrompt, RiskyPrompt
-)
+
 from config.enrichment_config import enrichment_config
+from domains.entities.audit_entities import (
+    IntentStats,
+    QualityStats,
+    RiskStats,
+    RiskyPrompt,
+    ThemeStats,
+    TopPrompt,
+    TopUser,
+    UsageStats,
+)
 
 
 def aggregate_quality_stats(quality_data: dict) -> QualityStats:
@@ -17,9 +25,7 @@ def aggregate_quality_stats(quality_data: dict) -> QualityStats:
     Calculates averages, distributions, and trends
     """
     current_scores = [
-        row.get("quality_score", 0)
-        for row in quality_data.get("current", [])
-        if row.get("quality_score") is not None
+        row.get("quality_score", 0) for row in quality_data.get("current", []) if row.get("quality_score") is not None
     ]
 
     if not current_scores:
@@ -41,7 +47,7 @@ def aggregate_quality_stats(quality_data: dict) -> QualityStats:
         median_score=median_score,
         distribution=distribution,
         total_rated=len(current_scores),
-        trend_change=round(trend_change, 2) if trend_change is not None else None
+        trend_change=round(trend_change, 2) if trend_change is not None else None,
     )
 
 
@@ -73,7 +79,7 @@ def aggregate_risk_stats(risk_data: list) -> RiskStats:
         pii_detected_count=pii_count,
         credentials_detected_count=credentials_count,
         sensitive_data_count=sensitive_count,
-        average_risk_score=round(avg_risk_score, 2)
+        average_risk_score=round(avg_risk_score, 2),
     )
 
 
@@ -86,7 +92,7 @@ def aggregate_usage_stats(usage_data: dict) -> UsageStats:
     work_classification = usage_data.get("work_classification", [])
 
     total_prompts = len(messages)
-    unique_users = len(set(msg.get("user_id") for msg in messages if msg.get("user_id")))
+    unique_users = len({msg.get("user_id") for msg in messages if msg.get("user_id")})
 
     work_related_count = sum(1 for row in work_classification if row.get("is_work_related"))
     personal_count = len(work_classification) - work_related_count
@@ -101,7 +107,7 @@ def aggregate_usage_stats(usage_data: dict) -> UsageStats:
         work_related_count=work_related_count,
         personal_count=personal_count,
         work_percentage=round(work_percentage, 2),
-        average_prompts_per_user=round(avg_prompts_per_user, 2)
+        average_prompts_per_user=round(avg_prompts_per_user, 2),
     )
 
 
@@ -122,11 +128,7 @@ def aggregate_theme_stats(theme_data: dict) -> ThemeStats:
     # Calculate trend changes
     trend_change = _calculate_theme_trends(theme_counts, Counter(trend_themes), total, len(trend_themes))
 
-    return ThemeStats(
-        top_themes=top_themes,
-        total_categorized=total,
-        trend_change=trend_change
-    )
+    return ThemeStats(top_themes=top_themes, total_categorized=total, trend_change=trend_change)
 
 
 def aggregate_intent_stats(intent_data: list) -> IntentStats:
@@ -153,15 +155,12 @@ def aggregate_intent_stats(intent_data: list) -> IntentStats:
         {
             "intent": intent,
             "count": data["count"],
-            "avg_quality": round(data["total_quality"] / data["count"], 2) if data["count"] > 0 else 0
+            "avg_quality": round(data["total_quality"] / data["count"], 2) if data["count"] > 0 else 0,
         }
         for intent, data in sorted(intent_quality.items(), key=lambda x: x[1]["count"], reverse=True)[:10]
     ]
 
-    return IntentStats(
-        top_intents=top_intents,
-        total_categorized=len(intent_data)
-    )
+    return IntentStats(top_intents=top_intents, total_categorized=len(intent_data))
 
 
 def aggregate_top_users(top_users_data: dict) -> list[TopUser]:
@@ -174,12 +173,9 @@ def aggregate_top_users(top_users_data: dict) -> list[TopUser]:
     risks = top_users_data.get("risks", [])
 
     # Aggregate by user_id
-    user_stats = defaultdict(lambda: {
-        "total_prompts": 0,
-        "quality_scores": [],
-        "work_prompts": 0,
-        "high_risk_messages": 0
-    })
+    user_stats = defaultdict(
+        lambda: {"total_prompts": 0, "quality_scores": [], "work_prompts": 0, "high_risk_messages": 0}
+    )
 
     # Count messages
     for msg in messages:
@@ -208,15 +204,17 @@ def aggregate_top_users(top_users_data: dict) -> list[TopUser]:
     for user_id, stats in sorted(user_stats.items(), key=lambda x: x[1]["total_prompts"], reverse=True)[:10]:
         avg_quality = (sum(stats["quality_scores"]) / len(stats["quality_scores"])) if stats["quality_scores"] else 0
 
-        top_users.append(TopUser(
-            user_id=user_id,
-            email="user@example.com",  # TODO: Fetch from auth
-            name=None,
-            total_prompts=stats["total_prompts"],
-            average_quality=round(avg_quality, 2),
-            work_prompts=stats["work_prompts"],
-            high_risk_messages=stats["high_risk_messages"]
-        ))
+        top_users.append(
+            TopUser(
+                user_id=user_id,
+                email="user@example.com",  # TODO: Fetch from auth
+                name=None,
+                total_prompts=stats["total_prompts"],
+                average_quality=round(avg_quality, 2),
+                work_prompts=stats["work_prompts"],
+                high_risk_messages=stats["high_risk_messages"],
+            )
+        )
 
     return top_users
 
@@ -238,15 +236,17 @@ def aggregate_top_prompts(top_prompts_data: dict) -> list[TopPrompt]:
         content = message_map.get(msg_provider_id, "")
         content_preview = content[:200] if content else "[No content]"
 
-        top_prompts.append(TopPrompt(
-            chat_provider_id=chat.get("chat_provider_id", ""),
-            message_provider_id=msg_provider_id,
-            quality_score=chat.get("quality_score", 0),
-            theme=chat.get("theme", "unknown"),
-            intent=chat.get("intent", "unknown"),
-            content_preview=content_preview,
-            created_at=datetime.fromisoformat(chat.get("created_at")) if chat.get("created_at") else datetime.now()
-        ))
+        top_prompts.append(
+            TopPrompt(
+                chat_provider_id=chat.get("chat_provider_id", ""),
+                message_provider_id=msg_provider_id,
+                quality_score=chat.get("quality_score", 0),
+                theme=chat.get("theme", "unknown"),
+                intent=chat.get("intent", "unknown"),
+                content_preview=content_preview,
+                created_at=datetime.fromisoformat(chat.get("created_at")) if chat.get("created_at") else datetime.now(),
+            )
+        )
 
     return top_prompts
 
@@ -279,23 +279,26 @@ def aggregate_risky_prompts(risky_prompts_data: dict) -> list[RiskyPrompt]:
         user_id = risk.get("user_id")
         user_info = user_map.get(user_id, {})
 
-        risky_prompts.append(RiskyPrompt(
-            message_provider_id=msg_provider_id,
-            risk_level=risk.get("overall_risk_level", "none"),
-            risk_score=risk.get("overall_risk_score", 0.0),
-            risk_categories=risk_categories,
-            content_preview=content_preview,
-            content_full=content_full if content_full else "[No content]",
-            created_at=datetime.fromisoformat(risk.get("created_at")) if risk.get("created_at") else datetime.now(),
-            user_whitelist=risk.get("user_whitelist", False),
-            user_email=user_info.get("email"),
-            user_name=user_info.get("name")
-        ))
+        risky_prompts.append(
+            RiskyPrompt(
+                message_provider_id=msg_provider_id,
+                risk_level=risk.get("overall_risk_level", "none"),
+                risk_score=risk.get("overall_risk_score", 0.0),
+                risk_categories=risk_categories,
+                content_preview=content_preview,
+                content_full=content_full if content_full else "[No content]",
+                created_at=datetime.fromisoformat(risk.get("created_at")) if risk.get("created_at") else datetime.now(),
+                user_whitelist=risk.get("user_whitelist", False),
+                user_email=user_info.get("email"),
+                user_name=user_info.get("name"),
+            )
+        )
 
     return risky_prompts
 
 
 # ==================== PRIVATE HELPER FUNCTIONS ====================
+
 
 def _calculate_quality_distribution(scores: list[int]) -> dict[str, int]:
     """Calculate quality score distribution by bucket"""
@@ -311,11 +314,7 @@ def _calculate_quality_trend(current_scores: list, trend_data: list) -> float | 
     if not current_scores:
         return None
 
-    trend_scores = [
-        row.get("quality_score", 0)
-        for row in trend_data
-        if row.get("quality_score") is not None
-    ]
+    trend_scores = [row.get("quality_score", 0) for row in trend_data if row.get("quality_score") is not None]
 
     if not trend_scores:
         return None
@@ -354,16 +353,14 @@ def _count_detected_issues(risk_data: list) -> tuple[int, int, int]:
 def _build_top_themes_list(theme_counts: Counter, total: int) -> list[dict]:
     """Build top themes list with percentages"""
     return [
-        {
-            "theme": theme,
-            "count": count,
-            "percentage": round(count / total * 100, 2) if total > 0 else 0
-        }
+        {"theme": theme, "count": count, "percentage": round(count / total * 100, 2) if total > 0 else 0}
         for theme, count in theme_counts.most_common(10)
     ]
 
 
-def _calculate_theme_trends(current_counts: Counter, trend_counts: Counter, current_total: int, trend_total: int) -> dict:
+def _calculate_theme_trends(
+    current_counts: Counter, trend_counts: Counter, current_total: int, trend_total: int
+) -> dict:
     """Calculate per-theme percentage changes"""
     trend_change = {}
 

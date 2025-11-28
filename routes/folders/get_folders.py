@@ -1,10 +1,14 @@
-from fastapi import Request, Query, HTTPException, status
 import logging
-from . import router
-from services.folder_service import FolderService
+
+from fastapi import HTTPException, Query, Request, status
+
 from dtos import FolderTitleResponseDTO
+from services.folder_service import FolderService
+
+from . import router
 
 logger = logging.getLogger(__name__)
+
 
 @router.get("", response_model=list[FolderTitleResponseDTO], status_code=status.HTTP_200_OK)
 async def get_folders(
@@ -13,24 +17,19 @@ async def get_folders(
     organization_id: str | None = None,
     parent_folder_id: str | None = None,
     limit: int = Query(100, le=500),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
 ) -> list[FolderTitleResponseDTO]:
     try:
         client = request.state.supabase_client
         locale = request.state.locale
         user_id = request.state.user_id
 
-        logger.info(f"User {user_id} fetching folders with workspace={workspace_type}, org={organization_id}, parent={parent_folder_id}")
+        logger.info(
+            f"User {user_id} fetching folders with workspace={workspace_type}, org={organization_id}, parent={parent_folder_id}"
+        )
 
         folders = FolderService.get_folders_titles(
-            client,
-            user_id,
-            locale,
-            workspace_type,
-            organization_id,
-            parent_folder_id,
-            limit,
-            offset
+            client, user_id, locale, workspace_type, organization_id, parent_folder_id, limit, offset
         )
 
         logger.info(f"Returning {len(folders)} folder titles")

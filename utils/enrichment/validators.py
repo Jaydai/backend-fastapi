@@ -2,6 +2,7 @@
 Validation Utilities
 Validates and sanitizes enrichment data
 """
+
 from config.enrichment_config import enrichment_config
 
 
@@ -92,11 +93,7 @@ def validate_risk_scores(risk_data: dict) -> dict:
                 if isinstance(confidence, str):
                     # LLM sometimes returns confidence as string ("low", "medium", "high")
                     # Convert to numeric value
-                    confidence_map = {
-                        "low": 35.0,
-                        "medium": 65.0,
-                        "high": 90.0
-                    }
+                    confidence_map = {"low": 35.0, "medium": 65.0, "high": 90.0}
                     cat_data["confidence"] = confidence_map.get(confidence.lower(), 50.0)
                 elif isinstance(confidence, (int, float)):
                     # Clamp numeric confidence to 0-100
@@ -113,11 +110,7 @@ def validate_risk_scores(risk_data: dict) -> dict:
     if "overall_confidence" in validated:
         confidence = validated["overall_confidence"]
         if isinstance(confidence, str):
-            confidence_map = {
-                "low": 35.0,
-                "medium": 65.0,
-                "high": 90.0
-            }
+            confidence_map = {"low": 35.0, "medium": 65.0, "high": 90.0}
             validated["overall_confidence"] = confidence_map.get(confidence.lower(), 50.0)
         elif isinstance(confidence, (int, float)):
             validated["overall_confidence"] = max(0.0, min(100.0, float(confidence)))
@@ -195,6 +188,7 @@ def sanitize_risk_assessment_result(result: dict) -> dict:
         Sanitized result with validated values
     """
     import logging
+
     logger = logging.getLogger(__name__)
 
     sanitized = validate_risk_scores(result)
@@ -207,7 +201,7 @@ def sanitize_risk_assessment_result(result: dict) -> dict:
             sanitized[category] = {
                 "risk_level": "none",
                 "risk_score": 0,
-                "description": f"No {category} assessment available"
+                "description": f"No {category} assessment available",
             }
         else:
             # Ensure category has all required fields
@@ -249,7 +243,7 @@ def get_risk_level_hierarchy(min_risk_level: str) -> list[str]:
         "critical": ["critical"],
         "high": ["critical", "high"],
         "medium": ["critical", "high", "medium"],
-        "low": ["critical", "high", "medium", "low"]
+        "low": ["critical", "high", "medium", "low"],
     }
 
     return hierarchy.get(min_risk_level, ["critical", "high", "medium"])

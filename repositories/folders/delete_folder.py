@@ -1,4 +1,5 @@
 """Delete folder"""
+
 from supabase import Client
 
 

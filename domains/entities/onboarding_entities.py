@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class OnboardingStatus:
     job_type: str | None = None

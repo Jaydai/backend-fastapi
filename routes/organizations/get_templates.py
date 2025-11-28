@@ -1,19 +1,18 @@
-from fastapi import HTTPException, Request, Query, status
 import logging
 
-from . import router
-from services import TemplateService
+from fastapi import HTTPException, Request, status
+
+from domains.enums import PermissionEnum
 from dtos import TemplateTitleResponseDTO
 from routes.dependencies import require_permission_in_organization
-from domains.enums import PermissionEnum
+from services import TemplateService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
 
-@router.get(
-    "/{organization_id}/templates",
-    response_model=list[TemplateTitleResponseDTO]
-)
+@router.get("/{organization_id}/templates", response_model=list[TemplateTitleResponseDTO])
 @require_permission_in_organization(PermissionEnum.ORGANIZATION_READ)
 async def get_organization_templates(
     request: Request,
@@ -31,13 +30,12 @@ async def get_organization_templates(
             folder_id=None,  # Not used anymore, we fetch all
             published=published,
             limit=1000,
-            offset=0
+            offset=0,
         )
         return templates
 
     except Exception as e:
         logger.error(f"Error fetching templates for organization {organization_id}: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch templates: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch templates: {str(e)}"
         )

@@ -1,9 +1,11 @@
-from fastapi import HTTPException, Request, status
 import logging
 
-from . import router
-from services.template_service import TemplateService
+from fastapi import HTTPException, Request, status
+
 from dtos import TemplateResponseDTO
+from services.template_service import TemplateService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +26,7 @@ async def get_template_by_id(
         template = TemplateService.get_template_by_id(client, template_id, published, locale)
 
         if not template:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Template {template_id} not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Template {template_id} not found")
 
         logger.info(f"Template {template_id} fetched successfully")
         return template
@@ -37,6 +36,5 @@ async def get_template_by_id(
     except Exception as e:
         logger.error(f"Error fetching template: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch template: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch template: {str(e)}"
         )

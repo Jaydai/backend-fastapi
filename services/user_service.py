@@ -1,7 +1,8 @@
 from supabase import Client
-from repositories import UserRepository
+
 from domains.entities import UserOrganizationRole
-from dtos import UserProfileResponseDTO, UpdateUserProfileDTO, UpdateDataCollectionDTO
+from dtos import UpdateUserProfileDTO, UserProfileResponseDTO
+from repositories import UserRepository
 
 
 class UserService:
@@ -12,13 +13,15 @@ class UserService:
         if response.data and response.data.get("email"):
             return response.data["email"]
         raise ValueError("User email not found")
-        
+
     @staticmethod
     def is_member_of_organization(client: Client, user_id: str, organization_id: str) -> bool:
         return UserRepository.is_user_in_organization(client, user_id, organization_id)
-    
+
     @staticmethod
-    def create_user_organization_role(client: Client, user_id: str, organization_id: str, role: str) -> UserOrganizationRole:
+    def create_user_organization_role(
+        client: Client, user_id: str, organization_id: str, role: str
+    ) -> UserOrganizationRole:
         if UserService.is_member_of_organization(client, user_id, organization_id):
             raise ValueError("User is already a member of the organization")
         user_organization_role = UserRepository.create_user_organization_role(client, user_id, organization_id, role)
@@ -41,7 +44,7 @@ class UserService:
             avatar_url=profile.avatar_url,
             phone=profile.phone,
             created_at=profile.created_at,
-            email_confirmed_at=profile.email_confirmed_at
+            email_confirmed_at=profile.email_confirmed_at,
         )
 
     @staticmethod
@@ -73,7 +76,7 @@ class UserService:
             avatar_url=updated_profile.avatar_url,
             phone=updated_profile.phone,
             created_at=updated_profile.created_at,
-            email_confirmed_at=updated_profile.email_confirmed_at
+            email_confirmed_at=updated_profile.email_confirmed_at,
         )
 
     @staticmethod

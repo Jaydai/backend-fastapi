@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from ..permission_entities import UserOrganizationRole
 
 

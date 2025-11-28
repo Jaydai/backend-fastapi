@@ -1,11 +1,13 @@
+import logging
+
+from fastapi import Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
-from fastapi import Request, status
+from supabase import ClientOptions, create_client
+
+from core.supabase import SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL
 from services import AuthService
 from utils.auth_helpers import ACCESS_COOKIE_KEY
-from core.supabase import SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
-from supabase import create_client, ClientOptions
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/enrichment/enrich-message-batch",
         "/enrichment/enrich-chat",
         "/enrichment/enrich-chat-batch",
-        "/docs", # TODO: désactiver en prod
+        "/docs",  # TODO: désactiver en prod
         "/redoc",
         "/auth/sign_in",
         "/auth/sign_up",
@@ -29,7 +31,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/auth/reset_password",
         "/openapi.json",
     ]
-    
+
     async def dispatch(self, request: Request, call_next):
         # Allow CORS preflight requests to pass through without authentication
         if request.method == "OPTIONS":
@@ -38,6 +40,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         if self._is_public_route(request):
             # For public routes, still provide an unauthenticated Supabase client
             from core.supabase import supabase
+
             request.state.supabase_client = supabase
             request.state.user_id = None
             return await call_next(request)
@@ -69,51 +72,42 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
 
             if not access_token:
                 return JSONResponse(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    content={"detail": "Missing access_token cookie."}
+                    status_code=status.HTTP_401_UNAUTHORIZED, content={"detail": "Missing access_token cookie."}
                 )
             user_id = AuthService.get_current_user_id(access_token)
             if not user_id:
                 return JSONResponse(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    content={
-                        "detail": "Authentication required. Please provide a valid JWT token in cookies."
-                    }
+                    content={"detail": "Authentication required. Please provide a valid JWT token in cookies."},
                 )
 
             # Create an authenticated Supabase client for this request
             authenticated_client = create_client(
                 SUPABASE_URL,
                 SUPABASE_PUBLISHABLE_KEY,
-                options=ClientOptions(
-                    headers={
-                        "Authorization": f"Bearer {access_token}"
-                    }
-                )
+                options=ClientOptions(headers={"Authorization": f"Bearer {access_token}"}),
             )
 
             request.state.user_id = user_id
             request.state.supabase_client = authenticated_client
-            
+
         except Exception:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content={
-                    "detail": "Invalid authentication credentials. Token may be expired or malformed."
-                }
+                content={"detail": "Invalid authentication credentials. Token may be expired or malformed."},
             )
-        
+
         response = await call_next(request)
         return response
-    
+
     def _is_public_route(self, request: Request) -> bool:
         path = request.url.path
-        
+
         if path in self.PUBLIC_PATHS_WITHOUT_AUTH:
             return True
-        
+
         for public_path in self.PUBLIC_PATHS_WITHOUT_AUTH:
             if public_path != "/" and path.startswith(public_path):
                 return True
-        
+
         return False

@@ -1,21 +1,18 @@
 """Pinned folders service"""
+
 from supabase import Client
+
 from dtos import FolderResponseDTO, UpdatePinnedFoldersDTO
-from repositories.folders import (
-    get_pinned_folder_ids,
-    get_folder_by_id,
-    pin_folder as repo_pin_folder,
-    unpin_folder as repo_unpin_folder,
-    update_pinned_folders as repo_update_pinned_folders
-)
 from mappers.folder_mapper import FolderMapper
+from repositories.folders import get_folder_by_id, get_pinned_folder_ids
+from repositories.folders import pin_folder as repo_pin_folder
+from repositories.folders import unpin_folder as repo_unpin_folder
+from repositories.folders import update_pinned_folders as repo_update_pinned_folders
 from services.locale_service import LocaleService
 
 
 def get_pinned_folders(
-    client: Client,
-    user_id: str,
-    locale: str = LocaleService.DEFAULT_LOCALE
+    client: Client, user_id: str, locale: str = LocaleService.DEFAULT_LOCALE
 ) -> list[FolderResponseDTO]:
     """Get all pinned folders for a user"""
     pinned_ids = get_pinned_folder_ids(client, user_id)
@@ -44,11 +41,7 @@ def unpin_folder(client: Client, user_id: str, folder_id: str) -> dict:
     return {"pinned": False, "pinned_folder_ids": pinned_ids}
 
 
-def update_pinned_folders(
-    client: Client,
-    user_id: str,
-    data: UpdatePinnedFoldersDTO
-) -> dict:
+def update_pinned_folders(client: Client, user_id: str, data: UpdatePinnedFoldersDTO) -> dict:
     """Update all pinned folders"""
     pinned_ids = repo_update_pinned_folders(client, user_id, data.folder_ids)
     return {"pinned_folder_ids": pinned_ids}

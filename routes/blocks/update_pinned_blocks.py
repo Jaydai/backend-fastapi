@@ -1,16 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
-from services.block_service import BlockService
+
+from fastapi import HTTPException, Request, status
+
 from dtos import UpdatePinnedBlocksDTO
+from services.block_service import BlockService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.put("/pinned", status_code=status.HTTP_200_OK)
-async def update_pinned_blocks(
-    request: Request,
-    data: UpdatePinnedBlocksDTO
-):
+async def update_pinned_blocks(request: Request, data: UpdatePinnedBlocksDTO):
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

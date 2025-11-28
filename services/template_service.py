@@ -1,16 +1,17 @@
-from services.template_version_service import TemplateVersionService
 from supabase import Client
+
 from dtos import (
     CreateTemplateDTO,
-    UpdateTemplateDTO,
-    TemplateTitleResponseDTO,
+    TemplateCountsResponseDTO,
     TemplateResponseDTO,
+    TemplateTitleResponseDTO,
+    UpdateTemplateDTO,
     UsageResponseDTO,
-    TemplateCountsResponseDTO
 )
-from repositories import TemplateRepository, PermissionRepository, TemplateVersionRepository
 from mappers.template_mapper import TemplateMapper
+from repositories import PermissionRepository, TemplateRepository, TemplateVersionRepository
 from services.locale_service import LocaleService
+from services.template_version_service import TemplateVersionService
 
 
 class TemplateService:
@@ -23,13 +24,12 @@ class TemplateService:
         folder_id: str | None = None,
         published: bool | None = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[TemplateTitleResponseDTO]:
         """Get template titles with simplified signature"""
         # Business logic: Determine which filters to apply based on priority
         filter_user_id = None
         filter_org_id = None
-        filter_folder_id = folder_id
 
         if folder_id is not None:
             # Priority 1: Filter by folder only
@@ -48,7 +48,7 @@ class TemplateService:
             organization_id=filter_org_id,
             published=published,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
 
         return [
@@ -74,14 +74,9 @@ class TemplateService:
 
         return TemplateMapper.entity_to_response_dto(template, versions_summary, locale)
 
-
-
     @staticmethod
     def create_template(
-        client: Client,
-        user_id: str,
-        data: CreateTemplateDTO,
-        locale: str = LocaleService.DEFAULT_LOCALE
+        client: Client, user_id: str, data: CreateTemplateDTO, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO:
         workspace_type = "user"
         if data.organization_id:
@@ -99,7 +94,7 @@ class TemplateService:
             data.folder_id,
             data.organization_id,
             data.tags,
-            workspace_type
+            workspace_type,
         )
 
         try:
@@ -111,7 +106,7 @@ class TemplateService:
                 name="1.0",
                 change_notes=None,
                 status="draft" if workspace_type != "user" else "published",
-                optimized_for=data.optimized_for
+                optimized_for=data.optimized_for,
             )
 
             TemplateRepository.update_template(client, template.id, current_version_id=version.id)
@@ -122,13 +117,9 @@ class TemplateService:
 
         return TemplateService.get_template_by_id(client, template.id, locale)
 
-
     @staticmethod
     def update_template(
-        client: Client,
-        template_id: str,
-        data: UpdateTemplateDTO,
-        locale: str = LocaleService.DEFAULT_LOCALE
+        client: Client, template_id: str, data: UpdateTemplateDTO, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO | None:
         template = TemplateRepository.get_template_by_id(client, template_id)
         if not template:
@@ -153,7 +144,7 @@ class TemplateService:
                     data.version_id,
                     template_id,
                     content=version_update_data.get("content"),
-                    status=version_update_data.get("status")
+                    status=version_update_data.get("status"),
                 )
 
                 if not version:
@@ -167,7 +158,7 @@ class TemplateService:
                         template.user_id,
                         content_dict,
                         change_notes=None,
-                        status=data.status or "draft"
+                        status=data.status or "draft",
                     )
                     TemplateRepository.update_template(
                         client,
@@ -176,7 +167,7 @@ class TemplateService:
                         description=description_dict,
                         folder_id=data.folder_id,
                         tags=data.tags,
-                        current_version_id=version.id
+                        current_version_id=version.id,
                     )
 
         if not content_updated and not status_updated:
@@ -187,14 +178,13 @@ class TemplateService:
                 description=description_dict,
                 folder_id=data.folder_id,
                 tags=data.tags,
-                current_version_id=data.current_version_id
+                current_version_id=data.current_version_id,
             )
 
         if data.is_pinned is not None:
             TemplateRepository.update_pinned_status(client, template.user_id, template_id, data.is_pinned)
 
         return TemplateService.get_template_by_id(client, template_id, locale)
-
 
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:
@@ -205,7 +195,6 @@ class TemplateService:
         new_count = TemplateRepository.increment_usage(client, template_id)
         return UsageResponseDTO(usage_count=new_count)
 
-
     @staticmethod
     def search_templates(
         client: Client,
@@ -215,17 +204,9 @@ class TemplateService:
         tags: list[str] | None = None,
         include_public: bool = True,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[TemplateTitleResponseDTO]:
-        templates = TemplateRepository.search_templates(
-            client,
-            user_id,
-            query,
-            tags,
-            include_public,
-            limit,
-            offset
-        )
+        templates = TemplateRepository.search_templates(client, user_id, query, tags, include_public, limit, offset)
         return [TemplateMapper.entity_to_list_item_dto(t, locale) for t in templates]
 
     @staticmethod
@@ -235,5 +216,7 @@ class TemplateService:
         organization_counts = {}
         for role in user_all_roles:
             if role.organization_id:
-                organization_counts[role.organization_id] = TemplateRepository.get_organization_templates_count(client, role.organization_id)
+                organization_counts[role.organization_id] = TemplateRepository.get_organization_templates_count(
+                    client, role.organization_id
+                )
         return TemplateCountsResponseDTO(user_counts=user_counts, organization_counts=organization_counts)

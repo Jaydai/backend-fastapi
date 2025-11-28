@@ -1,13 +1,30 @@
 from domains.entities.stats_entities import (
-    UserStats, WeeklyConversationStats, MessageDistribution,
-    UsageOverview, UsageTimeline, UsagePatterns
+    MessageDistribution,
+    UsageOverview,
+    UsagePatterns,
+    UsageTimeline,
+    UserStats,
+    WeeklyConversationStats,
 )
 from dtos.stats_dto import (
-    UserStatsDTO, TokenUsageDTO, EnergyUsageDTO, ThinkingTimeDTO, ModelUsageStatsDTO,
-    WeeklyConversationStatsDTO, DailyStatsDTO, MessageDistributionDTO,
-    UsageOverviewDTO, UsagePeriodDTO, UsageSummaryDTO, ChatStatisticsDTO,
-    ModelBreakdownDTO, ProviderBreakdownDTO, TopProviderDTO,
-    UsageTimelineDTO, TimelineDataPointDTO, UsagePatternsDTO
+    ChatStatisticsDTO,
+    DailyStatsDTO,
+    EnergyUsageDTO,
+    MessageDistributionDTO,
+    ModelBreakdownDTO,
+    ModelUsageStatsDTO,
+    ProviderBreakdownDTO,
+    ThinkingTimeDTO,
+    TimelineDataPointDTO,
+    TokenUsageDTO,
+    TopProviderDTO,
+    UsageOverviewDTO,
+    UsagePatternsDTO,
+    UsagePeriodDTO,
+    UsageSummaryDTO,
+    UsageTimelineDTO,
+    UserStatsDTO,
+    WeeklyConversationStatsDTO,
 )
 
 
@@ -27,27 +44,20 @@ class StatsMapper:
                 recent_output=entity.token_usage.recent_output,
                 total=entity.token_usage.total,
                 total_input=entity.token_usage.total_input,
-                total_output=entity.token_usage.total_output
+                total_output=entity.token_usage.total_output,
             ),
             energy_usage=EnergyUsageDTO(
                 recent_wh=entity.energy_usage.recent_wh,
                 total_wh=entity.energy_usage.total_wh,
                 per_message_wh=entity.energy_usage.per_message_wh,
-                equivalent=entity.energy_usage.equivalent
+                equivalent=entity.energy_usage.equivalent,
             ),
-            thinking_time=ThinkingTimeDTO(
-                average=entity.thinking_time.average,
-                total=entity.thinking_time.total
-            ),
+            thinking_time=ThinkingTimeDTO(average=entity.thinking_time.average, total=entity.thinking_time.total),
             efficiency=entity.efficiency,
             model_usage={
-                k: ModelUsageStatsDTO(
-                    count=v.count,
-                    input_tokens=v.input_tokens,
-                    output_tokens=v.output_tokens
-                )
+                k: ModelUsageStatsDTO(count=v.count, input_tokens=v.input_tokens, output_tokens=v.output_tokens)
                 for k, v in entity.model_usage.items()
-            }
+            },
         )
 
     @staticmethod
@@ -56,30 +66,22 @@ class StatsMapper:
             total_conversations=entity.total_conversations,
             total_messages=entity.total_messages,
             daily_breakdown=[
-                DailyStatsDTO(
-                    date=day.date,
-                    conversations=day.conversations,
-                    messages=day.messages
-                )
+                DailyStatsDTO(date=day.date, conversations=day.conversations, messages=day.messages)
                 for day in entity.daily_breakdown
-            ]
+            ],
         )
 
     @staticmethod
     def to_message_distribution_dto(entity: MessageDistribution) -> MessageDistributionDTO:
         return MessageDistributionDTO(
-            by_role=entity.by_role,
-            by_model=entity.by_model,
-            total_messages=entity.total_messages
+            by_role=entity.by_role, by_model=entity.by_model, total_messages=entity.total_messages
         )
 
     @staticmethod
     def to_usage_overview_dto(entity: UsageOverview) -> UsageOverviewDTO:
         return UsageOverviewDTO(
             period=UsagePeriodDTO(
-                days=entity.period.days,
-                start_date=entity.period.start_date,
-                end_date=entity.period.end_date
+                days=entity.period.days, start_date=entity.period.start_date, end_date=entity.period.end_date
             ),
             summary=UsageSummaryDTO(
                 total_messages=entity.summary.total_messages,
@@ -93,20 +95,16 @@ class StatsMapper:
                 avg_messages_per_chat=entity.summary.avg_messages_per_chat,
                 most_used_provider=entity.summary.most_used_provider,
                 top_providers=[
-                    TopProviderDTO(
-                        name=p["name"],
-                        chats=p["chats"],
-                        rank=p["rank"]
-                    )
+                    TopProviderDTO(name=p["name"], chats=p["chats"], rank=p["rank"])
                     for p in entity.summary.top_providers
-                ]
+                ],
             ),
             model_breakdown={
                 k: ModelBreakdownDTO(
                     messages=v["messages"],
                     input_tokens=v["input_tokens"],
                     output_tokens=v["output_tokens"],
-                    cost=v["cost"]
+                    cost=v["cost"],
                 )
                 for k, v in entity.model_breakdown.items()
             },
@@ -117,7 +115,7 @@ class StatsMapper:
                     input_tokens=v["input_tokens"],
                     output_tokens=v["output_tokens"],
                     cost=v["cost"],
-                    avg_messages_per_chat=v["avg_messages_per_chat"]
+                    avg_messages_per_chat=v["avg_messages_per_chat"],
                 )
                 for k, v in entity.provider_breakdown.items()
             },
@@ -126,8 +124,8 @@ class StatsMapper:
                 avg_messages_per_chat=entity.chat_statistics.avg_messages_per_chat,
                 longest_chat=entity.chat_statistics.longest_chat,
                 chat_distribution_by_provider=entity.chat_statistics.chat_distribution_by_provider,
-                recent_chats=entity.chat_statistics.recent_chats
-            )
+                recent_chats=entity.chat_statistics.recent_chats,
+            ),
         )
 
     @staticmethod
@@ -135,9 +133,7 @@ class StatsMapper:
         return UsageTimelineDTO(
             granularity=entity.granularity,
             period=UsagePeriodDTO(
-                days=entity.period.days,
-                start_date=entity.period.start_date,
-                end_date=entity.period.end_date
+                days=entity.period.days, start_date=entity.period.start_date, end_date=entity.period.end_date
             ),
             timeline=[
                 TimelineDataPointDTO(
@@ -148,22 +144,20 @@ class StatsMapper:
                     output_tokens=point.output_tokens,
                     total_tokens=point.total_tokens,
                     cost_usd=point.cost_usd,
-                    energy_wh=point.energy_wh
+                    energy_wh=point.energy_wh,
                 )
                 for point in entity.timeline
-            ]
+            ],
         )
 
     @staticmethod
     def to_usage_patterns_dto(entity: UsagePatterns) -> UsagePatternsDTO:
         return UsagePatternsDTO(
             period=UsagePeriodDTO(
-                days=entity.period.days,
-                start_date=entity.period.start_date,
-                end_date=entity.period.end_date
+                days=entity.period.days, start_date=entity.period.start_date, end_date=entity.period.end_date
             ),
             hourly_distribution=entity.hourly_distribution,
             daily_distribution=entity.daily_distribution,
             peak_hour=entity.peak_hour,
-            peak_day=entity.peak_day
+            peak_day=entity.peak_day,
         )

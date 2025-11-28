@@ -3,24 +3,23 @@ from fastapi.testclient import TestClient
 
 
 class TestUserEndpoints:
-
     def request(self, method, *args, **kwargs):
         """Helper to automatically include cookies in all requests"""
-        if hasattr(self, 'cookies'):
-            kwargs.setdefault('cookies', self.cookies)
+        if hasattr(self, "cookies"):
+            kwargs.setdefault("cookies", self.cookies)
         return getattr(self.client, method)(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        return self.request('get', *args, **kwargs)
+        return self.request("get", *args, **kwargs)
 
     def post(self, *args, **kwargs):
-        return self.request('post', *args, **kwargs)
+        return self.request("post", *args, **kwargs)
 
     def patch(self, *args, **kwargs):
-        return self.request('patch', *args, **kwargs)
+        return self.request("patch", *args, **kwargs)
 
     def put(self, *args, **kwargs):
-        return self.request('put', *args, **kwargs)
+        return self.request("put", *args, **kwargs)
 
     @pytest.fixture(autouse=True)
     def setup(self, test_client, supabase_admin, create_test_user):
@@ -45,10 +44,7 @@ class TestUserEndpoints:
         assert response.status_code in [401, 403]
 
     def test_update_user_profile_success(self):
-        payload = {
-            "name": "Updated Name",
-            "bio": "This is my updated bio"
-        }
+        payload = {"name": "Updated Name", "bio": "This is my updated bio"}
         response = self.put("/user/profile", json=payload)
 
         assert response.status_code == 200
@@ -57,19 +53,14 @@ class TestUserEndpoints:
         assert "id" in data and ("first_name" in data or "email" in data)
 
     def test_update_user_profile_partial(self):
-        payload = {
-            "name": "Only Name Updated"
-        }
+        payload = {"name": "Only Name Updated"}
         response = self.put("/user/profile", json=payload)
 
         assert response.status_code == 200
 
     def test_update_user_profile_unauthorized(self):
         client_no_auth = TestClient(self.client.app)
-        response = client_no_auth.put(
-            "/user/profile",
-            json={"name": "Test"}
-        )
+        response = client_no_auth.put("/user/profile", json={"name": "Test"})
         assert response.status_code in [401, 403]
 
     def test_get_user_metadata_success(self):
@@ -84,10 +75,7 @@ class TestUserEndpoints:
         assert response.status_code in [401, 403]
 
     def test_update_user_metadata_success(self):
-        payload = {
-            "preferences": {"theme": "dark", "language": "en"},
-            "settings": {"notifications": True}
-        }
+        payload = {"preferences": {"theme": "dark", "language": "en"}, "settings": {"notifications": True}}
         response = self.put("/user/metadata", json=payload)
 
         # This endpoint is not implemented yet
@@ -95,34 +83,24 @@ class TestUserEndpoints:
 
     def test_update_user_metadata_unauthorized(self):
         client_no_auth = TestClient(self.client.app)
-        response = client_no_auth.put(
-            "/user/metadata",
-            json={"preferences": {}}
-        )
+        response = client_no_auth.put("/user/metadata", json={"preferences": {}})
         assert response.status_code in [401, 403, 501]
 
     def test_update_data_collection_preferences_enable(self):
-        payload = {
-            "data_collection": True
-        }
+        payload = {"data_collection": True}
         response = self.put("/user/data-collection", json=payload)
 
         assert response.status_code in [200, 201, 204]
 
     def test_update_data_collection_preferences_disable(self):
-        payload = {
-            "data_collection": False
-        }
+        payload = {"data_collection": False}
         response = self.put("/user/data-collection", json=payload)
 
         assert response.status_code in [200, 201, 204]
 
     def test_update_data_collection_unauthorized(self):
         client_no_auth = TestClient(self.client.app)
-        response = client_no_auth.put(
-            "/user/data-collection",
-            json={"data_collection": True}
-        )
+        response = client_no_auth.put("/user/data-collection", json={"data_collection": True})
         assert response.status_code in [401, 403]
 
 

@@ -2,8 +2,10 @@
 Application settings and configuration
 Centralized configuration management for environment variables and constants
 """
+
 import os
 from enum import Enum
+
 import dotenv
 
 dotenv.load_dotenv()
@@ -11,8 +13,9 @@ dotenv.load_dotenv()
 
 class Environment(str, Enum):
     """Environment types"""
+
     LOCAL = "local"
-    DEV = "dev" # staging
+    DEV = "dev"  # staging
     PROD = "prod"
 
 
@@ -26,7 +29,7 @@ class BaseSettings:
 
     # App
     APP_VERSION: str = "2.0.1"
-    
+
     # Environment
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", Environment.LOCAL)
 
@@ -51,7 +54,7 @@ class LocalSettings(BaseSettings):
 
 class DevSettings(BaseSettings):
     """Development environment settings"""
-    
+
     ALLOWED_ORIGINS: list = [
         "http://localhost:3000",
         "http://localhost:3001",
@@ -62,7 +65,7 @@ class DevSettings(BaseSettings):
         "https://chat.mistral.ai",
         "https://copilot.microsoft.com",
         "https://gemini.google.com",
-        "https://www.perplexity.ai"
+        "https://www.perplexity.ai",
     ]
 
 
@@ -81,20 +84,20 @@ class ProdSettings(BaseSettings):
         "https://chat.mistral.ai",
         "https://copilot.microsoft.com",
         "https://gemini.google.com",
-        "https://www.perplexity.ai"
+        "https://www.perplexity.ai",
     ]
 
 
 def get_settings() -> BaseSettings:
     """Factory function to get settings based on environment"""
     env = os.getenv("ENVIRONMENT", Environment.LOCAL).lower()
-    
+
     settings_map = {
         Environment.LOCAL: LocalSettings,
         Environment.DEV: DevSettings,
         Environment.PROD: ProdSettings,
     }
-    
+
     settings_class = settings_map.get(env, LocalSettings)
     return settings_class()
 

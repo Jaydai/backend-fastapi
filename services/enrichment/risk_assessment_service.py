@@ -1,11 +1,14 @@
 """
 Improved Risk Assessment Service with better error handling and validation
 """
+
 import json
 import logging
+import os
 import time
+
 from openai import OpenAI
-from typing import Optional
+
 from config.enrichment_config import enrichment_config
 
 logger = logging.getLogger(__name__)
@@ -17,7 +20,11 @@ class RiskAssessmentService:
     """
 
     def __init__(self):
-        self.client = OpenAI()
+        # In test mode without OpenAI API key, client remains None
+        if os.getenv("OPENAI_API_KEY"):
+            self.client = OpenAI()
+        else:
+            self.client = None  # type: ignore
         self.use_assistant = enrichment_config.MESSAGE_ENRICHMENT_ASSISTANT_ID is not None
 
         if self.use_assistant:
@@ -30,18 +37,13 @@ class RiskAssessmentService:
     def _load_prompt_template() -> str:
         """Load risk assessment prompt from file (legacy mode)"""
         try:
-            with open("prompts/risk_assessment.txt", "r") as f:
+            with open("prompts/risk_assessment.txt") as f:
                 return f.read()
         except FileNotFoundError:
             logger.error("Risk assessment prompt file not found")
             raise
 
-    def assess_message_risk(
-        self,
-        content: str,
-        role: str = "user",
-        context: Optional[dict] = None
-    ) -> dict:
+    def assess_message_risk(self, content: str, role: str = "user", context: dict | None = None) -> dict:
         """
         Assess risks in a message
 
@@ -53,6 +55,7 @@ class RiskAssessmentService:
 
         # Truncate content if needed
         from utils.enrichment import truncate_message
+
         content_truncated = truncate_message(content)
         logger.info(f"[RISK DEBUG] Content truncated to: {len(content_truncated)} chars")
 
@@ -70,11 +73,7 @@ class RiskAssessmentService:
             raw_response = self._call_assistant_with_retry(user_prompt)
         else:
             # Legacy: Use chat completions with template
-            prompt = self.prompt_template.format(
-                message_content=content_truncated,
-                context=context_str,
-                role=role
-            )
+            prompt = self.prompt_template.format(message_content=content_truncated, context=context_str, role=role)
             raw_response = self._call_llm_with_retry(prompt)
 
         # Validate and enhance response
@@ -100,16 +99,13 @@ class RiskAssessmentService:
                     messages=[
                         {
                             "role": "system",
-                            "content": "You are a security risk assessment expert. Respond only with valid JSON."
+                            "content": "You are a security risk assessment expert. Respond only with valid JSON.",
                         },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
+                        {"role": "user", "content": prompt},
                     ],
                     temperature=enrichment_config.RISK_ASSESSMENT_TEMPERATURE,
                     max_tokens=enrichment_config.RISK_ASSESSMENT_MAX_TOKENS,
-                    response_format={"type": "json_object"}
+                    response_format={"type": "json_object"},
                 )
 
                 content = response.choices[0].message.content
@@ -131,11 +127,11 @@ class RiskAssessmentService:
                 content_stripped = content.strip()
                 if content_stripped and not content_stripped.startswith("{"):
                     # LLM returned JSON fields without wrapping braces - wrap it
-                    logger.info(f"[RISK DEBUG] Adding opening brace to JSON")
+                    logger.info("[RISK DEBUG] Adding opening brace to JSON")
                     content = "{" + content_stripped + "}"
                 elif content_stripped and not content_stripped.endswith("}"):
                     # Missing closing brace
-                    logger.info(f"[RISK DEBUG] Adding closing brace to JSON")
+                    logger.info("[RISK DEBUG] Adding closing brace to JSON")
                     content = content_stripped + "}"
                 else:
                     # Use stripped version
@@ -173,33 +169,22 @@ class RiskAssessmentService:
                 thread = self.client.beta.threads.create()
 
                 # Add message to thread
-                self.client.beta.threads.messages.create(
-                    thread_id=thread.id,
-                    role="user",
-                    content=user_prompt
-                )
+                self.client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_prompt)
 
                 # Run the assistant
                 run = self.client.beta.threads.runs.create(
-                    thread_id=thread.id,
-                    assistant_id=enrichment_config.MESSAGE_ENRICHMENT_ASSISTANT_ID
+                    thread_id=thread.id, assistant_id=enrichment_config.MESSAGE_ENRICHMENT_ASSISTANT_ID
                 )
 
                 # Wait for completion
                 while run.status in ["queued", "in_progress"]:
                     time.sleep(0.5)
-                    run = self.client.beta.threads.runs.retrieve(
-                        thread_id=thread.id,
-                        run_id=run.id
-                    )
+                    run = self.client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
 
                 if run.status == "completed":
                     # Get messages
                     messages = self.client.beta.threads.messages.list(thread_id=thread.id)
-                    assistant_message = next(
-                        (msg for msg in messages.data if msg.role == "assistant"),
-                        None
-                    )
+                    assistant_message = next((msg for msg in messages.data if msg.role == "assistant"), None)
 
                     if assistant_message:
                         content = assistant_message.content[0].text.value
@@ -235,7 +220,9 @@ class RiskAssessmentService:
                 time.sleep(enrichment_config.LLM_RETRY_DELAY_SECONDS)
 
         # All retries failed
-        logger.error(f"Assistant risk assessment failed after {enrichment_config.MAX_LLM_RETRIES + 1} attempts: {last_error}")
+        logger.error(
+            f"Assistant risk assessment failed after {enrichment_config.MAX_LLM_RETRIES + 1} attempts: {last_error}"
+        )
         raise Exception(f"Assistant risk assessment service failed: {last_error}")
 
     def _validate_and_enhance_risk_response(self, raw_response: dict) -> dict:
@@ -265,7 +252,7 @@ class RiskAssessmentService:
             "confidential": risk_data.get("confidential", {}).get("risk_score", 0),
             "misinformation": risk_data.get("misinformation", {}).get("risk_score", 0),
             "data_leakage": risk_data.get("data_leakage", {}).get("risk_score", 0),
-            "compliance": risk_data.get("compliance", {}).get("risk_score", 0)
+            "compliance": risk_data.get("compliance", {}).get("risk_score", 0),
         }
 
         # Apply weights
@@ -283,12 +270,8 @@ class RiskAssessmentService:
         # Determine level from score
         overall_level = enrichment_config.get_risk_level_from_score(overall_score)
 
-        return {
-            "score": round(overall_score, 2),
-            "level": overall_level
-        }
+        return {"score": round(overall_score, 2), "level": overall_level}
 
 
 # Singleton instance
 risk_assessment_service = RiskAssessmentService()
-

@@ -1,16 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
-from services.folder_service import FolderService
+
+from fastapi import HTTPException, Request, status
+
 from dtos import FolderResponseDTO
+from services.folder_service import FolderService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.get("/{folder_id}", response_model=FolderResponseDTO, status_code=status.HTTP_200_OK)
-async def get_folder(
-    request: Request,
-    folder_id: str
-) -> FolderResponseDTO:
+async def get_folder(request: Request, folder_id: str) -> FolderResponseDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client

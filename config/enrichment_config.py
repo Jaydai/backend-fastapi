@@ -1,12 +1,14 @@
 """
 Configuration for enrichment services
 """
+
 import os
 from enum import Enum
 
 
 class EnrichmentModels(str, Enum):
     """Available models for enrichment"""
+
     GPT_4_NANO = "gpt-4.1-nano"
     GPT_4_TURBO = "gpt-4-turbo-preview"
     GPT_4 = "gpt-4"
@@ -41,31 +43,20 @@ class EnrichmentConfig:
     MAX_MESSAGE_BATCH_SIZE = 100
 
     # Risk Assessment Configuration
-    RISK_LEVEL_THRESHOLDS = {
-        "critical": 80.0,
-        "high": 60.0,
-        "medium": 40.0,
-        "low": 20.0,
-        "none": 0.0
-    }
+    RISK_LEVEL_THRESHOLDS = {"critical": 80.0, "high": 60.0, "medium": 40.0, "low": 20.0, "none": 0.0}
 
     # Risk category weights for overall score calculation
     RISK_CATEGORY_WEIGHTS = {
-        "security": 1.5,        # Highest priority (credentials, API keys)
-        "confidential": 1.3,    # Business-critical data
-        "pii": 1.2,             # Personal information
-        "data_leakage": 1.1,    # Internal systems/code
-        "compliance": 1.0,      # Regulatory concerns
-        "misinformation": 0.7   # Lower priority
+        "security": 1.5,  # Highest priority (credentials, API keys)
+        "confidential": 1.3,  # Business-critical data
+        "pii": 1.2,  # Personal information
+        "data_leakage": 1.1,  # Internal systems/code
+        "compliance": 1.0,  # Regulatory concerns
+        "misinformation": 0.7,  # Lower priority
     }
 
     # Quality score distribution buckets
-    QUALITY_DISTRIBUTION_BUCKETS = {
-        "excellent": (80, 100),
-        "good": (60, 79),
-        "medium": (40, 59),
-        "poor": (0, 39)
-    }
+    QUALITY_DISTRIBUTION_BUCKETS = {"excellent": (80, 100), "good": (60, 79), "medium": (40, 59), "poor": (0, 39)}
 
     # Retry configuration
     MAX_LLM_RETRIES = 2

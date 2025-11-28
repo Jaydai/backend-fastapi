@@ -1,11 +1,14 @@
 """
 Improved Classification Service with better error handling and validation
 """
+
 import json
 import logging
+import os
 import time
+
 from openai import OpenAI
-from typing import Optional
+
 from config.enrichment_config import enrichment_config
 
 logger = logging.getLogger(__name__)
@@ -17,7 +20,11 @@ class ClassificationService:
     """
 
     def __init__(self):
-        self.client = OpenAI()
+        # In test mode without OpenAI API key, client remains None
+        if os.getenv("OPENAI_API_KEY"):
+            self.client = OpenAI()
+        else:
+            self.client = None  # type: ignore
         self.use_assistant = enrichment_config.CHAT_CLASSIFICATION_ASSISTANT_ID is not None
 
         if self.use_assistant:
@@ -30,17 +37,13 @@ class ClassificationService:
     def _load_prompt_template() -> str:
         """Load classification prompt from file (legacy mode)"""
         try:
-            with open("prompts/chat_classification_quality.txt", "r") as f:
+            with open("prompts/chat_classification_quality.txt") as f:
                 return f.read()
         except FileNotFoundError:
             logger.error("Classification prompt file not found")
             raise
 
-    def classify_chat(
-        self,
-        user_message: str,
-        assistant_response: Optional[str] = None
-    ) -> dict:
+    def classify_chat(self, user_message: str, assistant_response: str | None = None) -> dict:
         """
         Classify a chat and evaluate its quality
 
@@ -50,11 +53,9 @@ class ClassificationService:
         start_time = time.time()
 
         # Truncate messages if needed
-        user_message_truncated = user_message[:enrichment_config.MAX_TRUNCATED_MESSAGE_LENGTH]
+        user_message_truncated = user_message[: enrichment_config.MAX_TRUNCATED_MESSAGE_LENGTH]
         assistant_response_truncated = (
-            assistant_response[:enrichment_config.MAX_TRUNCATED_MESSAGE_LENGTH]
-            if assistant_response
-            else "N/A"
+            assistant_response[: enrichment_config.MAX_TRUNCATED_MESSAGE_LENGTH] if assistant_response else "N/A"
         )
 
         if self.use_assistant:
@@ -68,8 +69,7 @@ class ClassificationService:
         else:
             # Legacy: Use chat completions with template
             prompt = self.prompt_template.format(
-                user_message=user_message_truncated,
-                assistant_response=assistant_response_truncated
+                user_message=user_message_truncated, assistant_response=assistant_response_truncated
             )
             raw_response = self._call_llm_with_retry(prompt)
 
@@ -96,16 +96,13 @@ class ClassificationService:
                     messages=[
                         {
                             "role": "system",
-                            "content": "You are a prompt classification and quality evaluation expert. Respond only with valid JSON."
+                            "content": "You are a prompt classification and quality evaluation expert. Respond only with valid JSON.",
                         },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
+                        {"role": "user", "content": prompt},
                     ],
                     temperature=enrichment_config.CLASSIFICATION_TEMPERATURE,
                     max_tokens=enrichment_config.CLASSIFICATION_MAX_TOKENS,
-                    response_format={"type": "json_object"}
+                    response_format={"type": "json_object"},
                 )
 
                 content = response.choices[0].message.content
@@ -157,33 +154,22 @@ class ClassificationService:
                 thread = self.client.beta.threads.create()
 
                 # Add message to thread
-                self.client.beta.threads.messages.create(
-                    thread_id=thread.id,
-                    role="user",
-                    content=user_prompt
-                )
+                self.client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_prompt)
 
                 # Run the assistant
                 run = self.client.beta.threads.runs.create(
-                    thread_id=thread.id,
-                    assistant_id=enrichment_config.CHAT_CLASSIFICATION_ASSISTANT_ID
+                    thread_id=thread.id, assistant_id=enrichment_config.CHAT_CLASSIFICATION_ASSISTANT_ID
                 )
 
                 # Wait for completion
                 while run.status in ["queued", "in_progress"]:
                     time.sleep(0.5)
-                    run = self.client.beta.threads.runs.retrieve(
-                        thread_id=thread.id,
-                        run_id=run.id
-                    )
+                    run = self.client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
 
                 if run.status == "completed":
                     # Get messages
                     messages = self.client.beta.threads.messages.list(thread_id=thread.id)
-                    assistant_message = next(
-                        (msg for msg in messages.data if msg.role == "assistant"),
-                        None
-                    )
+                    assistant_message = next((msg for msg in messages.data if msg.role == "assistant"), None)
 
                     if assistant_message:
                         content = assistant_message.content[0].text.value
@@ -216,7 +202,9 @@ class ClassificationService:
                 time.sleep(enrichment_config.LLM_RETRY_DELAY_SECONDS)
 
         # All retries failed
-        logger.error(f"Assistant classification failed after {enrichment_config.MAX_LLM_RETRIES + 1} attempts: {last_error}")
+        logger.error(
+            f"Assistant classification failed after {enrichment_config.MAX_LLM_RETRIES + 1} attempts: {last_error}"
+        )
         raise Exception(f"Assistant classification service failed: {last_error}")
 
     def _validate_classification_response(self, raw_response: dict) -> dict:
@@ -224,9 +212,9 @@ class ClassificationService:
         Validate LLM response structure and provide defaults if needed
         """
         from utils.enrichment import sanitize_classification_result
+
         return sanitize_classification_result(raw_response)
 
 
 # Singleton instance
 classification_service = ClassificationService()
-

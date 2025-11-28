@@ -1,5 +1,6 @@
 from supabase import Client
-from domains.entities import Message, Chat
+
+from domains.entities import Chat, Message
 
 
 class MessageRepository:
@@ -20,7 +21,7 @@ class MessageRepository:
             chat_provider_id=row["chat_provider_id"],
             model=row["model"],
             created_at=row.get("created_at"),
-            parent_message_provider_id=row.get("parent_message_provider_id")
+            parent_message_provider_id=row.get("parent_message_provider_id"),
         )
 
     @staticmethod
@@ -28,11 +29,13 @@ class MessageRepository:
         if not message_ids:
             return set()
 
-        response = client.table("messages") \
-            .select("message_provider_id") \
-            .eq("user_id", user_id) \
-            .in_("message_provider_id", message_ids) \
+        response = (
+            client.table("messages")
+            .select("message_provider_id")
+            .eq("user_id", user_id)
+            .in_("message_provider_id", message_ids)
             .execute()
+        )
 
         if not response.data:
             return set()
@@ -59,7 +62,7 @@ class MessageRepository:
                 chat_provider_id=row["chat_provider_id"],
                 model=row["model"],
                 created_at=row.get("created_at"),
-                parent_message_provider_id=row.get("parent_message_provider_id")
+                parent_message_provider_id=row.get("parent_message_provider_id"),
             )
             for row in response.data
         ]
@@ -68,11 +71,9 @@ class MessageRepository:
 class ChatRepository:
     @staticmethod
     def get_chat_by_provider_id(client: Client, user_id: str, chat_provider_id: str) -> Chat | None:
-        response = client.table("chats") \
-            .select("*") \
-            .eq("user_id", user_id) \
-            .eq("chat_provider_id", chat_provider_id) \
-            .execute()
+        response = (
+            client.table("chats").select("*").eq("user_id", user_id).eq("chat_provider_id", chat_provider_id).execute()
+        )
 
         if not response.data:
             return None
@@ -84,7 +85,7 @@ class ChatRepository:
             chat_provider_id=row["chat_provider_id"],
             title=row["title"],
             provider_name=row["provider_name"],
-            created_at=row.get("created_at")
+            created_at=row.get("created_at"),
         )
 
     @staticmethod
@@ -101,16 +102,18 @@ class ChatRepository:
             chat_provider_id=row["chat_provider_id"],
             title=row["title"],
             provider_name=row["provider_name"],
-            created_at=row.get("created_at")
+            created_at=row.get("created_at"),
         )
 
     @staticmethod
     def update_chat(client: Client, user_id: str, chat_provider_id: str, update_data: dict) -> Chat | None:
-        response = client.table("chats") \
-            .update(update_data) \
-            .eq("user_id", user_id) \
-            .eq("chat_provider_id", chat_provider_id) \
+        response = (
+            client.table("chats")
+            .update(update_data)
+            .eq("user_id", user_id)
+            .eq("chat_provider_id", chat_provider_id)
             .execute()
+        )
 
         if not response.data:
             return None
@@ -122,7 +125,7 @@ class ChatRepository:
             chat_provider_id=row["chat_provider_id"],
             title=row["title"],
             provider_name=row["provider_name"],
-            created_at=row.get("created_at")
+            created_at=row.get("created_at"),
         )
 
     @staticmethod
@@ -130,11 +133,13 @@ class ChatRepository:
         if not chat_ids:
             return set()
 
-        response = client.table("chats") \
-            .select("chat_provider_id") \
-            .eq("user_id", user_id) \
-            .in_("chat_provider_id", chat_ids) \
+        response = (
+            client.table("chats")
+            .select("chat_provider_id")
+            .eq("user_id", user_id)
+            .in_("chat_provider_id", chat_ids)
             .execute()
+        )
 
         if not response.data:
             return set()
@@ -158,7 +163,7 @@ class ChatRepository:
                 chat_provider_id=row["chat_provider_id"],
                 title=row["title"],
                 provider_name=row["provider_name"],
-                created_at=row.get("created_at")
+                created_at=row.get("created_at"),
             )
             for row in response.data
         ]

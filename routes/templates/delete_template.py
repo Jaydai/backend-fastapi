@@ -1,8 +1,10 @@
-from fastapi import HTTPException, Request, status
 import logging
 
-from . import router
+from fastapi import HTTPException, Request, status
+
 from services.template_service import TemplateService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +12,7 @@ logger = logging.getLogger(__name__)
 @router.delete("/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_template(
     request: Request,
-    template_id: str  # UUID
+    template_id: str,  # UUID
 ):
     try:
         user_id = request.state.user_id
@@ -21,10 +23,7 @@ async def delete_template(
         success = TemplateService.delete_template(client, template_id)
 
         if not success:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Template {template_id} not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Template {template_id} not found")
 
         logger.info(f"Template {template_id} deleted successfully")
 
@@ -33,6 +32,5 @@ async def delete_template(
     except Exception as e:
         logger.error(f"Error deleting template: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete template: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to delete template: {str(e)}"
         )

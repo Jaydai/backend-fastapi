@@ -1,10 +1,14 @@
-from fastapi import Request, Query, HTTPException, status
 import logging
-from . import router
-from services.block_service import BlockService
+
+from fastapi import HTTPException, Query, Request, status
+
 from dtos import BlockTitleResponseDTO
+from services.block_service import BlockService
+
+from . import router
 
 logger = logging.getLogger(__name__)
+
 
 @router.get("", response_model=list[BlockTitleResponseDTO], status_code=status.HTTP_200_OK)
 async def get_blocks(
@@ -13,7 +17,7 @@ async def get_blocks(
     types: str | None = Query(None, description="Comma-separated block types to filter"),
     published: bool | None = None,
     limit: int = Query(100, le=500),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
 ) -> list[BlockTitleResponseDTO]:
     """
     Get block titles (id, title) with optional filtering.
@@ -34,15 +38,7 @@ async def get_blocks(
         if types is not None:
             type_list = [t.strip() for t in types.split(",") if t.strip()]
 
-        blocks = BlockService.get_blocks_titles(
-            client,
-            locale,
-            organization_id,
-            type_list,
-            published,
-            limit,
-            offset
-        )
+        blocks = BlockService.get_blocks_titles(client, locale, organization_id, type_list, published, limit, offset)
 
         logger.info(f"Returning {len(blocks)} block titles")
         return blocks

@@ -6,14 +6,14 @@ For new code, import directly from repositories.folders.* modules.
 """
 
 from repositories.folders import (
+    create_folder,
+    delete_folder,
     get_folder_by_id,
     get_folders_titles,
-    create_folder,
-    update_folder,
-    delete_folder,
     get_pinned_folder_ids,
     pin_folder,
     unpin_folder,
+    update_folder,
     update_pinned_folders,
 )
 
@@ -22,7 +22,14 @@ class FolderRepository:
     """Folder repository class for backward compatibility"""
 
     @staticmethod
-    def get_folders_titles(client, user_id=None, organization_id=None, parent_folder_id=None, limit=100, offset=0):
+    def get_folders_titles(
+        client,
+        user_id=None,
+        organization_id=None,
+        parent_folder_id=None,
+        limit=100,
+        offset=0,
+    ):
         """Get folder titles"""
         return get_folders_titles(
             client,
@@ -30,7 +37,7 @@ class FolderRepository:
             organization_id=organization_id,
             parent_folder_id=parent_folder_id,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
 
     @staticmethod
@@ -39,9 +46,25 @@ class FolderRepository:
         return get_folder_by_id(client, folder_id)
 
     @staticmethod
-    def create_folder(client, user_id: str, title, description, parent_folder_id, organization_id, workspace_type):
+    def create_folder(
+        client,
+        user_id: str,
+        title,
+        description,
+        parent_folder_id,
+        organization_id,
+        workspace_type,
+    ):
         """Create a new folder"""
-        return create_folder(client, user_id, title, description, parent_folder_id, organization_id, workspace_type)
+        return create_folder(
+            client,
+            user_id,
+            title,
+            description,
+            parent_folder_id,
+            organization_id,
+            workspace_type,
+        )
 
     @staticmethod
     def update_folder(client, folder_id: str, title=None, description=None, parent_folder_id=None):

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class Block:
     id: str
@@ -14,6 +15,7 @@ class Block:
     created_at: str
     updated_at: str | None
     usage_count: int
+
 
 @dataclass
 class BlockTitle:

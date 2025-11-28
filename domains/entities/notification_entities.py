@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class NotificationMetadata:
     action_type: str
     action_title_key: str
     action_url: str
+
 
 @dataclass
 class Notification:

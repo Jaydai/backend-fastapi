@@ -2,6 +2,7 @@ from domains.entities import Block
 from dtos import BlockResponseDTO
 from services.locale_service import LocaleService
 
+
 class BlockMapper:
     @staticmethod
     def entity_to_response_dto(block: Block, locale: str = LocaleService.DEFAULT_LOCALE) -> BlockResponseDTO:
@@ -17,5 +18,5 @@ class BlockMapper:
             workspace_type=block.workspace_type,
             created_at=block.created_at,
             updated_at=block.updated_at,
-            usage_count=block.usage_count
+            usage_count=block.usage_count,
         )

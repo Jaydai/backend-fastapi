@@ -7,12 +7,14 @@ class CreateTemplateVersionDTO(BaseModel):
 
 class TemplateVersionContentDTO(BaseModel):
     """Version content fetched separately"""
+
     id: int
     content: str
 
 
 class UpdateVersionStatusDTO(BaseModel):
     """DTO for updating version status fields"""
+
     template_id: str
     published: bool | None = None
     status: str | None = None

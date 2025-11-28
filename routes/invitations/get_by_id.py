@@ -1,14 +1,20 @@
-from fastapi import HTTPException, Request, status
 import logging
 
-from . import router
-from services.invitation_service import InvitationService
+from fastapi import HTTPException, Request, status
+
 from dtos import InvitationResponseDTO
+from services.invitation_service import InvitationService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
 
-@router.get("/{invitation_id}", response_model=InvitationResponseDTO, status_code=status.HTTP_200_OK)
+@router.get(
+    "/{invitation_id}",
+    response_model=InvitationResponseDTO,
+    status_code=status.HTTP_200_OK,
+)
 async def get_invitation_by_id(request: Request, invitation_id: str) -> InvitationResponseDTO:
     try:
         user_id = request.state.user_id

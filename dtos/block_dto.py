@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from enum import Enum
+
+from pydantic import BaseModel
+
 
 class BlockType(str, Enum):
     ROLE = "role"
@@ -12,6 +14,7 @@ class BlockType(str, Enum):
     CONSTRAINT = "constraint"
     CUSTOM = "custom"
 
+
 class CreateBlockDTO(BaseModel):
     type: BlockType
     title: str
@@ -20,12 +23,14 @@ class CreateBlockDTO(BaseModel):
     published: bool = True
     organization_id: str | None = None
 
+
 class UpdateBlockDTO(BaseModel):
     type: BlockType | None = None
     title: str | None = None
     description: str | None = None
     content: str | None = None
     published: bool | None = None
+
 
 class BlockResponseDTO(BaseModel):
     id: str
@@ -41,10 +46,13 @@ class BlockResponseDTO(BaseModel):
     updated_at: str | None = None
     usage_count: int
 
+
 class UpdatePinnedBlocksDTO(BaseModel):
     block_ids: list[str]
 
+
 class BlockTitleResponseDTO(BaseModel):
     """Block title response (minimal data for list endpoints)"""
+
     id: str
     title: str  # Localized title

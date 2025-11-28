@@ -1,2 +1,1 @@
 from .supabase import supabase
-

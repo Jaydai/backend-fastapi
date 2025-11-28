@@ -1,6 +1,11 @@
 import os
+
+from fastapi import APIRouter
+
 from config import settings
-from . import router
+
+router = APIRouter()
+
 
 @router.get("/")
 async def root():
@@ -10,5 +15,5 @@ async def root():
         "version": settings.APP_VERSION,
         "status": "running",
         "environment": os.getenv("ENVIRONMENT"),
-        "supabase_url": os.getenv("SUPABASE_URL")
+        "supabase_url": os.getenv("SUPABASE_URL"),
     }

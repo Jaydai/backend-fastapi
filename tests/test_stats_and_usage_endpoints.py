@@ -1,19 +1,19 @@
+import uuid
+from datetime import datetime, timedelta
+
 import pytest
 from fastapi.testclient import TestClient
-from datetime import datetime, timedelta
-import uuid
 
 
 class TestStatsEndpoints:
-
     def request(self, method, *args, **kwargs):
         """Helper to automatically include cookies in all requests"""
-        if hasattr(self, 'cookies'):
-            kwargs.setdefault('cookies', self.cookies)
+        if hasattr(self, "cookies"):
+            kwargs.setdefault("cookies", self.cookies)
         return getattr(self.client, method)(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        return self.request('get', *args, **kwargs)
+        return self.request("get", *args, **kwargs)
 
     @pytest.fixture(autouse=True)
     def setup(self, test_client, supabase_admin, create_test_user, create_test_organization):
@@ -36,8 +36,8 @@ class TestStatsEndpoints:
                     "user_id": self.user_id,
                     "chat_provider_id": f"test-chat-{uuid.uuid4()}",
                     "provider_name": "OpenAI" if i < 2 else "Anthropic",
-                    "title": f"Test Chat {i+1}",
-                    "created_at": (datetime.now() - timedelta(days=i)).isoformat()
+                    "title": f"Test Chat {i + 1}",
+                    "created_at": (datetime.now() - timedelta(days=i)).isoformat(),
                 }
                 # Model is stored on messages, not chats
                 test_model = "gpt-4" if i < 2 else "claude-3-sonnet"
@@ -56,9 +56,9 @@ class TestStatsEndpoints:
                         "chat_provider_id": chat["chat_provider_id"],
                         "message_provider_id": f"test-msg-user-{uuid.uuid4()}",
                         "role": "user",
-                        "content": f"Test user message {j+1} in chat {i+1}",
+                        "content": f"Test user message {j + 1} in chat {i + 1}",
                         "model": test_model,
-                        "created_at": (datetime.now() - timedelta(days=i, hours=j*2)).isoformat()
+                        "created_at": (datetime.now() - timedelta(days=i, hours=j * 2)).isoformat(),
                     }
                     user_msg_response = supabase_admin.table("messages").insert(user_msg_data).execute()
                     if user_msg_response.data:
@@ -71,9 +71,9 @@ class TestStatsEndpoints:
                             "message_provider_id": f"test-msg-assistant-{uuid.uuid4()}",
                             "parent_message_provider_id": user_msg_response.data[0]["message_provider_id"],
                             "role": "assistant",
-                            "content": f"Test assistant response {j+1} in chat {i+1}",
+                            "content": f"Test assistant response {j + 1} in chat {i + 1}",
                             "model": test_model,
-                            "created_at": (datetime.now() - timedelta(days=i, hours=j*2, seconds=30)).isoformat()
+                            "created_at": (datetime.now() - timedelta(days=i, hours=j * 2, seconds=30)).isoformat(),
                         }
                         assistant_msg_response = supabase_admin.table("messages").insert(assistant_msg_data).execute()
                         if assistant_msg_response.data:
@@ -183,15 +183,14 @@ class TestStatsEndpoints:
 
 
 class TestUsageEndpoints:
-
     def request(self, method, *args, **kwargs):
         """Helper to automatically include cookies in all requests"""
-        if hasattr(self, 'cookies'):
-            kwargs.setdefault('cookies', self.cookies)
+        if hasattr(self, "cookies"):
+            kwargs.setdefault("cookies", self.cookies)
         return getattr(self.client, method)(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        return self.request('get', *args, **kwargs)
+        return self.request("get", *args, **kwargs)
 
     @pytest.fixture(autouse=True)
     def setup(self, test_client, supabase_admin, create_test_user, create_test_organization):
@@ -213,7 +212,7 @@ class TestUsageEndpoints:
                 "chat_provider_id": f"usage-test-chat-{uuid.uuid4()}",
                 "provider_name": "OpenAI",
                 "title": "Usage Test Chat",
-                "created_at": datetime.now().isoformat()
+                "created_at": datetime.now().isoformat(),
             }
             test_model = "gpt-4"  # Model is stored on messages, not chats
             chat_response = supabase_admin.table("chats").insert(chat_data).execute()
@@ -229,7 +228,7 @@ class TestUsageEndpoints:
                         "role": "user",
                         "content": "Test message for usage analytics",
                         "model": test_model,
-                        "created_at": (datetime.now() - timedelta(hours=i)).isoformat()
+                        "created_at": (datetime.now() - timedelta(hours=i)).isoformat(),
                     }
                     user_response = supabase_admin.table("messages").insert(user_msg_data).execute()
                     if user_response.data:

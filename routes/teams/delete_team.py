@@ -1,9 +1,11 @@
-from fastapi import HTTPException, Request
 import logging
 
-from . import router
-from services.team_service import TeamService
+from fastapi import HTTPException, Request
+
 from dtos.team_dto import TeamDeletedResponseDTO
+from services.team_service import TeamService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 

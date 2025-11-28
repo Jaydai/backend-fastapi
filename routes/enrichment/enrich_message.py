@@ -1,9 +1,13 @@
 """Enrich single message endpoint"""
+
+import logging
+
 from fastapi import HTTPException, Request
-from . import router
+
 from dtos.enrichment_dto import EnrichMessageRequestDTO, EnrichMessageResponseDTO
 from services.enrichment_service import EnrichmentService
-import logging
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
@@ -17,12 +21,8 @@ async def enrich_message(request: Request, dto: EnrichMessageRequestDTO):
     """
     try:
         # Allow unauthenticated access for scripts - user_id will be None
-        user_id = getattr(request.state, 'user_id', None)
-        result = EnrichmentService.enrich_message(
-            request.state.supabase_client,
-            user_id,
-            dto
-        )
+        user_id = getattr(request.state, "user_id", None)
+        result = EnrichmentService.enrich_message(request.state.supabase_client, user_id, dto)
         return result
     except HTTPException:
         raise

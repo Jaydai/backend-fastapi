@@ -1,16 +1,17 @@
-from fastapi import Request, HTTPException, status
 import logging
-from . import router
-from services.block_service import BlockService
+
+from fastapi import HTTPException, Request, status
+
 from dtos import BlockResponseDTO
+from services.block_service import BlockService
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
+
 @router.get("/type/{block_type}", response_model=list[BlockResponseDTO], status_code=status.HTTP_200_OK)
-async def get_blocks_by_type(
-    request: Request,
-    block_type: str
-) -> list[BlockResponseDTO]:
+async def get_blocks_by_type(request: Request, block_type: str) -> list[BlockResponseDTO]:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
@@ -18,12 +19,7 @@ async def get_blocks_by_type(
 
         logger.info(f"User {user_id} getting blocks by type {block_type}")
 
-        blocks = BlockService.get_blocks(
-            client,
-            user_id,
-            locale,
-            block_type=block_type
-        )
+        blocks = BlockService.get_blocks(client, user_id, locale, block_type=block_type)
 
         return blocks
     except HTTPException:
