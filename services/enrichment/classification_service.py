@@ -4,6 +4,7 @@ Improved Classification Service with better error handling and validation
 
 import json
 import logging
+import os
 import time
 
 from openai import OpenAI
@@ -19,7 +20,11 @@ class ClassificationService:
     """
 
     def __init__(self):
-        self.client = OpenAI()
+        # In test mode without OpenAI API key, client remains None
+        if os.getenv("OPENAI_API_KEY"):
+            self.client = OpenAI()
+        else:
+            self.client = None  # type: ignore
         self.use_assistant = enrichment_config.CHAT_CLASSIFICATION_ASSISTANT_ID is not None
 
         if self.use_assistant:
