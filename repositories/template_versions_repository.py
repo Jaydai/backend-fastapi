@@ -106,3 +106,43 @@ class TemplateVersionRepository:
         data = response.data[0]
         return TemplateVersion(data)
 
+    @staticmethod
+    def update_version_status(
+        client: Client,
+        version_id: int,
+        template_id: str,
+        published: bool | None = None,
+        status: str | None = None,
+        is_current: bool | None = None
+    ) -> VersionContent | None:
+        """Update version status fields (published, status, is_current)"""
+        # If setting as current, first unset all other versions
+        if is_current is True:
+            client.table("prompt_templates_versions")\
+                .update({"is_current": False})\
+                .eq("template_id", template_id)\
+                .execute()
+
+        # Build update data
+        update_data = {}
+        if published is not None:
+            update_data["published"] = published
+        if status is not None:
+            update_data["status"] = status
+        if is_current is not None:
+            update_data["is_current"] = is_current
+
+        if not update_data:
+            # Nothing to update, just return current version
+            return TemplateVersionRepository.get_version_by_id(client, version_id)
+
+        response = client.table("prompt_templates_versions")\
+            .update(update_data)\
+            .eq("id", version_id)\
+            .execute()
+
+        if not response.data:
+            return None
+
+        return VersionContent(id=response.data[0]["id"], content=response.data[0].get("content", ""))
+
