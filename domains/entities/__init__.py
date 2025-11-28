@@ -1,6 +1,7 @@
 from .auth_entities import Session, User
 from .permission_entities import ROLE_PERMISSIONS, UserOrganizationRole
-from .template_entities import Template, TemplateVersion, VersionSummary,  TemplateWithVersions, TemplateComment, TemplateCommentAuthor, TemplateTitle
+from .template_entities import Template,  TemplateComment, TemplateCommentAuthor, TemplateTitle
+from .template_version_entities import VersionSummary, VersionContent, TemplateVersion
 from .user_entities import UserProfile
 from .message_entities import Message, Chat
 from .organizations import (
@@ -18,9 +19,9 @@ __all__ = [
     "ROLE_PERMISSIONS",
     "UserOrganizationRole",
     "Template",
-    "TemplateVersion",
     "VersionSummary",
-    "TemplateWithVersions",
+    "VersionContent",
+    "TemplateVersion",
     "TemplateComment",
     "TemplateCommentAuthor",
     "TemplateTitle",

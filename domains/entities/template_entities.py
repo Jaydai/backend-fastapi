@@ -1,15 +1,13 @@
 from dataclasses import dataclass
 
-
-
 @dataclass
 class Template:
-    id: str  # UUID in database
+    id: str
     title: dict[str, str]
     description: dict[str, str] | None
-    folder_id: str | None  # UUID
+    folder_id: str | None
     organization_id: str | None
-    user_id: str | None  # Can be None for public/shared templates
+    user_id: str | None
     created_at: str
     updated_at: str | None
     usage_count: int
@@ -17,29 +15,6 @@ class Template:
     current_version_id: int | None
     published: bool
 
-@dataclass
-class TemplateVersion:
-    id: int
-    template_id: str  # UUID foreign key to template
-    name: str
-    slug: str
-    content: dict[str, str]
-    change_notes: dict[str, str] | None
-    author_id: str
-    created_at: str
-    updated_at: str | None
-    status: str
-    is_current: bool
-    published: bool
-    usage_count: int
-    parent_version_id: int | None
-    optimized_for: list[str] | None
-
-@dataclass
-class TemplateWithVersions:
-    template: Template
-    versions: list[TemplateVersion]
-    current_version: TemplateVersion | None
 
 @dataclass
 class TemplateCommentAuthor:
@@ -63,11 +38,3 @@ class TemplateTitle:
     id: str
     title: dict[str, str]
     folder_id: str | None = None
-
-@dataclass
-class VersionSummary:
-    id: int
-    name: str
-    slug: str
-    is_current: bool
-    status: str

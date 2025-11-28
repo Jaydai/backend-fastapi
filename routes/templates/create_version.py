@@ -2,18 +2,18 @@ from fastapi import HTTPException, Request, status
 import logging
 
 from . import router
-from services.template_service import TemplateService
-from dtos import CreateVersionDTO, TemplateVersionResponseDTO
+from services.template_version_service import TemplateVersionService
+from dtos import CreateVersionDTO, CreateTemplateVersionDTO
 
 logger = logging.getLogger(__name__)
 
 
-@router.post("/{template_id}/versions", response_model=TemplateVersionResponseDTO, status_code=status.HTTP_201_CREATED)
+@router.post("/{template_id}/versions", response_model=CreateTemplateVersionDTO, status_code=status.HTTP_201_CREATED)
 async def create_template_version(
     request: Request,
-    template_id: str,  # UUID
+    template_id: str,
     data: CreateVersionDTO
-) -> TemplateVersionResponseDTO:
+) -> CreateTemplateVersionDTO:
     try:
         user_id = request.state.user_id
         client = request.state.supabase_client
@@ -21,7 +21,7 @@ async def create_template_version(
 
         logger.info(f"User {user_id} creating version for template {template_id}")
 
-        version = TemplateService.create_version(client, template_id, user_id, data, locale)
+        version = TemplateVersionService.create_version(client, template_id, user_id, data, locale)
 
         if not version:
             raise HTTPException(

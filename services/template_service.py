@@ -1,21 +1,16 @@
-from turtle import pu
 from services.template_version_service import TemplateVersionService
 from supabase import Client
 from dtos import (
     CreateTemplateDTO,
     UpdateTemplateDTO,
-    CreateVersionDTO,
-    TemplateVersionResponseDTO,
     TemplateTitleResponseDTO,
     TemplateResponseDTO,
     UsageResponseDTO,
     TemplateCountsResponseDTO
 )
-from repositories import TemplateRepository, TemplateVersionRepository, PermissionRepository
-
+from repositories import TemplateRepository, PermissionRepository, TemplateVersionRepository
 from mappers.template_mapper import TemplateMapper
 from services.locale_service import LocaleService
-from repositories import TemplateRepository
 
 
 class TemplateService:
@@ -108,7 +103,7 @@ class TemplateService:
         )
 
         try:
-            version = TemplateRepository.create_version(
+            version = TemplateVersionRepository.create_version(
                 client,
                 template.id,
                 user_id,
@@ -209,60 +204,6 @@ class TemplateService:
     def increment_usage(client: Client, template_id: str) -> UsageResponseDTO:
         new_count = TemplateRepository.increment_usage(client, template_id)
         return UsageResponseDTO(usage_count=new_count)
-
-    @staticmethod
-    def get_versions(
-        client: Client,
-        template_id: str,
-        locale: str = LocaleService.DEFAULT_LOCALE
-    ) -> list[TemplateVersionResponseDTO]:
-        versions = TemplateRepository.get_versions(client, template_id)
-        return [TemplateMapper.version_entity_to_dto(v, locale) for v in versions]
-
-    @staticmethod
-    def create_version(
-        client: Client,
-        template_id: str,
-        user_id: str,
-        data: CreateVersionDTO,
-        locale: str = LocaleService.DEFAULT_LOCALE
-    ) -> TemplateVersionResponseDTO:
-        if data.copy_from_version_id:
-            source_version = TemplateRepository.get_version_by_id(client, data.copy_from_version_id)
-            if not source_version:
-                return None
-            content_dict = source_version.content
-        else:
-            content_dict = LocaleService.ensure_localized_dict(data.content, locale) if data.content else {locale: ""}
-
-        change_notes_dict = LocaleService.ensure_localized_dict(data.change_notes, locale) if data.change_notes else None
-
-        version = TemplateRepository.create_version(
-            client,
-            template_id,
-            user_id,
-            content_dict,
-            name=data.name,
-            change_notes=change_notes_dict,
-            status=data.status or "draft",
-            optimized_for=data.optimized_for
-        )
-
-        return TemplateMapper.version_entity_to_dto(version, locale)
-
-    
-    @staticmethod
-    def get_version_by_slug(
-        client: Client,
-        template_id: str,
-        slug: str,
-        locale: str = LocaleService.DEFAULT_LOCALE
-    ) -> TemplateVersionResponseDTO | None:
-        version = TemplateVersionRepository.get_version_by_slug(client, template_id, slug)
-        if not version:
-            return None
-
-        return TemplateMapper.version_entity_to_dto(version, locale)
 
 
     @staticmethod

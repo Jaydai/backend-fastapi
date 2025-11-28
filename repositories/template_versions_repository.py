@@ -1,6 +1,6 @@
 """Template version repository - handles version database operations"""
 from supabase import Client
-from domains.entities import TemplateVersion, VersionSummary
+from domains.entities import TemplateVersion, VersionSummary, VersionContent
 
 
 class TemplateVersionRepository:
@@ -23,7 +23,7 @@ class TemplateVersionRepository:
     @staticmethod
     def get_versions_summary(client: Client, template_id: str, published: bool | None = None) -> list[VersionSummary]:
         query = client.table("prompt_templates_versions").select(
-        "id, name, slug, is_current, status"
+        "id, name, slug, is_current, status, published, optimized_for"
         ).eq("template_id", template_id)
         if published is not None:
             query = query.eq("published", published)
@@ -36,9 +36,9 @@ class TemplateVersionRepository:
         return [VersionSummary(**item) for item in response.data]
 
     @staticmethod
-    def get_version_by_id(client: Client, version_id: int) -> TemplateVersion | None:
+    def get_version_by_id(client: Client, version_id: int) -> VersionContent | None:
         response = client.table("prompt_templates_versions")\
-        .select("*")\
+        .select("id, content")\
         .eq("id", version_id)\
         .execute()
 
@@ -46,21 +46,8 @@ class TemplateVersionRepository:
             return None
 
         data = response.data[0]
-        return TemplateVersion(data)
+        return VersionContent(**data)
     
-    @staticmethod
-    def get_version_by_slug(client:Client, template_id: str, slug: str) -> TemplateVersion | None:
-        response = client.table("prompt_templates_versions").select(
-            "id, template_id, name, slug, content, change_notes, author_id, "
-            "created_at, updated_at, status, is_current, published, "
-            "usage_count, parent_version_id, optimized_for"
-        ).eq("template_id", template_id).eq("slug", slug).single().execute()
-
-        if not response.data:
-            return None
-
-        return TemplateVersion(**response.data)
-
     @staticmethod
     def create_version(
         client: Client,

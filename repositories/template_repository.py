@@ -1,8 +1,7 @@
 """Template repository - handles pure database operations for templates"""
 from supabase import Client
 from datetime import datetime
-from domains.entities import Template, TemplateTitle, TemplateVersion, TemplateComment
-from repositories.template_versions_repository import TemplateVersionRepository
+from domains.entities import Template, TemplateTitle, TemplateComment
 from services.locale_service import LocaleService
 
 class TemplateRepository:
@@ -195,107 +194,6 @@ class TemplateRepository:
         response = query.execute()
         return len(response.data or [])
 
-    @staticmethod
-    def create_version(
-        client: Client,
-        template_id: str,
-        author_id: str,
-        content: dict[str, str],
-        version_number: str | None = None,
-        change_notes: dict[str, str] | None = None,
-        status: str = "draft",
-        optimized_for: list[str] | None = None
-    ) -> TemplateVersion:
-        if not version_number:
-            versions = TemplateRepository.get_versions(client, template_id)
-            if versions:
-                latest = versions[0].version_number
-                try:
-                    major, minor = latest.split(".")
-                    version_number = f"{major}.{int(minor) + 1}"
-                except (ValueError, AttributeError):
-                    version_number = "1.1"
-            else:
-                version_number = "1.0"
-
-        version_data = {
-            "template_id": template_id,
-            "author_id": author_id,
-            "content": content,
-            "version_number": version_number,
-            "change_notes": change_notes,
-            "status": status,
-            "is_current": False,
-            "published": False,
-            "usage_count": 0,
-            "optimized_for": optimized_for
-        }
-
-        response = client.table("prompt_templates_versions").insert(version_data).execute()
-
-        data = response.data[0]
-        return TemplateVersion(
-            id=data["id"],
-            template_id=data["template_id"],
-            version_number=data.get("version_number", "1.0"),
-            content=data.get("content", {}),
-            description=data.get("description"),
-            change_notes=data.get("change_notes"),
-            author_id=data["author_id"],
-            created_at=data["created_at"],
-            updated_at=data.get("updated_at"),
-            status=data.get("status", "draft"),
-            is_current=data.get("is_current", False),
-            published=data.get("published", False),
-            usage_count=data.get("usage_count", 0),
-            parent_version_id=data.get("parent_version_id"),
-            optimized_for=data.get("optimized_for")
-        )
-
-    @staticmethod
-    def update_version(
-        client: Client,
-        version_id: int,
-        template_id: str,
-        content: dict[str, str] | None = None,
-        status: str | None = None
-    ) -> TemplateVersion | None:
-        update_data = {}
-        if content is not None:
-            update_data["content"] = content
-        if status is not None:
-            update_data["status"] = status
-
-        if not update_data:
-            return TemplateRepository.get_version_by_id(client, version_id)
-
-        response = client.table("prompt_templates_versions")\
-            .update(update_data)\
-            .eq("id", version_id)\
-            .eq("template_id", template_id)\
-            .execute()
-
-        if not response.data:
-            return None
-
-        data = response.data[0]
-        return TemplateVersion(
-            id=data["id"],
-            template_id=data["template_id"],
-            version_number=data.get("version_number", "1.0"),
-            content=data.get("content", {}),
-            description=data.get("description"),
-            change_notes=data.get("change_notes"),
-            author_id=data["author_id"],
-            created_at=data["created_at"],
-            updated_at=data.get("updated_at"),
-            status=data.get("status", "draft"),
-            is_current=data.get("is_current", False),
-            published=data.get("published", False),
-            usage_count=data.get("usage_count", 0),
-            parent_version_id=data.get("parent_version_id"),
-            optimized_for=data.get("optimized_for")
-        )
 
     @staticmethod
     def search_templates(

@@ -11,7 +11,6 @@ from . import (
     delete_template,
     track_usage,
     get_versions,
-    get_version_by_slug,
     create_version,
     set_default_version,
 )

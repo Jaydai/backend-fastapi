@@ -1,10 +1,10 @@
-from domains.entities import Template, TemplateVersion, TemplateComment, TemplateCommentAuthor, VersionSummary
+from domains.entities import Template, TemplateComment, TemplateCommentAuthor, VersionSummary, VersionContent
 from dtos import (
     TemplateListItemDTO,
     TemplateResponseDTO,
-    TemplateVersionResponseDTO,
     TemplateCommentDTO,
     TemplateCommentAuthorDTO,
+    TemplateVersionContentDTO,
 )
 from services.locale_service import LocaleService
 
@@ -41,7 +41,10 @@ class TemplateMapper:
                 name=LocaleService.localize_string(v.name, locale),
                 slug=v.slug,
                 is_current=v.is_current,
-                status=v.status
+                status=v.status,
+                optimized_for=v.optimized_for,
+                published=v.published
+
             )
             for v in versions_summary
         ]
@@ -63,23 +66,13 @@ class TemplateMapper:
             versions=version_dtos
             )
 
+
     @staticmethod
-    def version_entity_to_dto(version: TemplateVersion, locale: str = LocaleService.DEFAULT_LOCALE) -> TemplateVersionResponseDTO:
-        return TemplateVersionResponseDTO(
+    def version_entity_to_content_dto(version: VersionContent, locale: str = LocaleService.DEFAULT_LOCALE) -> TemplateVersionContentDTO:
+        """Map version entity to TemplateVersionContentDTO for fetching version content"""
+        return TemplateVersionContentDTO(
             id=version.id,
-            template_id=version.template_id,
-            name=version.name,
-            content=LocaleService.localize_string(version.content, locale),
-            change_notes=LocaleService.localize_string(version.change_notes, locale) if version.change_notes else None,
-            author_id=version.author_id,
-            created_at=version.created_at,
-            updated_at=version.updated_at,
-            status=version.status,
-            is_current=version.is_current,
-            published=version.published,
-            usage_count=version.usage_count,
-            parent_version_id=version.parent_version_id,
-            optimized_for=version.optimized_for
+            content=LocaleService.localize_string(version.content, locale)
         )
 
     @staticmethod

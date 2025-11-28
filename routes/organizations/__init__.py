@@ -12,7 +12,6 @@ from . import (
     get_invitations,
     get_templates,
     get_folders,
-    get_version_content,
     get_user_role,
     get_ai_coach_insights,
 )
