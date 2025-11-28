@@ -1,17 +1,18 @@
 import logging
 
-from . import router
+from fastapi import HTTPException, Request, status
+
+from dtos import CreateTemplateVersionDTO, CreateVersionDTO
 from services.template_version_service import TemplateVersionService
-from dtos import CreateVersionDTO, CreateTemplateVersionDTO
+
+from . import router
 
 logger = logging.getLogger(__name__)
 
 
 @router.post("/{template_id}/versions", response_model=CreateTemplateVersionDTO, status_code=status.HTTP_201_CREATED)
 async def create_template_version(
-    request: Request,
-    template_id: str,
-    data: CreateVersionDTO
+    request: Request, template_id: str, data: CreateVersionDTO
 ) -> CreateTemplateVersionDTO:
     try:
         user_id = request.state.user_id

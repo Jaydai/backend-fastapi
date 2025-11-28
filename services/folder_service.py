@@ -7,13 +7,11 @@ from dtos import (
     UpdateFolderDTO,
     UpdatePinnedFoldersDTO,
 )
+from repositories import FolderRepository
 from services.folders import (
     create_folder,
     delete_folder,
     get_folder_by_id,
-    create_folder,
-    update_folder,
-    delete_folder,
     get_pinned_folders,
     pin_folder,
     unpin_folder,
@@ -21,7 +19,6 @@ from services.folders import (
     update_pinned_folders,
 )
 from services.locale_service import LocaleService
-from repositories import FolderRepository
 
 
 class FolderService:
@@ -38,7 +35,7 @@ class FolderService:
         offset: int = 0,
     ) -> list[FolderTitleResponseDTO]:
         """Get folder titles with optional filtering"""
-         # Business logic: Determine which filters to apply based on priority
+        # Business logic: Determine which filters to apply based on priority
         filter_user_id = None
         filter_org_id = None
         filter_parent_id = parent_folder_id

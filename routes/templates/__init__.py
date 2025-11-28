@@ -4,11 +4,6 @@ router = APIRouter(prefix="/templates", tags=["Templates"])
 
 from . import (  # noqa: E402
     create_template,
-    get_template_by_id,
-    update_template,
-    delete_template,
-    track_usage,
-    get_versions,
     create_version,
     delete_template,
     get_template_by_id,

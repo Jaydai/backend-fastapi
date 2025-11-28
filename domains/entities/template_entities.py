@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class Template:
     id: str
@@ -14,7 +15,6 @@ class Template:
     last_used_at: str | None
     current_version_id: int | None
     published: bool
-
 
 
 @dataclass

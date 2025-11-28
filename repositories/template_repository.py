@@ -1,7 +1,10 @@
 """Template repository - handles pure database operations for templates"""
-from supabase import Client
+
 from datetime import datetime
-from domains.entities import Template, TemplateTitle, TemplateComment
+
+from supabase import Client
+
+from domains.entities import Template, TemplateComment, TemplateTitle
 from services.locale_service import LocaleService
 
 
@@ -32,11 +35,8 @@ class TemplateRepository:
 
     @staticmethod
     def get_template_by_id(client: Client, template_id: str) -> Template | None:
-        response = client.table("prompt_templates")\
-            .select("*")\
-            .eq("id", template_id)\
-            .execute()
-            
+        response = client.table("prompt_templates").select("*").eq("id", template_id).execute()
+
         if not response.data:
             return None
 
@@ -54,7 +54,7 @@ class TemplateRepository:
             usage_count=data.get("usage_count", 0),
             last_used_at=data.get("last_used_at"),
             current_version_id=data.get("current_version_id"),
-            published=data.get("published", False)
+            published=data.get("published", False),
         )
 
     @staticmethod
@@ -75,15 +75,13 @@ class TemplateRepository:
             "folder_id": folder_id,
             "organization_id": organization_id,
             "tags": tags or [],
-            "workspace_type": workspace_type
+            "workspace_type": workspace_type,
         }
         response = client.table("prompt_templates").insert(template_data).execute()
         if len(response.data or []) == 0:
             return None
         data = response.data[0]
         return Template(data)
-       
-
 
     @staticmethod
     def update_template(
@@ -107,10 +105,7 @@ class TemplateRepository:
         if current_version_id is not None:
             update_data["current_version_id"] = current_version_id
 
-        response = client.table("prompt_templates")\
-            .update(update_data)\
-            .eq("id", template_id)\
-            .execute()
+        response = client.table("prompt_templates").update(update_data).eq("id", template_id).execute()
 
         if len(response.data or []) == 0:
             return None
@@ -120,19 +115,13 @@ class TemplateRepository:
 
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:
-        response = client.table("prompt_templates")\
-        .delete()\
-        .eq("id", template_id)\
-        .execute()
+        response = client.table("prompt_templates").delete().eq("id", template_id).execute()
 
         return len(response.data or []) > 0
 
     @staticmethod
     def increment_usage(client: Client, template_id: str) -> int:
-        response = client.table("prompt_templates")\
-        .select("usage_count")\
-        .eq("id", template_id)\
-        .execute()
+        response = client.table("prompt_templates").select("usage_count").eq("id", template_id).execute()
 
         if not response.data:
             return 0
@@ -140,28 +129,17 @@ class TemplateRepository:
         current_count = response.data[0].get("usage_count", 0)
         new_count = current_count + 1
 
-        client.table("prompt_templates")\
-            .update({
-                "usage_count": new_count,
-                "last_used_at": datetime.utcnow().isoformat()
-            })\
-            .eq("id", template_id)\
-            .execute()
+        client.table("prompt_templates").update(
+            {"usage_count": new_count, "last_used_at": datetime.utcnow().isoformat()}
+        ).eq("id", template_id).execute()
 
         return new_count
 
     @staticmethod
-    def update_pinned_status(
-        client: Client,
-        user_id: str,
-        template_id: str,
-        is_pinned: bool
-    ) -> bool:
-        response = client.table("users_metadata")\
-        .select("pinned_template_ids")\
-        .eq("user_id", user_id)\
-        .single()\
-        .execute()
+    def update_pinned_status(client: Client, user_id: str, template_id: str, is_pinned: bool) -> bool:
+        response = (
+            client.table("users_metadata").select("pinned_template_ids").eq("user_id", user_id).single().execute()
+        )
 
         if not response.data:
             return False
@@ -173,17 +151,13 @@ class TemplateRepository:
         elif not is_pinned and template_id in current_pinned:
             current_pinned.remove(template_id)
 
-        client.table("users_metadata")\
-            .update({"pinned_template_ids": current_pinned})\
-            .eq("user_id", user_id)\
-            .execute()
+        client.table("users_metadata").update({"pinned_template_ids": current_pinned}).eq("user_id", user_id).execute()
 
         return True
 
-
     @staticmethod
     def get_user_templates_count(client: Client, user_id: str) -> int:
-        query = client.table("prompt_templates").select("id").eq("organization_id", organization_id)
+        query = client.table("prompt_templates").select("id").eq("user_id", user_id)
         response = query.execute()
         return len(response.data or [])
 
@@ -192,7 +166,6 @@ class TemplateRepository:
         query = client.table("prompt_templates").select("id").eq("organization_id", organization_id)
         response = query.execute()
         return len(response.data or [])
-
 
     @staticmethod
     def search_templates(
@@ -231,16 +204,17 @@ class TemplateRepository:
                     folder_id=data.get("folder_id"),
                     organization_id=data.get("organization_id"),
                     user_id=data["user_id"],
-                workspace_type=data["workspace_type"],
-                created_at=data["created_at"],
-                updated_at=data.get("updated_at"),
-                tags=data.get("tags"),
-                usage_count=data.get("usage_count", 0),
-                last_used_at=data.get("last_used_at"),
-                current_version_id=data.get("current_version_id"),
-                is_free=data.get("is_free", True),
-                published=data.get("published", False)
-            ))
+                    workspace_type=data["workspace_type"],
+                    created_at=data["created_at"],
+                    updated_at=data.get("updated_at"),
+                    tags=data.get("tags"),
+                    usage_count=data.get("usage_count", 0),
+                    last_used_at=data.get("last_used_at"),
+                    current_version_id=data.get("current_version_id"),
+                    is_free=data.get("is_free", True),
+                    published=data.get("published", False),
+                )
+            )
 
         return templates
 

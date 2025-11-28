@@ -16,7 +16,7 @@ class OrganizationRepository:
 
         if not response.data:
             return []
-        
+
         organizations = []
         for row in response.data:
             # Get the first available role

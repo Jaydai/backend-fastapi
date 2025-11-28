@@ -1,19 +1,17 @@
-from services.template_version_service import TemplateVersionService
 from supabase import Client
+
 from dtos import (
     CreateTemplateDTO,
-    UpdateTemplateDTO,
-    TemplateTitleResponseDTO,
+    TemplateCountsResponseDTO,
     TemplateResponseDTO,
     TemplateTitleResponseDTO,
-    TemplateVersionResponseDTO,
     UpdateTemplateDTO,
     UsageResponseDTO,
 )
-from repositories import TemplateRepository, PermissionRepository, TemplateVersionRepository
 from mappers.template_mapper import TemplateMapper
+from repositories import PermissionRepository, TemplateRepository, TemplateVersionRepository
 from services.locale_service import LocaleService
-from services.templates import create_template, get_templates_titles, update_template
+from services.template_version_service import TemplateVersionService
 
 
 class TemplateService:
@@ -32,7 +30,6 @@ class TemplateService:
         # Business logic: Determine which filters to apply based on priority
         filter_user_id = None
         filter_org_id = None
-        filter_folder_id = folder_id
 
         if folder_id is not None:
             # Priority 1: Filter by folder only
@@ -97,7 +94,7 @@ class TemplateService:
             data.folder_id,
             data.organization_id,
             data.tags,
-            workspace_type
+            workspace_type,
         )
 
         try:
@@ -109,7 +106,7 @@ class TemplateService:
                 name="1.0",
                 change_notes=None,
                 status="draft" if workspace_type != "user" else "published",
-                optimized_for=data.optimized_for
+                optimized_for=data.optimized_for,
             )
 
             TemplateRepository.update_template(client, template.id, current_version_id=version.id)
@@ -147,7 +144,7 @@ class TemplateService:
                     data.version_id,
                     template_id,
                     content=version_update_data.get("content"),
-                    status=version_update_data.get("status")
+                    status=version_update_data.get("status"),
                 )
 
                 if not version:
@@ -161,7 +158,7 @@ class TemplateService:
                         template.user_id,
                         content_dict,
                         change_notes=None,
-                        status=data.status or "draft"
+                        status=data.status or "draft",
                     )
                     TemplateRepository.update_template(
                         client,
@@ -170,7 +167,7 @@ class TemplateService:
                         description=description_dict,
                         folder_id=data.folder_id,
                         tags=data.tags,
-                        current_version_id=version.id
+                        current_version_id=version.id,
                     )
 
         if not content_updated and not status_updated:
@@ -181,7 +178,7 @@ class TemplateService:
                 description=description_dict,
                 folder_id=data.folder_id,
                 tags=data.tags,
-                current_version_id=data.current_version_id
+                current_version_id=data.current_version_id,
             )
 
         if data.is_pinned is not None:
@@ -197,7 +194,6 @@ class TemplateService:
     def increment_usage(client: Client, template_id: str) -> UsageResponseDTO:
         new_count = TemplateRepository.increment_usage(client, template_id)
         return UsageResponseDTO(usage_count=new_count)
-
 
     @staticmethod
     def search_templates(

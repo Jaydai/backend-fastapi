@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class TemplateVersion:
     id: int
@@ -17,6 +18,7 @@ class TemplateVersion:
     parent_version_id: int | None
     optimized_for: list[str] | None
 
+
 @dataclass
 class VersionSummary:
     id: int
@@ -26,6 +28,7 @@ class VersionSummary:
     status: str
     optimized_for: list[str] | None = None
     published: bool = False
+
 
 @dataclass
 class VersionContent:
