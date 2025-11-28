@@ -122,6 +122,10 @@ class TemplateService:
     def update_template(
         client: Client, template_id: str, data: UpdateTemplateDTO, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO | None:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"update_template called with data: {data}")
+
         template = TemplateRepository.get_template_by_id(client, template_id)
         if not template:
             return None
@@ -129,8 +133,12 @@ class TemplateService:
         title_dict = LocaleService.ensure_localized_dict(data.title, locale) if data.title else None
         description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
 
+        logger.info(f"title_dict: {title_dict}, description_dict: {description_dict}")
+
         content_updated = data.content is not None
         status_updated = data.status is not None
+
+        logger.info(f"content_updated: {content_updated}, status_updated: {status_updated}")
 
         if content_updated or status_updated:
             if data.version_id:

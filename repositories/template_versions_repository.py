@@ -119,6 +119,7 @@ class TemplateVersionRepository:
         """Update version fields."""
         # Convert dataclass to dict and filter out None values
         data_dict = {k: v for k, v in asdict(update_data).items() if v is not None}
+        print(f"💕💕💕 data_dict: {data_dict}")
 
         if not data_dict:
             return False

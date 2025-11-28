@@ -63,6 +63,7 @@ class TemplateVersionService:
         locale: str = LocaleService.DEFAULT_LOCALE,
     ) -> UpdateTemplateVersionDTO | None:
         """Update version fields (content, description, status, is_default, published, optimized_for)"""
+        print(f"💕💕💕 update_data: {update_data}")
         # Handle setting as default first
         if update_data.is_default is True:
             result = TemplateVersionRepository.set_default_version(client, version_id, template_id)
