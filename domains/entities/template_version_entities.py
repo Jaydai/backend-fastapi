@@ -33,14 +33,14 @@ class TemplateVersionUpdate:
 class VersionSummary:
     id: int
     name: str
-    slug: str
     is_default: bool
-    status: str
-    optimized_for: list[str] | None
     published: bool = False
 
 
 @dataclass
-class VersionContent:
+class VersionDetails:
     id: int
     content: dict[str, str]
+    status: str
+    published: bool
+    optimized_for: list[str] | None

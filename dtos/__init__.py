@@ -65,7 +65,7 @@ from .template_dto import (
     TemplateTitleResponseDTO,
     VersionSummary,
 )
-from .template_version_dto import CreateTemplateVersionDTO, TemplateVersionContentDTO, UpdateTemplateVersionDTO
+from .template_version_dto import CreateTemplateVersionDTO, TemplateVersionDTO, UpdateTemplateVersionDTO
 from .user_dto import UpdateDataCollectionDTO, UpdateUserProfileDTO, UserProfileResponseDTO
 
 __all__ = [
@@ -82,7 +82,7 @@ __all__ = [
     "UpdateTemplateDTO",
     "CreateVersionDTO",
     "CreateTemplateVersionDTO",
-    "TemplateVersionContentDTO",
+    "TemplateVersionDTO",
     "TemplateListItemDTO",
     "TemplateResponseDTO",
     "TemplateCommentAuthorDTO",
@@ -91,7 +91,7 @@ __all__ = [
     "TemplateTitleResponseDTO",
     "OrganizationTemplateTitleDTO",
     "VersionSummary",
-    "TemplateVersionContentDTO",
+    "TemplateVersionDTO",
     "TemplateCountsResponseDTO",
     "UserProfileResponseDTO",
     "UpdateUserProfileDTO",

@@ -4,7 +4,7 @@ from dataclasses import asdict
 
 from supabase import Client
 
-from domains.entities import TemplateVersion, TemplateVersionUpdate, VersionContent, VersionSummary
+from domains.entities import TemplateVersion, TemplateVersionUpdate, VersionDetails, VersionSummary
 
 
 class TemplateVersionRepository:
@@ -30,7 +30,7 @@ class TemplateVersionRepository:
     def get_versions_summary(client: Client, template_id: str, published: bool | None = None) -> list[VersionSummary]:
         query = (
             client.table("prompt_templates_versions")
-            .select("id, name, slug, is_default, status, published, optimized_for")
+            .select("id, name, is_default, published")
             .eq("template_id", template_id)
         )
         if published is not None:
@@ -43,14 +43,14 @@ class TemplateVersionRepository:
         return [VersionSummary(**item) for item in response.data]
 
     @staticmethod
-    def get_version_by_id(client: Client, version_id: int) -> VersionContent | None:
-        response = client.table("prompt_templates_versions").select("id, content").eq("id", version_id).execute()
+    def get_version_by_id(client: Client, version_id: int) -> VersionDetails | None:
+        response = client.table("prompt_templates_versions").select("id, optimized_for, published, status, content").eq("id", version_id).execute()
 
         if not response.data:
             return None
 
         data = response.data[0]
-        return VersionContent(**data)
+        return VersionDetails(**data)
 
     @staticmethod
     def create_version(

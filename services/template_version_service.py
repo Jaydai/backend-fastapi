@@ -1,7 +1,7 @@
 from supabase import Client
 
 from domains.entities import TemplateVersionUpdate, VersionSummary
-from dtos import CreateTemplateVersionDTO, CreateVersionDTO, TemplateVersionContentDTO, UpdateTemplateVersionDTO
+from dtos import CreateTemplateVersionDTO, CreateVersionDTO, TemplateVersionDTO, UpdateTemplateVersionDTO
 from mappers.template_mapper import TemplateMapper
 from repositories import TemplateVersionRepository
 from services.locale_service import LocaleService
@@ -11,7 +11,7 @@ class TemplateVersionService:
     @staticmethod
     def get_version_by_id(
         client: Client, version_id: int, locale: str = LocaleService.DEFAULT_LOCALE
-    ) -> TemplateVersionContentDTO | None:
+    ) -> TemplateVersionDTO | None:
         """Get a specific template version by its ID"""
         version = TemplateVersionRepository.get_version_by_id(client, version_id)
         if not version:

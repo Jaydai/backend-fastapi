@@ -5,10 +5,12 @@ class CreateTemplateVersionDTO(BaseModel):
     id: int
 
 
-class TemplateVersionContentDTO(BaseModel):
+class TemplateVersionDTO(BaseModel):
     """Version content fetched separately"""
-
     id: int
+    status: str
+    published: bool
+    optimized_for: list[str] | None = None
     content: str
 
 
@@ -21,7 +23,3 @@ class UpdateTemplateVersionDTO(BaseModel):
     published: bool | None = None
     optimized_for: list[str] | None = None
 
-
-class VersionSlugResponseDTO(BaseModel):
-    id: int
-    slug: str
