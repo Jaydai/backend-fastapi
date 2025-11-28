@@ -81,7 +81,9 @@ class TestAuthEndpoints:
 
     def test_sign_out_success(self):
         # First sign in
-        sign_in_response = self.client.post("/auth/sign_in", json={"email": "vincent+1@jayd.ai", "password": "test1234"})
+        sign_in_response = self.client.post(
+            "/auth/sign_in", json={"email": "vincent+1@jayd.ai", "password": "test1234"}
+        )
 
         # Extract cookie values directly (secure cookies don't forward in TestClient)
         cookies = {
@@ -105,7 +107,9 @@ class TestAuthEndpoints:
 
     def test_refresh_token_success(self):
         # Sign in first to get refresh token
-        sign_in_response = self.client.post("/auth/sign_in", json={"email": "vincent+1@jayd.ai", "password": "test1234"})
+        sign_in_response = self.client.post(
+            "/auth/sign_in", json={"email": "vincent+1@jayd.ai", "password": "test1234"}
+        )
 
         # Extract cookie values directly (secure cookies don't forward in TestClient)
         cookies = {

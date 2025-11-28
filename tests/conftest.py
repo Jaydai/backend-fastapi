@@ -68,15 +68,17 @@ def mock_auth_service(shared_test_storage):
 
     def mock_create_client_for_middleware(url, key, options=None):
         """When middleware creates authenticated client with mock token, use service key instead"""
-        if options and hasattr(options, 'headers'):
-            auth_header = options.headers.get('Authorization', '')
-            if 'mock_token_' in auth_header:
+        if options and hasattr(options, "headers"):
+            auth_header = options.headers.get("Authorization", "")
+            if "mock_token_" in auth_header:
                 # Use service key instead of mock token for real Supabase
                 return original_create_client(url, SUPABASE_SERVICE_KEY)
         return original_create_client(url, key, options)
 
-    with patch.object(AuthService, "get_current_user_id", side_effect=mock_get_current_user_id), \
-         patch.object(middleware.auth_middleware, "create_client", side_effect=mock_create_client_for_middleware):
+    with (
+        patch.object(AuthService, "get_current_user_id", side_effect=mock_get_current_user_id),
+        patch.object(middleware.auth_middleware, "create_client", side_effect=mock_create_client_for_middleware),
+    ):
         yield
 
 
