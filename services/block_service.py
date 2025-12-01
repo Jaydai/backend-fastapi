@@ -2,8 +2,8 @@ from supabase import Client
 
 from dtos import (
     BlockResponseDTO,
-    BlockTitleResponseDTO,
-    BlockType,
+    BlockSummaryResponseDTO,
+    BlockTypeEnum,
     CreateBlockDTO,
     UpdateBlockDTO,
     UpdatePinnedBlocksDTO,
@@ -17,19 +17,23 @@ class BlockService:
     @staticmethod
     def get_blocks(
         client: Client,
-        user_id: str,
         locale: str = LocaleService.DEFAULT_LOCALE,
-        block_type: str | None = None,
-        workspace_type: str | None = None,
+        user_id: str | None = None,
         organization_id: str | None = None,
-        published: bool | None = None,
-        search_query: str | None = None,
-    ) -> list[BlockResponseDTO]:
+        type: str | None = None,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> list[BlockSummaryResponseDTO]:
         blocks = BlockRepository.get_blocks(
-            client, user_id, block_type, workspace_type, organization_id, published, search_query
+            client,
+            user_id=user_id,
+            organization_id=organization_id,
+            type=type,
+            limit=limit,
+            offset=offset,
         )
 
-        return [BlockMapper.entity_to_response_dto(b, locale) for b in blocks]
+        return [BlockMapper.entity_to_summary_dto(b, locale) for b in blocks]
 
     @staticmethod
     def get_blocks_titles(
@@ -40,7 +44,7 @@ class BlockService:
         published: bool | None = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[BlockTitleResponseDTO]:
+    ) -> list[BlockSummaryResponseDTO]:
         """
         Get block titles (id, title) with optional filtering.
         Returns minimal data for list endpoints.
@@ -117,7 +121,7 @@ class BlockService:
 
     @staticmethod
     def get_block_types() -> list[str]:
-        return [bt.value for bt in BlockType]
+        return [bt.value for bt in BlockTypeEnum]
 
     @staticmethod
     def get_pinned_blocks(

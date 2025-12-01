@@ -2,7 +2,7 @@ import logging
 
 from fastapi import HTTPException, Request, status
 
-from dtos import BlockResponseDTO, BlockType, CreateBlockDTO
+from dtos import BlockResponseDTO, BlockTypeEnum, CreateBlockDTO
 from services.block_service import BlockService
 
 from . import router
@@ -26,28 +26,28 @@ async def seed_sample_blocks(request: Request) -> list[BlockResponseDTO]:
 
         sample_blocks = [
             CreateBlockDTO(
-                type=BlockType.CONTEXT,
+                type=BlockTypeEnum.CONTEXT,
                 title="Professional Context",
                 description="Sets a professional tone for business communications",
                 content="You are a professional assistant helping with business tasks. Maintain a formal and respectful tone.",
                 published=True,
             ),
             CreateBlockDTO(
-                type=BlockType.OUTPUT_FORMAT,
+                type=BlockTypeEnum.OUTPUT_FORMAT,
                 title="Markdown Output",
                 description="Format output as markdown",
                 content="Format your response using markdown syntax with proper headings, lists, and code blocks where appropriate.",
                 published=True,
             ),
             CreateBlockDTO(
-                type=BlockType.EXAMPLE,
+                type=BlockTypeEnum.EXAMPLE,
                 title="API Response Example",
                 description="Example of a well-structured API response",
                 content='{\n  "status": "success",\n  "data": {\n    "id": 123,\n    "name": "Example"\n  }\n}',
                 published=True,
             ),
             CreateBlockDTO(
-                type=BlockType.CONSTRAINT,
+                type=BlockTypeEnum.CONSTRAINT,
                 title="Concise Responses",
                 description="Keep responses brief and to the point",
                 content="Keep your responses concise and focused. Avoid unnecessary elaboration.",

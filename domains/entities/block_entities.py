@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from domains.enums import BlockTypeEnum
+
 
 @dataclass
 class Block:
@@ -21,3 +23,11 @@ class Block:
 class BlockTitle:
     id: str
     title: dict[str, str]
+
+@dataclass
+class BlockSummary:
+    id: str
+    title: dict[str, str]
+    type: BlockTypeEnum
+    description: dict[str, str] | None
+    usage_count: int

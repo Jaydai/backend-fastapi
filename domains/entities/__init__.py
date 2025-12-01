@@ -1,5 +1,5 @@
 from .auth_entities import Session, User
-from .block_entities import Block, BlockTitle
+from .block_entities import Block, BlockTitle, BlockSummary
 from .folder_entities import Folder, FolderWithItems, FolderTitle
 from .message_entities import Chat, Message
 from .organizations import (
@@ -43,4 +43,5 @@ __all__ = [
     "FolderTitle",
     "Block",
     "BlockTitle",
+    "BlockSummary",
 ]

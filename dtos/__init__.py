@@ -1,8 +1,8 @@
 from .auth_dto import OAuthSignIn, RefreshTokenDTO, SignInDTO, SignUpDTO, UserMeResponseDTO
 from .block_dto import (
     BlockResponseDTO,
-    BlockTitleResponseDTO,
-    BlockType,
+    BlockSummaryResponseDTO,
+    BlockTypeEnum,
     CreateBlockDTO,
     UpdateBlockDTO,
     UpdatePinnedBlocksDTO,
@@ -124,11 +124,11 @@ __all__ = [
     "UpdatePinnedFoldersDTO",
     "FolderTitleResponseDTO",
     "OrganizationFolderTitleDTO",
-    "BlockType",
+    "BlockTypeEnum",
     "CreateBlockDTO",
     "UpdateBlockDTO",
     "BlockResponseDTO",
     "UpdatePinnedBlocksDTO",
-    "BlockTitleResponseDTO",
+    "BlockSummaryResponseDTO",
     "UpdateTemplateVersionDTO",
 ]

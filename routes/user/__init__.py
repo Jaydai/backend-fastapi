@@ -18,6 +18,7 @@ from . import (  # noqa: E402
     get_profile,
     get_templates,
     get_templates_counts,
+    get_blocks,
     me,
     update_data_collection,
     update_metadata,

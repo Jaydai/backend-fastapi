@@ -18,5 +18,6 @@ from . import (  # noqa: E402
     update,
     update_member_role,
     get_folders,
-    get_templates
+    get_templates,
+    get_blocks
 )

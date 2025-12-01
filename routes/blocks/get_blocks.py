@@ -2,7 +2,7 @@ import logging
 
 from fastapi import HTTPException, Query, Request, status
 
-from dtos import BlockTitleResponseDTO
+from dtos import BlockSummaryResponseDTO
 from services.block_service import BlockService
 
 from . import router
@@ -10,7 +10,7 @@ from . import router
 logger = logging.getLogger(__name__)
 
 
-@router.get("", response_model=list[BlockTitleResponseDTO], status_code=status.HTTP_200_OK)
+@router.get("", response_model=list[BlockSummaryResponseDTO], status_code=status.HTTP_200_OK)
 async def get_blocks(
     request: Request,
     organization_id: str | None = None,
@@ -18,7 +18,7 @@ async def get_blocks(
     published: bool | None = None,
     limit: int = Query(100, le=500),
     offset: int = Query(0, ge=0),
-) -> list[BlockTitleResponseDTO]:
+) -> list[BlockSummaryResponseDTO]:
     """
     Get block titles (id, title) with optional filtering.
     Returns minimal data for list endpoints.

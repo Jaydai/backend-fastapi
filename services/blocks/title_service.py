@@ -2,7 +2,7 @@
 
 from supabase import Client
 
-from dtos import BlockTitleResponseDTO
+from dtos import BlockSummaryResponseDTO
 from repositories.blocks import BlockBaseRepository
 from services.locale_service import LocaleService
 from services.permissions import UserPermissionsService
@@ -22,7 +22,7 @@ class BlockTitleService:
         workspace_type: str | None = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[BlockTitleResponseDTO]:
+    ) -> list[BlockSummaryResponseDTO]:
         """
         Get block titles with optional filtering and permission checks.
         """
@@ -61,6 +61,6 @@ class BlockTitleService:
 
         # Localize and convert to DTOs
         return [
-            BlockTitleResponseDTO(**LocaleService.localize_object(block.__dict__, locale, ["title"]))
+            BlockSummaryResponseDTO(**LocaleService.localize_object(block.__dict__, locale, ["title"]))
             for block in blocks
         ]
