@@ -88,7 +88,19 @@ class TemplateVersionService:
         )
 
         # Only call update if there's something to update
-        has_updates = any([update_data.name, content_dict, description_dict, update_data.status, update_data.published, update_data.optimized_for])
+        # We consider a field "provided" if it's not None (including if it's False or 0, which count as provided)
+        has_updates = any(
+            field is not None
+            for field in [
+                update_data.name,
+                content_dict,
+                description_dict,
+                update_data.status,
+                update_data.published,
+                update_data.optimized_for,
+            ]
+        )
+        print(f"💕💕💕💕💕💕💕💕💕💕💕💕 has_updates: {has_updates}")
         if has_updates:
             updated = TemplateVersionRepository.update_version(
                 client,

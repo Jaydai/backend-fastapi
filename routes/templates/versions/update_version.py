@@ -20,6 +20,7 @@ async def update_version(
     version_id: int,
     update_data: UpdateTemplateVersionDTO
 ) -> dict:
+    print(f"💕💕💕💕💕💕💕💕💕💕💕💕 update_data: {update_data}")
     try:
         user_id = request.state.user_id
         supabase_client = request.state.supabase_client

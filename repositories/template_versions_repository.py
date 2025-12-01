@@ -30,7 +30,7 @@ class TemplateVersionRepository:
     def get_versions_summary(client: Client, template_id: str, published: bool | None = None) -> list[VersionSummary]:
         query = (
             client.table("prompt_templates_versions")
-            .select("id, name, is_default, published")
+            .select("id, name, is_default, status, published, optimized_for")
             .eq("template_id", template_id)
         )
         if published is not None:
@@ -122,6 +122,7 @@ class TemplateVersionRepository:
         print(f"💕💕💕 data_dict: {data_dict}")
 
         if not data_dict:
+            print(f"💕💕💕💕💕💕💕💕💕💕💕💕 data_dict is empty")
             return False
 
         update_response = (
@@ -131,6 +132,8 @@ class TemplateVersionRepository:
             .eq("template_id", template_id)
             .execute()
         )
+
+        print(f"😁😁😁😁😁😁😁😁😁😁😁😁 update_response: {update_response}")
 
         return bool(update_response.data)
 

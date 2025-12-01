@@ -34,7 +34,9 @@ class VersionSummary:
     id: int
     name: str
     is_default: bool
-    published: bool = False
+    status: str
+    published: bool
+    optimized_for: list[str] | None
 
 
 @dataclass
