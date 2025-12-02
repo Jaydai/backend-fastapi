@@ -1,6 +1,7 @@
 from supabase import Client
 
 from domains.entities import Block, BlockSummary, BlockTitle
+from domains.enums import BlockTypeEnum
 
 
 class BlockRepository:
@@ -38,7 +39,7 @@ class BlockRepository:
             blocks.append(
                 BlockSummary(
                     id=data["id"],
-                    type=data["type"],
+                    type=BlockTypeEnum(data["type"]),
                     title=data.get("title", {}),
                     description=data.get("description"),
                     usage_count=data.get("usage_count", 0),
