@@ -11,6 +11,7 @@ from . import (  # noqa: E402
     get_ai_coach_insights,
     get_all,
     get_by_id,
+    get_members,
     get_user_role,
     invite_member,
     leave,
@@ -19,5 +20,6 @@ from . import (  # noqa: E402
     update_member_role,
     get_folders,
     get_templates,
+    get_templates_usage,
     get_blocks
 )

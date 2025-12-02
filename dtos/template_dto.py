@@ -108,3 +108,14 @@ class OrganizationTemplateTitleDTO(BaseModel):
 class TemplateCountsResponseDTO(BaseModel):
     user_counts: int
     organization_counts: dict[str, int]
+
+
+class TemplateUsageDTO(BaseModel):
+    """Template with usage statistics for organization dashboards"""
+
+    id: str
+    title: str
+    folder_id: str | None = None
+    usage_count: int = 0
+    last_used_at: str | None = None
+    created_at: str | None = None

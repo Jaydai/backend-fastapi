@@ -14,6 +14,7 @@ from .template_entities import (
     TemplateComment,
     TemplateCommentAuthor,
     TemplateTitle,
+    TemplateUsage,
 )
 from .template_version_entities import TemplateVersion, TemplateVersionUpdate, VersionDetails, VersionSummary
 from .user_entities import UserProfile
@@ -31,6 +32,7 @@ __all__ = [
     "TemplateComment",
     "TemplateCommentAuthor",
     "TemplateTitle",
+    "TemplateUsage",
     "UserProfile",
     "Message",
     "Chat",

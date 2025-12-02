@@ -41,3 +41,14 @@ class TemplateTitle:
     id: str
     title: dict[str, str]
     folder_id: str | None = None
+
+
+@dataclass
+class TemplateUsage:
+    """Template with usage statistics for organization dashboards"""
+    id: str
+    title: dict[str, str]
+    folder_id: str | None = None
+    usage_count: int = 0
+    last_used_at: str | None = None
+    created_at: str | None = None

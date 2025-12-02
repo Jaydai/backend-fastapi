@@ -4,7 +4,7 @@ from datetime import datetime
 
 from supabase import Client
 
-from domains.entities import Template, TemplateComment, TemplateTitle
+from domains.entities import Template, TemplateComment, TemplateTitle, TemplateUsage
 from services.locale_service import LocaleService
 
 
@@ -31,6 +31,37 @@ class TemplateRepository:
         response = query.execute()
         templates_data = response.data or []
         templates = [TemplateTitle(**item) for item in templates_data]
+        return templates
+
+    @staticmethod
+    def get_templates_with_usage(
+        client: Client,
+        organization_id: str,
+        published: bool | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[TemplateUsage]:
+        """Get templates with usage statistics for organization dashboards"""
+        query = client.table("prompt_templates").select(
+            "id, title, folder_id, usage_count, last_used_at, created_at"
+        )
+        query = query.eq("organization_id", organization_id)
+        if published is not None:
+            query = query.eq("published", published)
+        query = query.order("usage_count", desc=True).range(offset, offset + limit - 1)
+        response = query.execute()
+        templates_data = response.data or []
+        templates = [
+            TemplateUsage(
+                id=item["id"],
+                title=item.get("title", {}),
+                folder_id=item.get("folder_id"),
+                usage_count=item.get("usage_count", 0),
+                last_used_at=item.get("last_used_at"),
+                created_at=item.get("created_at"),
+            )
+            for item in templates_data
+        ]
         return templates
 
     @staticmethod
