@@ -29,4 +29,6 @@ class BlockMapper:
             type=block.type,
             description=LocaleService.localize_string(block.description, locale) if block.description else None,
             usage_count=block.usage_count,
+            organization_image_url=block.organization_image_url,
+            organization_id=block.organization_id,
         )

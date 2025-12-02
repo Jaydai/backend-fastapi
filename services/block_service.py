@@ -21,6 +21,7 @@ class BlockService:
         user_id: str | None = None,
         organization_id: str | None = None,
         type: str | None = None,
+        include_org_info: bool = False,
         limit: int = 1000,
         offset: int = 0,
     ) -> list[BlockSummaryResponseDTO]:
@@ -29,6 +30,7 @@ class BlockService:
             user_id=user_id,
             organization_id=organization_id,
             type=type,
+            include_org_info=include_org_info,
             limit=limit,
             offset=offset,
         )

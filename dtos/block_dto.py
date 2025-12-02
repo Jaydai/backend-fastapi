@@ -47,3 +47,5 @@ class BlockSummaryResponseDTO(BaseModel):
     type: BlockTypeEnum
     description: str | None = None
     usage_count: int
+    organization_image_url: str | None = None
+    organization_id: str | None = None

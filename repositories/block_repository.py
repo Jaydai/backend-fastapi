@@ -17,13 +17,23 @@ class BlockRepository:
     @staticmethod
     def get_blocks(
         client: Client,
-        user_id: str,
+        user_id: str | None = None,
         organization_id: str | None = None,
+        include_org_info: bool = False,
         type: str | None = None,
         limit: int = 1000,
         offset: int = 0,
     ) -> list[BlockSummary]:
-        query = client.table("prompt_blocks").select("id, title, description, usage_count, type")
+        # If include_org_info, join with organizations to fetch image_url
+        if include_org_info:
+            query = client.table("prompt_blocks").select(
+                "id, title, description, usage_count, type, organization_id, organizations!inner(image_url)"
+            )
+        else:
+            query = client.table("prompt_blocks").select(
+                "id, title, description, usage_count, type"
+            )
+
         if user_id is not None:
             query = query.eq("user_id", user_id)
         if organization_id is not None:
@@ -32,7 +42,6 @@ class BlockRepository:
             query = query.eq("type", type)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
-
 
         blocks = []
         for data in response.data or []:
@@ -43,6 +52,8 @@ class BlockRepository:
                     title=data.get("title", {}),
                     description=data.get("description"),
                     usage_count=data.get("usage_count", 0),
+                    organization_image_url=data.get("organizations", {}).get("image_url"),
+                    organization_id=data.get("organization_id"),
                 )
             )
 

@@ -31,3 +31,5 @@ class BlockSummary:
     type: BlockTypeEnum
     description: dict[str, str] | None
     usage_count: int
+    organization_image_url: str | None
+    organization_id: str | None
