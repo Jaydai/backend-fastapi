@@ -259,8 +259,8 @@ class AdoptionCurveDataDTO(BaseModel):
     average_daily_prompts: float
     average_messages_per_chat: float  # Average number of messages per chat
     provider_distribution: list[ProviderDistributionDTO]  # Distribution by provider (ChatGPT, Claude, etc.)
-    by_provider: dict[str, list[TimeSeriesDataPointDTO | None]] = None  # Time series per provider
-    by_model: dict[str, int | None] = None  # Distribution by model when view_mode is 'models'
+    by_provider: dict[str, list[TimeSeriesDataPointDTO]] | None = None  # Time series per provider
+    by_model: dict[str, int] | None = None  # Distribution by model when view_mode is 'models'
 
 
 class AdoptionCurveResponseDTO(BaseModel):
@@ -269,7 +269,7 @@ class AdoptionCurveResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     view_mode: str  # 'chats', 'messages', 'providers', or 'models'
     data: AdoptionCurveDataDTO
     generated_at: datetime
@@ -309,7 +309,7 @@ class RiskTimelineResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     data: RiskTimelineDataDTO
     generated_at: datetime
 
@@ -348,7 +348,7 @@ class QualityTimelineResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     data: QualityTimelineDataDTO
     generated_at: datetime
 
@@ -375,7 +375,7 @@ class ThemeTimelineResponseDTO(BaseModel):
 
     organization_id: str
     date_range: dict[str, str]
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     top_themes: list[str]  # Top N themes being tracked
     current_distribution: ThemeDistributionDTO
     generated_at: datetime
@@ -403,7 +403,7 @@ class IntentTimelineResponseDTO(BaseModel):
 
     organization_id: str
     date_range: dict[str, str]
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     top_intents: list[str]  # Top N intents being tracked
     current_distribution: IntentDistributionDTO
     generated_at: datetime
@@ -425,7 +425,7 @@ class ModelDistributionResponseDTO(BaseModel):
 
     organization_id: str
     date_range: dict[str, str]
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     models: list[ModelDistributionItemDTO]
     total_messages: int
     generated_at: datetime
@@ -436,7 +436,7 @@ class ProviderDistributionResponseDTO(BaseModel):
 
     organization_id: str
     date_range: dict[str, str]
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     providers: list[ProviderDistributionDTO]
     total_chats: int
     generated_at: datetime
@@ -463,7 +463,7 @@ class QualityMetricsTimelineResponseDTO(BaseModel):
     organization_id: str
     date_range: dict[str, str]
     granularity: str
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     timeline: list[QualityMetricsTimelineDataPointDTO]
     averages: dict[str, float]  # Overall averages for each metric
     generated_at: datetime
@@ -482,7 +482,7 @@ class QualityDistributionResponseDTO(BaseModel):
 
     organization_id: str
     date_range: dict[str, str]
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     bins: list[QualityDistributionBinDTO]
     total_rated: int
     average_score: float
@@ -506,7 +506,7 @@ class UsageByHourResponseDTO(BaseModel):
 
     organization_id: str
     date_range: dict[str, str]
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     hourly_data: list[UsageByHourDataPointDTO]
     peak_hour: int
     total_messages: int
@@ -530,7 +530,7 @@ class RiskCategoriesResponseDTO(BaseModel):
 
     organization_id: str
     date_range: dict[str, str]
-    team_filter: list[str | None] = None
+    team_filter: list[str] | None = None
     categories: list[RiskCategoryItemDTO]
     total_risky_messages: int
     generated_at: datetime
