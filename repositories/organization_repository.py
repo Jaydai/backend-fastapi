@@ -1,5 +1,6 @@
 from supabase import Client
 
+from core.supabase import supabase_admin
 from domains.entities import (
     Organization,
     OrganizationDetail,
@@ -49,9 +50,13 @@ class OrganizationRepository:
 
     @staticmethod
     def get_organization_members(client: Client, organization_id: str) -> list[OrganizationMember]:
+        # Use admin client to bypass RLS - users can only see their own roles by default
+        # but we need to see all members in the organization for the org dashboard
+        admin_client = supabase_admin if supabase_admin else client
+
         # First, get all user_organization_roles for this organization
         response = (
-            client.table("user_organization_roles")
+            admin_client.table("user_organization_roles")
             .select("user_id, role")
             .eq("organization_id", organization_id)
             .execute()
@@ -64,9 +69,9 @@ class OrganizationRepository:
         for role_data in response.data:
             user_id = role_data["user_id"]
 
-            # Fetch user metadata separately
+            # Fetch user metadata separately (also using admin client for consistency)
             user_metadata_response = (
-                client.table("users_metadata").select("email, name").eq("user_id", user_id).execute()
+                admin_client.table("users_metadata").select("email, name").eq("user_id", user_id).execute()
             )
 
             user_metadata = {}

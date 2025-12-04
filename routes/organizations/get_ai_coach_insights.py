@@ -6,6 +6,8 @@ from typing import Any
 
 from fastapi import HTTPException, Request
 
+from core.supabase import supabase_admin
+
 from . import router
 
 logger = logging.getLogger(__name__)
@@ -22,10 +24,12 @@ async def get_ai_coach_insights(request: Request, organization_id: str):
     """
     try:
         client = request.state.supabase_client
+        # Use admin client to bypass RLS for fetching all org members
+        admin_client = supabase_admin if supabase_admin else client
 
-        # Get all users in this organization first
+        # Get all users in this organization first (using user_organization_roles table)
         org_members_response = (
-            client.table("organization_members").select("user_id").eq("organization_id", organization_id).execute()
+            admin_client.table("user_organization_roles").select("user_id").eq("organization_id", organization_id).execute()
         )
 
         if not org_members_response.data:

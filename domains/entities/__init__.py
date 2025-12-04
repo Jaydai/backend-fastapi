@@ -1,5 +1,5 @@
 from .auth_entities import Session, User
-from .block_entities import Block, BlockTitle
+from .block_entities import Block, BlockTitle, BlockSummary
 from .folder_entities import Folder, FolderWithItems, FolderTitle
 from .message_entities import Chat, Message
 from .organizations import (
@@ -14,8 +14,9 @@ from .template_entities import (
     TemplateComment,
     TemplateCommentAuthor,
     TemplateTitle,
+    TemplateUsage,
 )
-from .template_version_entities import TemplateVersion, VersionContent, VersionSummary
+from .template_version_entities import TemplateVersion, TemplateVersionUpdate, VersionDetails, VersionSummary
 from .user_entities import UserProfile
 
 __all__ = [
@@ -24,12 +25,14 @@ __all__ = [
     "ROLE_PERMISSIONS",
     "UserOrganizationRole",
     "Template",
+    "TemplateVersionUpdate",
     "VersionSummary",
-    "VersionContent",
+    "VersionDetails",
     "TemplateVersion",
     "TemplateComment",
     "TemplateCommentAuthor",
     "TemplateTitle",
+    "TemplateUsage",
     "UserProfile",
     "Message",
     "Chat",
@@ -42,4 +45,5 @@ __all__ = [
     "FolderTitle",
     "Block",
     "BlockTitle",
+    "BlockSummary",
 ]

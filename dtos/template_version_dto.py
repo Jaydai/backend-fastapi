@@ -5,22 +5,22 @@ class CreateTemplateVersionDTO(BaseModel):
     id: int
 
 
-class TemplateVersionContentDTO(BaseModel):
+class TemplateVersionDTO(BaseModel):
     """Version content fetched separately"""
-
     id: int
+    status: str
+    published: bool
+    optimized_for: list[str] | None = None
     content: str
+    description: str | None = None
 
 
-class UpdateVersionStatusDTO(BaseModel):
-    """DTO for updating version status fields"""
-
-    template_id: str
-    published: bool | None = None
+class UpdateTemplateVersionDTO(BaseModel):
+    name: str | None = None
+    content: str | None = None
+    description: str | None = None
     status: str | None = None
-    is_current: bool | None = None
+    is_default: bool | None = None
+    published: bool | None = None
+    optimized_for: list[str] | None = None
 
-
-class VersionSlugResponseDTO(BaseModel):
-    id: int
-    slug: str

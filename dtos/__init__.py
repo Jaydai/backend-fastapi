@@ -1,8 +1,8 @@
 from .auth_dto import OAuthSignIn, RefreshTokenDTO, SignInDTO, SignUpDTO, UserMeResponseDTO
 from .block_dto import (
     BlockResponseDTO,
-    BlockTitleResponseDTO,
-    BlockType,
+    BlockSummaryResponseDTO,
+    BlockTypeEnum,
     CreateBlockDTO,
     UpdateBlockDTO,
     UpdatePinnedBlocksDTO,
@@ -63,9 +63,10 @@ from .template_dto import (
     TemplateListItemDTO,
     TemplateResponseDTO,
     TemplateTitleResponseDTO,
+    TemplateUsageDTO,
     VersionSummary,
 )
-from .template_version_dto import CreateTemplateVersionDTO, TemplateVersionContentDTO, UpdateVersionStatusDTO
+from .template_version_dto import CreateTemplateVersionDTO, TemplateVersionDTO, UpdateTemplateVersionDTO
 from .user_dto import UpdateDataCollectionDTO, UpdateUserProfileDTO, UserProfileResponseDTO
 
 __all__ = [
@@ -82,7 +83,7 @@ __all__ = [
     "UpdateTemplateDTO",
     "CreateVersionDTO",
     "CreateTemplateVersionDTO",
-    "TemplateVersionContentDTO",
+    "TemplateVersionDTO",
     "TemplateListItemDTO",
     "TemplateResponseDTO",
     "TemplateCommentAuthorDTO",
@@ -91,8 +92,9 @@ __all__ = [
     "TemplateTitleResponseDTO",
     "OrganizationTemplateTitleDTO",
     "VersionSummary",
-    "TemplateVersionContentDTO",
+    "TemplateVersionDTO",
     "TemplateCountsResponseDTO",
+    "TemplateUsageDTO",
     "UserProfileResponseDTO",
     "UpdateUserProfileDTO",
     "UpdateDataCollectionDTO",
@@ -124,11 +126,11 @@ __all__ = [
     "UpdatePinnedFoldersDTO",
     "FolderTitleResponseDTO",
     "OrganizationFolderTitleDTO",
-    "BlockType",
+    "BlockTypeEnum",
     "CreateBlockDTO",
     "UpdateBlockDTO",
     "BlockResponseDTO",
     "UpdatePinnedBlocksDTO",
-    "BlockTitleResponseDTO",
-    "UpdateVersionStatusDTO",
+    "BlockSummaryResponseDTO",
+    "UpdateTemplateVersionDTO",
 ]

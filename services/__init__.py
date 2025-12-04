@@ -11,6 +11,7 @@ from .organization_service import OrganizationService
 from .permission_service import PermissionService
 from .stats_service import StatsService
 from .template_service import TemplateService
+from .block_service import BlockService
 from .template_version_service import TemplateVersionService
 from .user_service import UserService
 
@@ -18,6 +19,7 @@ __all__ = [
     "AuthService",
     "PermissionService",
     "TemplateService",
+    "BlockService",
     "TemplateVersionService",
     "FolderService",
     "OrganizationService",

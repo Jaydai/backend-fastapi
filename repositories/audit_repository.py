@@ -455,6 +455,139 @@ class AuditRepository:
         return result
 
     @staticmethod
+    async def get_user_profile_data_async(
+        client: Client,
+        user_id: str,
+        org_user_ids: list[str],
+        start_date: datetime,
+        end_date: datetime,
+    ) -> dict:
+        """Get comprehensive profile data for a single user (async)"""
+        loop = asyncio.get_event_loop()
+
+        def _fetch():
+            # Get user metadata
+            user_response = client.table("users_metadata").select("user_id, email, name").eq("user_id", user_id).execute()
+            user_info = user_response.data[0] if user_response.data else {"user_id": user_id, "email": "", "name": None}
+
+            # Get user messages in date range with chat info
+            messages_response = (
+                client.table("messages")
+                .select("id, chat_provider_id, created_at")
+                .eq("user_id", user_id)
+                .gte("created_at", start_date.isoformat())
+                .lte("created_at", end_date.isoformat())
+                .execute()
+            )
+            user_messages = messages_response.data or []
+            user_chat_ids = list({msg["chat_provider_id"] for msg in user_messages if msg.get("chat_provider_id")})
+
+            # Get quality and work data for user's chats
+            user_quality_data = []
+            provider_map = {}
+            if user_chat_ids:
+                # Get enriched chat data (quality, work, theme, intent)
+                quality_response = (
+                    client.table("enriched_chats")
+                    .select("chat_provider_id, quality_score, is_work_related, theme, intent")
+                    .in_("chat_provider_id", user_chat_ids)
+                    .eq("user_id", user_id)
+                    .execute()
+                )
+                user_quality_data = quality_response.data or []
+
+                # Get provider info from chats table
+                provider_response = (
+                    client.table("chats")
+                    .select("chat_provider_id, provider_name")
+                    .in_("chat_provider_id", user_chat_ids)
+                    .execute()
+                )
+                provider_map = {
+                    chat["chat_provider_id"]: chat.get("provider_name", "Unknown")
+                    for chat in (provider_response.data or [])
+                }
+
+                # Merge provider info into quality data
+                for item in user_quality_data:
+                    item["provider"] = provider_map.get(item.get("chat_provider_id"), "Unknown")
+
+            # Get user risk data
+            risk_response = (
+                client.table("enriched_messages")
+                .select("overall_risk_level, overall_risk_score")
+                .eq("user_id", user_id)
+                .gte("created_at", start_date.isoformat())
+                .lte("created_at", end_date.isoformat())
+                .in_("overall_risk_level", ["high", "critical"])
+                .execute()
+            )
+            user_risk_data = risk_response.data or []
+
+            # Get previous period data for trend (7 days before start)
+            trend_start = start_date - timedelta(days=7)
+            trend_end = start_date
+            trend_messages = (
+                client.table("messages")
+                .select("chat_provider_id")
+                .eq("user_id", user_id)
+                .gte("created_at", trend_start.isoformat())
+                .lt("created_at", trend_end.isoformat())
+                .execute()
+            )
+            trend_chat_ids = list({msg["chat_provider_id"] for msg in (trend_messages.data or []) if msg.get("chat_provider_id")})
+
+            trend_quality_data = []
+            if trend_chat_ids:
+                trend_response = (
+                    client.table("enriched_chats")
+                    .select("quality_score")
+                    .in_("chat_provider_id", trend_chat_ids)
+                    .eq("user_id", user_id)
+                    .execute()
+                )
+                trend_quality_data = trend_response.data or []
+
+            # Get org-wide stats for comparison (all org users)
+            org_messages_response = (
+                client.table("messages")
+                .select("id, user_id, chat_provider_id")
+                .in_("user_id", org_user_ids)
+                .gte("created_at", start_date.isoformat())
+                .lte("created_at", end_date.isoformat())
+                .execute()
+            )
+            org_messages = org_messages_response.data or []
+            org_chat_ids = list({msg["chat_provider_id"] for msg in org_messages if msg.get("chat_provider_id")})
+
+            org_quality_data = []
+            if org_chat_ids:
+                org_quality_response = (
+                    client.table("enriched_chats")
+                    .select("user_id, quality_score, is_work_related")
+                    .in_("chat_provider_id", org_chat_ids)
+                    .in_("user_id", org_user_ids)
+                    .execute()
+                )
+                org_quality_data = org_quality_response.data or []
+
+            return {
+                "user_info": user_info,
+                "user_messages": user_messages,
+                "user_quality": user_quality_data,
+                "user_risks": user_risk_data,
+                "trend_quality": trend_quality_data,
+                "org_messages": org_messages,
+                "org_quality": org_quality_data,
+                "org_user_ids": org_user_ids,
+            }
+
+        with ThreadPoolExecutor() as executor:
+            result = await loop.run_in_executor(executor, _fetch)
+
+        return result
+
+    @staticmethod
     async def fetch_all_audit_data_parallel(
         client: Client, user_ids: list[str], start_date: datetime, end_date: datetime
     ) -> dict:

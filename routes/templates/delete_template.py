@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 @router.delete("/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_template(
     request: Request,
-    template_id: str,  # UUID
+    template_id: str
 ):
     try:
         user_id = request.state.user_id

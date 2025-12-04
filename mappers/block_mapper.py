@@ -1,5 +1,5 @@
-from domains.entities import Block
-from dtos import BlockResponseDTO
+from domains.entities import Block, BlockSummary
+from dtos import BlockResponseDTO, BlockSummaryResponseDTO
 from services.locale_service import LocaleService
 
 
@@ -19,4 +19,16 @@ class BlockMapper:
             created_at=block.created_at,
             updated_at=block.updated_at,
             usage_count=block.usage_count,
+        )
+
+    @staticmethod
+    def entity_to_summary_dto(block: BlockSummary, locale: str = LocaleService.DEFAULT_LOCALE) -> BlockSummaryResponseDTO:
+        return BlockSummaryResponseDTO(
+            id=block.id,
+            title=LocaleService.localize_string(block.title, locale),
+            type=block.type,
+            description=LocaleService.localize_string(block.description, locale) if block.description else None,
+            usage_count=block.usage_count,
+            organization_image_url=block.organization_image_url,
+            organization_id=block.organization_id,
         )

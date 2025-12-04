@@ -32,7 +32,7 @@ class UpdateTemplateDTO(BaseModel):
 class CreateVersionDTO(BaseModel):
     content: str | None = None
     name: str | None = None
-    change_notes: str | None = None
+    description: str | None = None
     status: str | None = None
     copy_from_version_id: int | None = None
     optimized_for: list[str] | None = None
@@ -108,3 +108,14 @@ class OrganizationTemplateTitleDTO(BaseModel):
 class TemplateCountsResponseDTO(BaseModel):
     user_counts: int
     organization_counts: dict[str, int]
+
+
+class TemplateUsageDTO(BaseModel):
+    """Template with usage statistics for organization dashboards"""
+
+    id: str
+    title: str
+    folder_id: str | None = None
+    usage_count: int = 0
+    last_used_at: str | None = None
+    created_at: str | None = None

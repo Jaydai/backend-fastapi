@@ -1,22 +1,11 @@
 from enum import Enum
 
 from pydantic import BaseModel
-
-
-class BlockType(str, Enum):
-    ROLE = "role"
-    CONTEXT = "context"
-    GOAL = "goal"
-    TONE_STYLE = "tone_style"
-    OUTPUT_FORMAT = "output_format"
-    AUDIENCE = "audience"
-    EXAMPLE = "example"
-    CONSTRAINT = "constraint"
-    CUSTOM = "custom"
+from domains.enums import BlockTypeEnum
 
 
 class CreateBlockDTO(BaseModel):
-    type: BlockType
+    type: BlockTypeEnum
     title: str
     description: str | None = None
     content: str
@@ -25,7 +14,7 @@ class CreateBlockDTO(BaseModel):
 
 
 class UpdateBlockDTO(BaseModel):
-    type: BlockType | None = None
+    type: BlockTypeEnum | None = None
     title: str | None = None
     description: str | None = None
     content: str | None = None
@@ -51,8 +40,12 @@ class UpdatePinnedBlocksDTO(BaseModel):
     block_ids: list[str]
 
 
-class BlockTitleResponseDTO(BaseModel):
+class BlockSummaryResponseDTO(BaseModel):
     """Block title response (minimal data for list endpoints)"""
-
     id: str
-    title: str  # Localized title
+    title: str
+    type: BlockTypeEnum
+    description: str | None = None
+    usage_count: int
+    organization_image_url: str | None = None
+    organization_id: str | None = None

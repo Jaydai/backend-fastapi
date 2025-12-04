@@ -1,5 +1,6 @@
 from supabase import Client
 
+from domains.entities import TemplateVersionUpdate
 from dtos import (
     CreateTemplateDTO,
     TemplateCountsResponseDTO,
@@ -104,7 +105,7 @@ class TemplateService:
                 user_id,
                 content_dict,
                 name="1.0",
-                change_notes=None,
+                description=None,
                 status="draft" if workspace_type != "user" else "published",
                 optimized_for=data.optimized_for,
             )
@@ -121,6 +122,10 @@ class TemplateService:
     def update_template(
         client: Client, template_id: str, data: UpdateTemplateDTO, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO | None:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"update_template called with data: {data}")
+
         template = TemplateRepository.get_template_by_id(client, template_id)
         if not template:
             return None
@@ -128,26 +133,33 @@ class TemplateService:
         title_dict = LocaleService.ensure_localized_dict(data.title, locale) if data.title else None
         description_dict = LocaleService.ensure_localized_dict(data.description, locale) if data.description else None
 
+        logger.info(f"title_dict: {title_dict}, description_dict: {description_dict}")
+
         content_updated = data.content is not None
         status_updated = data.status is not None
 
+        logger.info(f"content_updated: {content_updated}, status_updated: {status_updated}")
+
         if content_updated or status_updated:
             if data.version_id:
-                version_update_data = {}
-                if content_updated:
-                    version_update_data["content"] = LocaleService.ensure_localized_dict(data.content, locale)
-                if status_updated:
-                    version_update_data["status"] = data.status
+                version_update = TemplateVersionUpdate(
+                    name=None,
+                    content=LocaleService.ensure_localized_dict(data.content, locale) if content_updated else None,
+                    description=None,
+                    status=data.status if status_updated else None,
+                    is_default=None,
+                    published=None,
+                    optimized_for=None,
+                )
 
-                version = TemplateRepository.update_version(
+                success = TemplateVersionRepository.update_version(
                     client,
                     data.version_id,
                     template_id,
-                    content=version_update_data.get("content"),
-                    status=version_update_data.get("status"),
+                    version_update,
                 )
 
-                if not version:
+                if not success:
                     return None
             else:
                 if content_updated:
@@ -157,7 +169,7 @@ class TemplateService:
                         template_id,
                         template.user_id,
                         content_dict,
-                        change_notes=None,
+                        description=None,
                         status=data.status or "draft",
                     )
                     TemplateRepository.update_template(
@@ -184,7 +196,7 @@ class TemplateService:
         if data.is_pinned is not None:
             TemplateRepository.update_pinned_status(client, template.user_id, template_id, data.is_pinned)
 
-        return TemplateService.get_template_by_id(client, template_id, locale)
+        return TemplateService.get_template_by_id(client, template_id, locale=locale)
 
     @staticmethod
     def delete_template(client: Client, template_id: str) -> bool:

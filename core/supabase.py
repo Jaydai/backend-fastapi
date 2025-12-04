@@ -24,6 +24,12 @@ else:
     # Placeholder for testing mode - will be replaced by mock in conftest.py
     supabase: Client = None  # type: ignore
 
+# Service role client that bypasses RLS (for admin operations like fetching all org members)
+if SUPABASE_URL and SUPABASE_SECRET_KEY:
+    supabase_admin: Client = create_client(SUPABASE_URL, SUPABASE_SECRET_KEY)
+else:
+    supabase_admin: Client = None  # type: ignore
+
 
 def create_authenticated_client(access_token: str) -> Client:
     """

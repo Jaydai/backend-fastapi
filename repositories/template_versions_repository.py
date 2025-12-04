@@ -1,8 +1,10 @@
 """Template version repository - handles version database operations"""
 
+from dataclasses import asdict
+
 from supabase import Client
 
-from domains.entities import TemplateVersion, VersionContent, VersionSummary
+from domains.entities import TemplateVersion, TemplateVersionUpdate, VersionDetails, VersionSummary
 
 
 class TemplateVersionRepository:
@@ -28,7 +30,7 @@ class TemplateVersionRepository:
     def get_versions_summary(client: Client, template_id: str, published: bool | None = None) -> list[VersionSummary]:
         query = (
             client.table("prompt_templates_versions")
-            .select("id, name, slug, is_current, status, published, optimized_for")
+            .select("id, name, is_default, status, published, optimized_for")
             .eq("template_id", template_id)
         )
         if published is not None:
@@ -41,14 +43,19 @@ class TemplateVersionRepository:
         return [VersionSummary(**item) for item in response.data]
 
     @staticmethod
-    def get_version_by_id(client: Client, version_id: int) -> VersionContent | None:
-        response = client.table("prompt_templates_versions").select("id, content").eq("id", version_id).execute()
-
+    def get_version_by_id(client: Client, version_id: int) -> VersionDetails | None:
+        response = client.table("prompt_templates_versions").select("id, optimized_for, published, status, description, content").eq("id", version_id).execute()
         if not response.data:
             return None
-
         data = response.data[0]
-        return VersionContent(**data)
+        return VersionDetails(
+            id=data["id"],
+            optimized_for=data["optimized_for"],
+            published=data["published"],
+            status=data["status"],
+            description=data["description"],
+            content=data["content"],
+        )
 
     @staticmethod
     def create_version(
@@ -57,7 +64,7 @@ class TemplateVersionRepository:
         author_id: str,
         content: dict[str, str],
         name: str | None = None,
-        change_notes: dict[str, str] | None = None,
+        description: dict[str, str] | None = None,
         status: str = "draft",
         optimized_for: list[str] | None = None,
     ) -> TemplateVersion:
@@ -70,7 +77,7 @@ class TemplateVersionRepository:
             "author_id": author_id,
             "content": content,
             "name": name,
-            "change_notes": change_notes,
+            "description": description,
             "status": status,
             "optimized_for": optimized_for,
         }
@@ -81,22 +88,61 @@ class TemplateVersionRepository:
         return TemplateVersion(data)
 
     @staticmethod
+    def set_default_version(client: Client, version_id: int, template_id: str) -> int | None:
+        unset_default_response = (
+            client.table("prompt_templates_versions")
+            .update({"is_default": False})
+            .eq("template_id", template_id)
+            .execute()
+        )
+        if not unset_default_response.data:
+            return None
+
+        set_default_response = (
+            client.table("prompt_templates_versions")
+            .update({"is_default": True})
+            .eq("id", version_id)
+            .execute()
+        )
+        if not set_default_response.data:
+            return None
+
+        return version_id
+
+    @staticmethod
     def update_version(
         client: Client,
         version_id: int,
         template_id: str,
-        content: dict[str, str] | None = None,
-        status: str | None = None,
-    ) -> TemplateVersion | None:
-        update_data = {}
-        if content is not None:
-            update_data["content"] = content
-        if status is not None:
-            update_data["status"] = status
+        update_data: TemplateVersionUpdate
+    ) -> bool:
+        """Update version fields."""
+        # Convert dataclass to dict and filter out None values
+        data_dict = {k: v for k, v in asdict(update_data).items() if v is not None}
+        print(f"💕💕💕 data_dict: {data_dict}")
 
+        if not data_dict:
+            print(f"💕💕💕💕💕💕💕💕💕💕💕💕 data_dict is empty")
+            return False
+
+        update_response = (
+            client.table("prompt_templates_versions")
+            .update(data_dict)
+            .eq("id", version_id)
+            .eq("template_id", template_id)
+            .execute()
+        )
+
+        print(f"😁😁😁😁😁😁😁😁😁😁😁😁 update_response: {update_response}")
+
+        return bool(update_response.data)
+
+    @staticmethod
+    def get_version_details(client: Client, version_id: int, template_id: str) -> dict | None:
+        """Get version details including is_default status."""
         response = (
             client.table("prompt_templates_versions")
-            .update(update_data)
+            .select("id, name, is_default")
             .eq("id", version_id)
             .eq("template_id", template_id)
             .execute()
@@ -105,41 +151,17 @@ class TemplateVersionRepository:
         if not response.data:
             return None
 
-        data = response.data[0]
-        return TemplateVersion(data)
+        return response.data[0]
 
     @staticmethod
-    def update_version_status(
-        client: Client,
-        version_id: int,
-        template_id: str,
-        published: bool | None = None,
-        status: str | None = None,
-        is_current: bool | None = None,
-    ) -> VersionContent | None:
-        """Update version status fields (published, status, is_current)"""
-        # If setting as current, first unset all other versions
-        if is_current is True:
-            client.table("prompt_templates_versions").update({"is_current": False}).eq(
-                "template_id", template_id
-            ).execute()
+    def delete_version(client: Client, version_id: int, template_id: str) -> bool:
+        """Delete a template version."""
+        response = (
+            client.table("prompt_templates_versions")
+            .delete()
+            .eq("id", version_id)
+            .eq("template_id", template_id)
+            .execute()
+        )
 
-        # Build update data
-        update_data = {}
-        if published is not None:
-            update_data["published"] = published
-        if status is not None:
-            update_data["status"] = status
-        if is_current is not None:
-            update_data["is_current"] = is_current
-
-        if not update_data:
-            # Nothing to update, just return current version
-            return TemplateVersionRepository.get_version_by_id(client, version_id)
-
-        response = client.table("prompt_templates_versions").update(update_data).eq("id", version_id).execute()
-
-        if not response.data:
-            return None
-
-        return VersionContent(id=response.data[0]["id"], content=response.data[0].get("content", ""))
+        return bool(response.data)

@@ -1,6 +1,7 @@
 from supabase import Client
 
-from domains.entities import Block, BlockTitle
+from domains.entities import Block, BlockSummary, BlockTitle
+from domains.enums import BlockTypeEnum
 
 
 class BlockRepository:
@@ -16,71 +17,43 @@ class BlockRepository:
     @staticmethod
     def get_blocks(
         client: Client,
-        user_id: str,
-        block_type: str | None = None,
-        workspace_type: str | None = None,
+        user_id: str | None = None,
         organization_id: str | None = None,
-        published: bool | None = None,
-        search_query: str | None = None,
-    ) -> list[Block]:
-        query = client.table("prompt_blocks").select("*")
+        include_org_info: bool = False,
+        type: str | None = None,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> list[BlockSummary]:
+        # If include_org_info, join with organizations to fetch image_url
+        if include_org_info:
+            query = client.table("prompt_blocks").select(
+                "id, title, description, usage_count, type, organization_id, organizations!inner(image_url)"
+            )
+        else:
+            query = client.table("prompt_blocks").select(
+                "id, title, description, usage_count, type"
+            )
 
-        if workspace_type == "all" or (not workspace_type and not organization_id):
-            user_metadata = BlockRepository._get_user_metadata(client, user_id)
-            conditions = [f"user_id.eq.{user_id}"]
-
-            roles = user_metadata.get("roles") or {}
-            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
-            if org_roles:
-                for org_id in org_roles.keys():
-                    conditions.append(f"organization_id.eq.{org_id}")
-
-            query = query.or_(",".join(conditions))
-        elif workspace_type == "user":
-            query = query.eq("user_id", user_id).is_("organization_id", "null")
-        elif workspace_type == "organization":
-            user_metadata = BlockRepository._get_user_metadata(client, user_id)
-            roles = user_metadata.get("roles") or {}
-            org_roles = roles.get("organizations", {}) if isinstance(roles, dict) else {}
-
-            if organization_id:
-                if organization_id not in org_roles:
-                    return []
-                query = query.eq("organization_id", organization_id)
-            else:
-                if not org_roles:
-                    return []
-                query = query.in_("organization_id", list(org_roles.keys()))
-
-        if block_type is not None:
-            query = query.eq("type", block_type)
-
-        if published is not None:
-            query = query.eq("published", published)
-
-        if search_query:
-            query = query.or_(f"title->>custom.ilike.%{search_query}%,content->>custom.ilike.%{search_query}%")
-
-        query = query.order("created_at", desc=True)
-
+        if user_id is not None:
+            query = query.eq("user_id", user_id)
+        if organization_id is not None:
+            query = query.eq("organization_id", organization_id)
+        if type is not None:
+            query = query.eq("type", type)
+        query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
 
         blocks = []
         for data in response.data or []:
             blocks.append(
-                Block(
+                BlockSummary(
                     id=data["id"],
-                    type=data["type"],
+                    type=BlockTypeEnum(data["type"]),
                     title=data.get("title", {}),
                     description=data.get("description"),
-                    content=data.get("content", {}),
-                    published=data.get("published", False),
-                    user_id=data["user_id"],
-                    organization_id=data.get("organization_id"),
-                    workspace_type=data.get("workspace_type", "user"),
-                    created_at=data["created_at"],
-                    updated_at=data.get("updated_at"),
                     usage_count=data.get("usage_count", 0),
+                    organization_image_url=data.get("organizations", {}).get("image_url"),
+                    organization_id=data.get("organization_id"),
                 )
             )
 

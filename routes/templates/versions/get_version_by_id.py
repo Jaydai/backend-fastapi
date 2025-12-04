@@ -2,7 +2,7 @@ import logging
 
 from fastapi import HTTPException, Request, status
 
-from dtos import TemplateVersionContentDTO
+from dtos import TemplateVersionDTO
 from services import TemplateVersionService
 
 from . import router
@@ -10,8 +10,8 @@ from . import router
 logger = logging.getLogger(__name__)
 
 
-@router.get("/versions/{version_id}", response_model=TemplateVersionContentDTO, status_code=status.HTTP_200_OK)
-async def get_version_by_id(request: Request, version_id: int) -> TemplateVersionContentDTO:
+@router.get("/versions/{version_id}", response_model=TemplateVersionDTO, status_code=status.HTTP_200_OK)
+async def get_version_by_id(request: Request, version_id: int) -> TemplateVersionDTO:
     """Get a specific template version by its ID"""
     try:
         user_id = request.state.user_id

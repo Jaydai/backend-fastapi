@@ -1,10 +1,11 @@
-from domains.entities import Template, TemplateComment, TemplateCommentAuthor, VersionContent, VersionSummary
+from domains.entities import Template, TemplateComment, TemplateCommentAuthor, TemplateVersionUpdate, VersionDetails, VersionSummary
 from dtos import (
     TemplateCommentAuthorDTO,
     TemplateCommentDTO,
     TemplateListItemDTO,
     TemplateResponseDTO,
-    TemplateVersionContentDTO,
+    TemplateVersionDTO,
+    UpdateTemplateVersionDTO,
 )
 from services.locale_service import LocaleService
 
@@ -37,11 +38,10 @@ class TemplateMapper:
             VersionSummary(
                 id=v.id,
                 name=LocaleService.localize_string(v.name, locale),
-                slug=v.slug,
-                is_current=v.is_current,
+                is_default=v.is_default,
                 status=v.status,
-                optimized_for=v.optimized_for,
                 published=v.published,
+                optimized_for=v.optimized_for,
             )
             for v in versions_summary
         ]
@@ -64,10 +64,33 @@ class TemplateMapper:
 
     @staticmethod
     def version_entity_to_content_dto(
-        version: VersionContent, locale: str = LocaleService.DEFAULT_LOCALE
-    ) -> TemplateVersionContentDTO:
-        """Map version entity to TemplateVersionContentDTO for fetching version content"""
-        return TemplateVersionContentDTO(id=version.id, content=LocaleService.localize_string(version.content, locale))
+        version: VersionDetails, locale: str = LocaleService.DEFAULT_LOCALE
+    ) -> TemplateVersionDTO:
+        """Map version entity to TemplateVersionDTO for fetching version content"""
+        return TemplateVersionDTO(
+            id=version.id,
+            description=LocaleService.localize_string(version.description, locale) if version.description else None,
+            content=LocaleService.localize_string(version.content, locale),
+            status=version.status,
+            published=version.published,
+            optimized_for=version.optimized_for,
+            )
+
+    @staticmethod
+    def update_version_entity_to_dto(
+        version: TemplateVersionUpdate, locale: str = LocaleService.DEFAULT_LOCALE
+    ) -> UpdateTemplateVersionDTO:
+        return UpdateTemplateVersionDTO(
+            content=LocaleService.localize_string(version.content if getattr(version, "content", None) is not None else {locale: ""}, locale)
+                if getattr(version, "content", None) is not None else None,
+            description=LocaleService.localize_string(version.description if getattr(version, "description", None) is not None else {locale: ""}, locale)
+                if getattr(version, "description", None) is not None else None,
+            status=getattr(version, "status", None),
+            is_default=getattr(version, "is_default", None),
+            published=getattr(version, "published", None),
+            optimized_for=getattr(version, "optimized_for", None),
+        )
+
 
     @staticmethod
     def comment_author_entity_to_dto(author: TemplateCommentAuthor) -> TemplateCommentAuthorDTO:
