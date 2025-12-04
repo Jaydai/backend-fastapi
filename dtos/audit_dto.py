@@ -534,3 +534,83 @@ class RiskCategoriesResponseDTO(BaseModel):
     categories: list[RiskCategoryItemDTO]
     total_risky_messages: int
     generated_at: datetime
+
+
+# User Profile DTOs
+
+
+class UserProfileKPIsDTO(BaseModel):
+    """User profile KPIs"""
+
+    total_prompts: int
+    average_quality: float
+    work_percentage: float
+    high_risk_count: int
+    quality_trend: float | None = None
+    percentile_ranking: float
+
+
+class UserProfileComparisonDTO(BaseModel):
+    """User comparison to organization averages"""
+
+    org_average_quality: float
+    org_average_prompts: float
+    org_average_work_percentage: float
+    user_quality_vs_org: float  # Percentage difference
+    user_prompts_vs_org: float  # Percentage difference
+
+
+class UserActivityPointDTO(BaseModel):
+    """User activity data point for timeline"""
+
+    date: str
+    prompt_count: int
+    average_quality: float
+
+
+class UserProviderUsageDTO(BaseModel):
+    """User provider usage breakdown"""
+
+    provider_name: str
+    chat_count: int
+    percentage: float
+
+
+class UserThemeDataDTO(BaseModel):
+    """User theme distribution"""
+
+    theme: str
+    count: int
+    percentage: float
+
+
+class UserIntentDataDTO(BaseModel):
+    """User intent distribution with quality"""
+
+    intent: str
+    count: int
+    percentage: float
+    avg_quality: float
+
+
+class UserProfileDataDTO(BaseModel):
+    """Complete user profile data"""
+
+    user_id: str
+    email: str
+    name: str | None = None
+    kpis: UserProfileKPIsDTO
+    comparison: UserProfileComparisonDTO
+    activity_timeline: list[UserActivityPointDTO]
+    provider_breakdown: list[UserProviderUsageDTO]
+    themes: list[UserThemeDataDTO]
+    intents: list[UserIntentDataDTO]
+
+
+class UserProfileResponseDTO(BaseModel):
+    """User profile response with context"""
+
+    organization_id: str
+    date_range: dict[str, str]
+    data: UserProfileDataDTO
+    generated_at: datetime

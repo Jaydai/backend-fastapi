@@ -18,6 +18,14 @@ from dtos.audit_dto import (
     TopPromptsWithContextDTO,
     TopUsersWithContextDTO,
     UsageStatsWithContextDTO,
+    UserProfileResponseDTO,
+    UserProfileDataDTO,
+    UserProfileKPIsDTO,
+    UserProfileComparisonDTO,
+    UserActivityPointDTO,
+    UserProviderUsageDTO,
+    UserThemeDataDTO,
+    UserIntentDataDTO,
 )
 from repositories.audit_repository import AuditRepository
 from utils.enrichment import (
@@ -340,6 +348,195 @@ class AuditService:
             organization_id=organization_id,
             date_range={"start_date": start_dt.isoformat(), "end_date": end_dt.isoformat()},
             data=[risky_prompt_to_dto(p) for p in risky_prompts],
+            generated_at=datetime.now(),
+        )
+
+    @staticmethod
+    async def get_user_profile(
+        client: Client,
+        requesting_user_id: str,
+        organization_id: str,
+        target_user_id: str,
+        start_date: str | None,
+        end_date: str | None,
+        days: int,
+    ) -> UserProfileResponseDTO:
+        """Get comprehensive profile for a specific user in the organization"""
+        start_dt, end_dt = _calculate_date_range(start_date, end_date, days)
+        org_user_ids = AuditRepository.get_organization_member_ids(client, organization_id)
+
+        if not org_user_ids:
+            raise ValueError("No members found for organization")
+
+        # Verify target user is in the organization
+        if target_user_id not in org_user_ids:
+            raise ValueError("User not found in organization")
+
+        # Fetch all user profile data
+        profile_data = await AuditRepository.get_user_profile_data_async(
+            client, target_user_id, org_user_ids, start_dt, end_dt
+        )
+
+        # Process the data
+        user_info = profile_data["user_info"]
+        user_messages = profile_data["user_messages"]
+        user_quality = profile_data["user_quality"]
+        user_risks = profile_data["user_risks"]
+        trend_quality = profile_data["trend_quality"]
+        org_messages = profile_data["org_messages"]
+        org_quality = profile_data["org_quality"]
+
+        # Calculate KPIs
+        total_prompts = len(user_messages)
+        quality_scores = [q["quality_score"] for q in user_quality if q.get("quality_score") is not None]
+        average_quality = sum(quality_scores) / len(quality_scores) if quality_scores else 0.0
+
+        work_related = sum(1 for q in user_quality if q.get("is_work_related"))
+        work_percentage = (work_related / len(user_quality) * 100) if user_quality else 0.0
+
+        high_risk_count = len(user_risks)
+
+        # Calculate quality trend
+        trend_scores = [q["quality_score"] for q in trend_quality if q.get("quality_score") is not None]
+        trend_avg = sum(trend_scores) / len(trend_scores) if trend_scores else None
+        quality_trend = None
+        if trend_avg is not None and trend_avg > 0:
+            quality_trend = ((average_quality - trend_avg) / trend_avg) * 100
+
+        # Calculate percentile ranking among org users
+        user_prompt_counts = {}
+        for msg in org_messages:
+            uid = msg["user_id"]
+            user_prompt_counts[uid] = user_prompt_counts.get(uid, 0) + 1
+
+        sorted_counts = sorted(user_prompt_counts.values())
+        user_count = user_prompt_counts.get(target_user_id, 0)
+        if sorted_counts:
+            rank = sum(1 for c in sorted_counts if c <= user_count)
+            percentile_ranking = (rank / len(sorted_counts)) * 100
+        else:
+            percentile_ranking = 0.0
+
+        # Calculate org averages for comparison
+        org_total_prompts = len(org_messages)
+        org_active_users = len(set(msg["user_id"] for msg in org_messages))
+        org_avg_prompts = org_total_prompts / org_active_users if org_active_users > 0 else 0
+
+        org_quality_scores = [q["quality_score"] for q in org_quality if q.get("quality_score") is not None]
+        org_avg_quality = sum(org_quality_scores) / len(org_quality_scores) if org_quality_scores else 0.0
+
+        org_work_related = sum(1 for q in org_quality if q.get("is_work_related"))
+        org_work_percentage = (org_work_related / len(org_quality) * 100) if org_quality else 0.0
+
+        # Calculate user vs org differences
+        user_quality_vs_org = ((average_quality - org_avg_quality) / org_avg_quality * 100) if org_avg_quality > 0 else 0
+        user_prompts_vs_org = ((total_prompts - org_avg_prompts) / org_avg_prompts * 100) if org_avg_prompts > 0 else 0
+
+        # Build activity timeline (group by date)
+        activity_by_date: dict[str, dict] = {}
+        for msg in user_messages:
+            date_str = msg["created_at"][:10]  # YYYY-MM-DD
+            if date_str not in activity_by_date:
+                activity_by_date[date_str] = {"count": 0, "chat_ids": set()}
+            activity_by_date[date_str]["count"] += 1
+            if msg.get("chat_provider_id"):
+                activity_by_date[date_str]["chat_ids"].add(msg["chat_provider_id"])
+
+        # Get quality scores per date
+        chat_to_quality = {q["chat_provider_id"]: q.get("quality_score", 0) for q in user_quality}
+        activity_timeline = []
+        for date_str in sorted(activity_by_date.keys()):
+            data = activity_by_date[date_str]
+            chat_qualities = [chat_to_quality.get(cid, 0) for cid in data["chat_ids"] if cid in chat_to_quality]
+            avg_q = sum(chat_qualities) / len(chat_qualities) if chat_qualities else 0.0
+            activity_timeline.append(
+                UserActivityPointDTO(date=date_str, prompt_count=data["count"], average_quality=round(avg_q, 2))
+            )
+
+        # Build provider breakdown
+        provider_counts: dict[str, int] = {}
+        for q in user_quality:
+            provider = q.get("provider") or "Unknown"
+            provider_counts[provider] = provider_counts.get(provider, 0) + 1
+
+        total_provider_chats = sum(provider_counts.values())
+        provider_breakdown = [
+            UserProviderUsageDTO(
+                provider_name=provider,
+                chat_count=count,
+                percentage=round(count / total_provider_chats * 100, 1) if total_provider_chats > 0 else 0,
+            )
+            for provider, count in sorted(provider_counts.items(), key=lambda x: x[1], reverse=True)
+        ]
+
+        # Build theme distribution
+        theme_counts: dict[str, int] = {}
+        for q in user_quality:
+            theme = q.get("theme")
+            if theme:
+                theme_counts[theme] = theme_counts.get(theme, 0) + 1
+
+        total_themes = sum(theme_counts.values())
+        themes = [
+            UserThemeDataDTO(
+                theme=theme,
+                count=count,
+                percentage=round(count / total_themes * 100, 1) if total_themes > 0 else 0,
+            )
+            for theme, count in sorted(theme_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+        ]
+
+        # Build intent distribution with quality
+        intent_data: dict[str, dict] = {}
+        for q in user_quality:
+            intent = q.get("intent")
+            if intent:
+                if intent not in intent_data:
+                    intent_data[intent] = {"count": 0, "quality_sum": 0, "quality_count": 0}
+                intent_data[intent]["count"] += 1
+                if q.get("quality_score") is not None:
+                    intent_data[intent]["quality_sum"] += q["quality_score"]
+                    intent_data[intent]["quality_count"] += 1
+
+        total_intents = sum(d["count"] for d in intent_data.values())
+        intents = [
+            UserIntentDataDTO(
+                intent=intent,
+                count=data["count"],
+                percentage=round(data["count"] / total_intents * 100, 1) if total_intents > 0 else 0,
+                avg_quality=round(data["quality_sum"] / data["quality_count"], 2) if data["quality_count"] > 0 else 0,
+            )
+            for intent, data in sorted(intent_data.items(), key=lambda x: x[1]["count"], reverse=True)[:10]
+        ]
+
+        # Build response
+        return UserProfileResponseDTO(
+            organization_id=organization_id,
+            date_range={"start_date": start_dt.isoformat(), "end_date": end_dt.isoformat()},
+            data=UserProfileDataDTO(
+                user_id=target_user_id,
+                email=user_info.get("email", ""),
+                name=user_info.get("name"),
+                kpis=UserProfileKPIsDTO(
+                    total_prompts=total_prompts,
+                    average_quality=round(average_quality, 2),
+                    work_percentage=round(work_percentage, 1),
+                    high_risk_count=high_risk_count,
+                    quality_trend=round(quality_trend, 1) if quality_trend is not None else None,
+                    percentile_ranking=round(percentile_ranking, 1),
+                ),
+                comparison=UserProfileComparisonDTO(
+                    org_average_quality=round(org_avg_quality, 2),
+                    org_average_prompts=round(org_avg_prompts, 1),
+                    org_average_work_percentage=round(org_work_percentage, 1),
+                    user_quality_vs_org=round(user_quality_vs_org, 1),
+                    user_prompts_vs_org=round(user_prompts_vs_org, 1),
+                ),
+                activity_timeline=activity_timeline,
+                provider_breakdown=provider_breakdown,
+                themes=themes,
+                intents=intents,
+            ),
             generated_at=datetime.now(),
         )
 

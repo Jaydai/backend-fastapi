@@ -25,6 +25,7 @@ from . import (  # noqa: E402
     top_prompts,
     top_users,
     usage,
+    user_profile,
 )
 
 __all__ = ["router"]
