@@ -229,11 +229,11 @@ BEGIN
             author_id,
             is_default,
             status,
-            description,
+            change_notes,
             usage_count
         ) VALUES (
             NEW.id,
-            '1.0', 
+            'défaut', 
             jsonb_build_object('en', 'Template content will be added via version creation', 'fr', 'Le contenu du modèle sera ajouté via la création de version'),
             author_uuid,
             true,
@@ -2122,6 +2122,11 @@ ALTER TABLE ONLY "public"."share_invitations"
 
 ALTER TABLE ONLY "public"."notifications"
     ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id");
+
+
+
+ALTER TABLE ONLY "public"."prompt_blocks"
+    ADD CONSTRAINT "prompt_blocks_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id");
 
 
 
