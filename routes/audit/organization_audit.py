@@ -19,12 +19,14 @@ async def get_organization_audit(
     start_date: str | None = Query(default=None, description="Start date (YYYY-MM-DD)"),
     end_date: str | None = Query(default=None, description="End date (YYYY-MM-DD)"),
     days: int = Query(default=30, ge=1, le=365, description="Number of days to look back"),
+    team_ids: str | None = Query(default=None, description="Comma-separated team IDs to filter by"),
 ):
     """
     Get comprehensive organization audit with quality, risk, usage, and user statistics
     Requires admin or owner role in the organization
 
-    This endpoint fetches data in parallel for optimal performance
+    This endpoint fetches data in parallel for optimal performance.
+    Optionally filter by team_ids (comma-separated).
     """
     try:
         user_id = request.state.user_id
@@ -32,8 +34,19 @@ async def get_organization_audit(
         # TODO: Add permission check - verify user has admin/owner role in organization
         # For now, assuming authentication middleware handles this
 
+        # Parse team_ids from comma-separated string
+        parsed_team_ids = None
+        if team_ids:
+            parsed_team_ids = [t.strip() for t in team_ids.split(",") if t.strip()]
+
         result = await AuditService.get_organization_audit(
-            request.state.supabase_client, user_id, organization_id, start_date, end_date, days
+            request.state.supabase_client,
+            user_id,
+            organization_id,
+            start_date,
+            end_date,
+            days,
+            team_ids=parsed_team_ids,
         )
 
         return result

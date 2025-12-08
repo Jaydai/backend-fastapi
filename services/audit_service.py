@@ -14,6 +14,7 @@ from dtos.audit_dto import (
     QualityStatsWithContextDTO,
     RiskStatsWithContextDTO,
     RiskyPromptsWithContextDTO,
+    TeamStatsDTO,
     ThemeStatsWithContextDTO,
     TopPromptsWithContextDTO,
     TopUsersWithContextDTO,
@@ -28,6 +29,7 @@ from dtos.audit_dto import (
     UserIntentDataDTO,
 )
 from repositories.audit_repository import AuditRepository
+from repositories.team_repository import TeamRepository
 from utils.enrichment import (
     aggregate_intent_stats,
     aggregate_quality_stats,
@@ -55,16 +57,26 @@ class AuditService:
 
     @staticmethod
     async def get_organization_audit(
-        client: Client, user_id: str, organization_id: str, start_date: str | None, end_date: str | None, days: int
+        client: Client,
+        user_id: str,
+        organization_id: str,
+        start_date: str | None,
+        end_date: str | None,
+        days: int,
+        team_ids: list[str] | None = None,
     ) -> OrganizationAuditResponseDTO:
         """
         Get comprehensive organization audit with parallel data fetching
+        Optionally filter by team_ids
         """
         # Calculate date range
         start_dt, end_dt = _calculate_date_range(start_date, end_date, days)
 
-        # Get organization member IDs
-        user_ids = AuditRepository.get_organization_member_ids(client, organization_id)
+        # Get user IDs - either filtered by teams or all org members
+        if team_ids and len(team_ids) > 0:
+            user_ids = _get_user_ids_for_teams(client, organization_id, team_ids)
+        else:
+            user_ids = AuditRepository.get_organization_member_ids(client, organization_id)
 
         if not user_ids:
             logger.warning(f"No members found for organization {organization_id}")
@@ -83,6 +95,9 @@ class AuditService:
         top_prompts = aggregate_top_prompts(audit_data["top_prompts"])
         risky_prompts = aggregate_risky_prompts(audit_data["risky_prompts"])
 
+        # Calculate team stats
+        team_stats = await _calculate_team_stats(client, organization_id, start_dt, end_dt)
+
         # Build response DTO using utility mappers
         return OrganizationAuditResponseDTO(
             organization_id=organization_id,
@@ -96,6 +111,7 @@ class AuditService:
             top_users=[top_user_to_dto(u) for u in top_users],
             top_prompts=[top_prompt_to_dto(p) for p in top_prompts],
             riskiest_prompts=[risky_prompt_to_dto(p) for p in risky_prompts],
+            team_stats=team_stats,
             generated_at=datetime.now(),
         )
 
@@ -600,5 +616,95 @@ def _create_empty_audit_response(
         top_users=[],
         top_prompts=[],
         riskiest_prompts=[],
+        team_stats=[],
         generated_at=datetime.now(),
     )
+
+
+def _get_user_ids_for_teams(client: Client, organization_id: str, team_ids: list[str] | None) -> list[str]:
+    """Get user IDs filtered by teams, or all organization members if no teams specified"""
+    if not team_ids or len(team_ids) == 0:
+        return AuditRepository.get_organization_member_ids(client, organization_id)
+
+    # Get users in specified teams
+    user_ids_set = set()
+    for team_id in team_ids:
+        members = TeamRepository.get_team_members(client, team_id)
+        user_ids_set.update([m.user_id for m in members])
+
+    return list(user_ids_set)
+
+
+async def _calculate_team_stats(
+    client: Client, organization_id: str, start_dt: datetime, end_dt: datetime
+) -> list[TeamStatsDTO]:
+    """Calculate adoption stats for each team in the organization"""
+    # Get all teams for the organization
+    teams = TeamRepository.get_organization_teams(client, organization_id)
+
+    if not teams:
+        return []
+
+    team_stats = []
+    for team in teams:
+        # Get team members
+        members = TeamRepository.get_team_members(client, team.id)
+        member_user_ids = [m.user_id for m in members]
+
+        if not member_user_ids:
+            team_stats.append(
+                TeamStatsDTO(
+                    team_id=team.id,
+                    team_name=team.name,
+                    team_color=team.color,
+                    active_users=0,
+                    total_prompts=0,
+                    average_quality=0.0,
+                )
+            )
+            continue
+
+        # Get messages for team members in date range
+        messages_response = (
+            client.table("messages")
+            .select("user_id")
+            .in_("user_id", member_user_ids)
+            .gte("created_at", start_dt.isoformat())
+            .lte("created_at", end_dt.isoformat())
+            .execute()
+        )
+
+        messages = messages_response.data or []
+        total_prompts = len(messages)
+        active_users = len(set(msg["user_id"] for msg in messages)) if messages else 0
+
+        # Get quality data for team members
+        quality_response = (
+            client.table("enriched_chats")
+            .select("quality_score")
+            .in_("user_id", member_user_ids)
+            .gte("created_at", start_dt.isoformat())
+            .lte("created_at", end_dt.isoformat())
+            .not_.is_("quality_score", "null")
+            .execute()
+        )
+
+        quality_data = quality_response.data or []
+        quality_scores = [q["quality_score"] for q in quality_data if q.get("quality_score") is not None]
+        average_quality = sum(quality_scores) / len(quality_scores) if quality_scores else 0.0
+
+        team_stats.append(
+            TeamStatsDTO(
+                team_id=team.id,
+                team_name=team.name,
+                team_color=team.color,
+                active_users=active_users,
+                total_prompts=total_prompts,
+                average_quality=round(average_quality, 2),
+            )
+        )
+
+    # Sort by total_prompts descending
+    team_stats.sort(key=lambda x: x.total_prompts, reverse=True)
+
+    return team_stats

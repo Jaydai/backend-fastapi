@@ -117,6 +117,17 @@ class RiskyPromptDTO(BaseModel):
     user_name: str | None = None
 
 
+class TeamStatsDTO(BaseModel):
+    """Team adoption statistics"""
+
+    team_id: str
+    team_name: str
+    team_color: str
+    active_users: int
+    total_prompts: int
+    average_quality: float
+
+
 class OrganizationAuditResponseDTO(BaseModel):
     """Complete organization audit response"""
 
@@ -131,6 +142,7 @@ class OrganizationAuditResponseDTO(BaseModel):
     top_users: list[TopUserDTO]
     top_prompts: list[TopPromptDTO]
     riskiest_prompts: list[RiskyPromptDTO]
+    team_stats: list[TeamStatsDTO] = []
     generated_at: datetime
 
 
