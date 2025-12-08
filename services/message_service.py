@@ -58,8 +58,17 @@ class MessageService:
         if not messages:
             return [], MessageBatchResultDTO(saved_count=0, skipped_count=0, total_count=0)
 
-        messages_to_upsert = []
+        message_ids = [msg.message_provider_id for msg in messages]
+        existing_ids = MessageRepository.get_existing_message_ids(client, user_id, message_ids)
+
+        messages_to_insert = []
+        skipped_count = 0
+
         for message in messages:
+            if message.message_provider_id in existing_ids:
+                skipped_count += 1
+                continue
+
             created_at = MessageService._convert_timestamp(message.created_at)
 
             message_data = {
@@ -75,9 +84,9 @@ class MessageService:
             if message.parent_message_provider_id:
                 message_data["parent_message_provider_id"] = message.parent_message_provider_id
 
-            messages_to_upsert.append(message_data)
+            messages_to_insert.append(message_data)
 
-        upserted_messages = MessageRepository.upsert_messages_batch(client, messages_to_upsert)
+        inserted_messages = MessageRepository.save_messages_batch(client, messages_to_insert) if messages_to_insert else []
 
         response_dtos = [
             MessageResponseDTO(
@@ -91,11 +100,11 @@ class MessageService:
                 created_at=msg.created_at,
                 parent_message_provider_id=msg.parent_message_provider_id,
             )
-            for msg in upserted_messages
+            for msg in inserted_messages
         ]
 
         result_dto = MessageBatchResultDTO(
-            saved_count=len(upserted_messages), skipped_count=0, total_count=len(messages)
+            saved_count=len(inserted_messages), skipped_count=skipped_count, total_count=len(messages)
         )
 
         return response_dtos, result_dto
