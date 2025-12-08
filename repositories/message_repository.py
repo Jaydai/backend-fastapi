@@ -67,6 +67,35 @@ class MessageRepository:
             for row in response.data
         ]
 
+    @staticmethod
+    def upsert_messages_batch(client: Client, messages_data: list[dict]) -> list[Message]:
+        if not messages_data:
+            return []
+
+        response = (
+            client.table("messages")
+            .upsert(messages_data, on_conflict="user_id,message_provider_id")
+            .execute()
+        )
+
+        if not response.data:
+            return []
+
+        return [
+            Message(
+                id=row["id"],
+                user_id=row["user_id"],
+                message_provider_id=row["message_provider_id"],
+                content=row["content"],
+                role=row["role"],
+                chat_provider_id=row["chat_provider_id"],
+                model=row["model"],
+                created_at=row.get("created_at"),
+                parent_message_provider_id=row.get("parent_message_provider_id"),
+            )
+            for row in response.data
+        ]
+
 
 class ChatRepository:
     @staticmethod
