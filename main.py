@@ -3,6 +3,8 @@ Refactored main.py for Jaydai API
 Clean, modular, and maintainable structure
 """
 
+# Hello World
+
 import logging
 from contextlib import asynccontextmanager
 
