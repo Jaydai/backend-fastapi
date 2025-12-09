@@ -1,3 +1,5 @@
+import logging
+
 from supabase import Client
 
 from domains.entities import Organization, OrganizationDetail, OrganizationInvitation, OrganizationMember
@@ -7,7 +9,11 @@ from dtos import (
     OrganizationMemberResponseDTO,
     OrganizationResponseDTO,
 )
+from dtos.organization_dto import BulkInviteResponseDTO, CreateOrganizationDTO
 from repositories import OrganizationRepository
+from services.user_service import UserService
+
+logger = logging.getLogger(__name__)
 
 
 class OrganizationService:
@@ -127,3 +133,98 @@ class OrganizationService:
             )
             for invitation in invitations
         ]
+
+    @staticmethod
+    def create_organization(
+        client: Client, user_id: str, data: CreateOrganizationDTO
+    ) -> OrganizationDetailResponseDTO:
+        """
+        Create a new organization and set the creator as admin.
+        """
+        logger.info(f"User {user_id} creating organization: {data.name}")
+
+        organization = OrganizationRepository.create_organization(
+            client=client,
+            user_id=user_id,
+            name=data.name,
+            description=data.description,
+            image_url=data.image_url,
+            website_url=data.website_url,
+            org_type=data.type,
+        )
+
+        # Get user info to include in response
+        user_profile = UserService.get_user_profile(client, user_id)
+
+        members = [
+            OrganizationMemberResponseDTO(
+                user_id=user_id,
+                email=user_profile.email,
+                role="admin",
+                first_name=user_profile.first_name,
+                last_name=user_profile.last_name,
+            )
+        ]
+
+        logger.info(f"Organization {organization.id} created successfully")
+
+        return OrganizationDetailResponseDTO(
+            id=organization.id,
+            name=organization.name,
+            description={"text": data.description} if data.description else None,
+            type=organization.type,
+            image_url=organization.image_url,
+            banner_url=organization.banner_url,
+            website_url=organization.website_url,
+            created_at=organization.created_at,
+            role="admin",
+            members_count=1,
+            members=members,
+        )
+
+    @staticmethod
+    def bulk_invite_members(
+        client: Client,
+        organization_id: str,
+        inviter_id: str,
+        emails: list[str],
+        role: str = "viewer",
+    ) -> BulkInviteResponseDTO:
+        """
+        Send invitations to multiple emails.
+        """
+        logger.info(f"User {inviter_id} bulk inviting {len(emails)} users to org {organization_id}")
+
+        # Get inviter info
+        user_profile = UserService.get_user_profile(client, inviter_id)
+        inviter_name = f"{user_profile.first_name or ''} {user_profile.last_name or ''}".strip()
+        if not inviter_name:
+            inviter_name = user_profile.email
+
+        # Get organization name
+        org = OrganizationRepository.get_organization_by_id(client, organization_id)
+        if not org:
+            raise ValueError(f"Organization {organization_id} not found")
+
+        result = BulkInviteResponseDTO()
+
+        for email in emails:
+            try:
+                OrganizationRepository.create_invitation(
+                    client=client,
+                    organization_id=organization_id,
+                    organization_name=org.name,
+                    inviter_id=inviter_id,
+                    inviter_name=inviter_name,
+                    inviter_email=user_profile.email,
+                    invited_email=email,
+                    role=role,
+                )
+                result.successful.append(email)
+                result.total_invited += 1
+            except Exception as e:
+                logger.warning(f"Failed to invite {email}: {e}")
+                result.failed.append({"email": email, "reason": str(e)})
+
+        logger.info(f"Bulk invite complete: {result.total_invited} successful, {len(result.failed)} failed")
+        return result

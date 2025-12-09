@@ -11,4 +11,5 @@ from . import (  # noqa: E402
     sign_in,
     sign_out,
     sign_up,
+    verify_callback,
 )

@@ -170,6 +170,123 @@ class OrganizationRepository:
         )
 
     @staticmethod
+    def create_organization(
+        client: Client,
+        user_id: str,
+        name: str,
+        description: str | None = None,
+        image_url: str | None = None,
+        website_url: str | None = None,
+        org_type: str = "company",
+    ) -> Organization:
+        """
+        Create a new organization and add the creator as admin.
+
+        Returns the created Organization entity.
+        """
+        # Use admin client to bypass RLS for organization creation
+        # This is a trusted server-side operation
+        admin_client = supabase_admin if supabase_admin else client
+
+        # Create the organization
+        org_data = {
+            "name": name,
+            "type": org_type,
+        }
+
+        if description:
+            org_data["description"] = {"text": description}
+        if image_url:
+            org_data["image_url"] = image_url
+        if website_url:
+            org_data["website_url"] = website_url
+
+        org_response = admin_client.table("organizations").insert(org_data).execute()
+
+        if not org_response.data or len(org_response.data) == 0:
+            raise ValueError("Failed to create organization")
+
+        org_row = org_response.data[0]
+        org_id = org_row["id"]
+
+        # Add creator as admin (using admin client to bypass RLS)
+        role_data = {
+            "user_id": user_id,
+            "organization_id": org_id,
+            "role": "admin",
+        }
+
+        role_response = admin_client.table("user_organization_roles").insert(role_data).execute()
+
+        if not role_response.data:
+            # Try to clean up the org if role creation failed
+            admin_client.table("organizations").delete().eq("id", org_id).execute()
+            raise ValueError("Failed to assign admin role to organization creator")
+
+        return Organization(
+            id=org_id,
+            name=org_row["name"],
+            type=org_row.get("type", "standard"),
+            image_url=org_row.get("image_url"),
+            banner_url=org_row.get("banner_url"),
+            created_at=org_row.get("created_at"),
+            website_url=org_row.get("website_url"),
+            user_organization_role=UserOrganizationRole(
+                user_id=user_id,
+                organization_id=org_id,
+                role="admin",
+            ),
+        )
+
+    @staticmethod
+    def create_invitation(
+        client: Client,
+        organization_id: str,
+        organization_name: str,
+        inviter_id: str,
+        inviter_name: str,
+        inviter_email: str,
+        invited_email: str,
+        role: str = "viewer",
+    ) -> OrganizationInvitation:
+        """
+        Create an organization invitation.
+        """
+        # Use admin client to bypass RLS for invitation creation
+        admin_client = supabase_admin if supabase_admin else client
+
+        invitation_data = {
+            "organization_id": organization_id,
+            "invited_email": invited_email,
+            "inviter_email": inviter_email,
+            "inviter_name": inviter_name,
+            "invitation_type": "organization",
+            "status": "pending",
+            "metadata": {
+                "role": role,
+                "organization_name": organization_name,
+            },
+        }
+
+        response = admin_client.table("share_invitations").insert(invitation_data).execute()
+
+        if not response.data or len(response.data) == 0:
+            raise ValueError(f"Failed to create invitation for {invited_email}")
+
+        row = response.data[0]
+        return OrganizationInvitation(
+            id=row["id"],
+            invited_email=row["invited_email"],
+            inviter_email=row["inviter_email"],
+            inviter_name=row["inviter_name"],
+            status=row["status"],
+            organization_id=row["organization_id"],
+            role=role,
+            organization_name=organization_name,
+            created_at=row.get("created_at"),
+        )
+
+    @staticmethod
     def get_organization_invitations(client: Client, organization_id: str) -> list[OrganizationInvitation]:
         response = (
             client.table("share_invitations")
