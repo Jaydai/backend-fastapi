@@ -28,8 +28,7 @@ class AuthRepository:
         )
 
     @staticmethod
-    def sign_up_with_email(sign_up_dto: SignUpDTO) -> Session:
-        # TODO: sign_up with email validation
+    def sign_up_with_email(sign_up_dto: SignUpDTO) -> Session | None:
         sign_up_response = supabase.auth.sign_up(
             {
                 "email": sign_up_dto.email,
@@ -37,9 +36,14 @@ class AuthRepository:
                 "options": {"data": {"first_name": sign_up_dto.first_name, "last_name": sign_up_dto.last_name}},
             }
         )
-        return Session(
-            access_token=sign_up_response.session.access_token, refresh_token=sign_up_response.session.refresh_token
-        )
+        # When email confirmation is enabled, session will be None until user confirms
+        if sign_up_response.session:
+            return Session(
+                access_token=sign_up_response.session.access_token,
+                refresh_token=sign_up_response.session.refresh_token,
+            )
+        # Return None to indicate email confirmation is required
+        return None
 
     @staticmethod
     def sign_out() -> None:

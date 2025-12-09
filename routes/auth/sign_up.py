@@ -25,7 +25,13 @@ async def sign_up(sign_up_dto: SignUpDTO, request: Request, response: Response):
             logger.error(f"[AUTH] Unknown client_type: {client_type}")
             raise HTTPException(status_code=400, detail="Unknown client type")
 
+        # If session is None, email confirmation is required
+        if session is None:
+            logger.info(f"[AUTH] Email confirmation required for: {sign_up_dto.email}")
+            return {"message": "Email confirmation required", "email_confirmation_required": True}
+
         set_auth_cookies(response, session)
+        return {"message": "Sign up successful", "email_confirmation_required": False}
 
     except Exception as e:
         error_message = str(e)
