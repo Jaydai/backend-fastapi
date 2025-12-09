@@ -9,7 +9,10 @@ class OnboardingRepository:
         response = (
             client.table("users_metadata")
             .select(
-                "job_type, job_industry, job_seniority, interests, signup_source, onboarding_dismissed, first_template_created, first_template_used, first_block_created, keyboard_shortcut_used"
+                "job_type, job_industry, job_seniority, interests, signup_source, "
+                "onboarding_dismissed, first_template_created, first_template_used, "
+                "first_block_created, keyboard_shortcut_used, onboarding_step, "
+                "onboarding_flow_type, onboarding_completed_at, extension_installed"
             )
             .eq("user_id", user_id)
             .single()
@@ -31,6 +34,10 @@ class OnboardingRepository:
             first_template_used=data.get("first_template_used", False),
             first_block_created=data.get("first_block_created", False),
             keyboard_shortcut_used=data.get("keyboard_shortcut_used", False),
+            onboarding_step=data.get("onboarding_step", "not_started"),
+            onboarding_flow_type=data.get("onboarding_flow_type"),
+            onboarding_completed_at=data.get("onboarding_completed_at"),
+            extension_installed=data.get("extension_installed", False),
         )
 
     @staticmethod
