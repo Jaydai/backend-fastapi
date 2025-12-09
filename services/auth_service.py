@@ -15,7 +15,7 @@ class AuthService:
         return AuthRepository.oauth_sign_in(sign_in_dto)
 
     @staticmethod
-    def sign_up_with_email(sign_up_dto: SignUpDTO) -> Session:
+    def sign_up_with_email(sign_up_dto: SignUpDTO) -> Session | None:
         return AuthRepository.sign_up_with_email(sign_up_dto)
 
     @staticmethod
