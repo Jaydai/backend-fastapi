@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, field_validator
 
 from domains.enums import RoleEnum
 
@@ -19,7 +19,7 @@ class CreateOrganizationDTO(BaseModel):
 class BulkInviteDTO(BaseModel):
     """DTO for bulk inviting members to an organization"""
 
-    emails: list[EmailStr]
+    emails: list[str]
     role: str = "viewer"
 
     @field_validator("role")
