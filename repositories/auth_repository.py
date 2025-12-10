@@ -68,7 +68,7 @@ class AuthRepository:
         """Get user metadata from users_metadata table"""
         response = (
             client.table("users_metadata")
-            .select("user_id, name, data_collection, profile_picture_url")
+            .select("user_id, name, data_collection, profile_picture_url, email, created_at, onboarding_step, onboarding_flow_type, onboarding_completed_at")
             .eq("user_id", user_id)
             .execute()
         )
@@ -86,9 +86,31 @@ class AuthRepository:
             insert_response = client.table("users_metadata").insert(new_user_data).execute()
 
             if insert_response.data and len(insert_response.data) > 0:
-                return User(**insert_response.data[0])
+                data = insert_response.data[0]
+                return User(
+                    user_id=data.get("user_id", user_id),
+                    name=data.get("name"),
+                    data_collection=data.get("data_collection", True),
+                    profile_picture_url=data.get("profile_picture_url"),
+                    email=data.get("email"),
+                    created_at=data.get("created_at"),
+                    onboarding_step=data.get("onboarding_step"),
+                    onboarding_flow_type=data.get("onboarding_flow_type"),
+                    onboarding_completed_at=data.get("onboarding_completed_at"),
+                )
 
             # If insert failed, return default User
             return User(user_id=user_id, name=None, data_collection=True, profile_picture_url=None)
 
-        return User(**response.data[0])
+        data = response.data[0]
+        return User(
+            user_id=data.get("user_id", user_id),
+            name=data.get("name"),
+            data_collection=data.get("data_collection", True),
+            profile_picture_url=data.get("profile_picture_url"),
+            email=data.get("email"),
+            created_at=data.get("created_at"),
+            onboarding_step=data.get("onboarding_step"),
+            onboarding_flow_type=data.get("onboarding_flow_type"),
+            onboarding_completed_at=data.get("onboarding_completed_at"),
+        )
