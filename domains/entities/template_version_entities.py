@@ -33,7 +33,6 @@ class TemplateVersionUpdate:
 class VersionSummary:
     id: int
     name: str
-    is_default: bool
     status: str
     published: bool
     optimized_for: list[str] | None

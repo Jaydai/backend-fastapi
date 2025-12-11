@@ -38,7 +38,6 @@ class TemplateMapper:
             VersionSummary(
                 id=v.id,
                 name=LocaleService.localize_string(v.name, locale),
-                is_default=v.is_default,
                 status=v.status,
                 published=v.published,
                 optimized_for=v.optimized_for,

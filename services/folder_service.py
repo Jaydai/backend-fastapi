@@ -31,30 +31,34 @@ class FolderService:
         locale: str = LocaleService.DEFAULT_LOCALE,
         organization_id: str | None = None,
         parent_folder_id: str | None = None,
+        depth: int | None = None,
         limit: int = 100,
         offset: int = 0,
     ) -> list[FolderTitleResponseDTO]:
-        """Get folder titles with optional filtering"""
-        # Business logic: Determine which filters to apply based on priority
+        """Get folder titles with optional filtering
+
+        Args:
+            depth: If provided, limits folder depth relative to parent_folder_id.
+                   depth=0: Only root folders (or folders at parent_folder_id level)
+                   depth=1: Root folders + their direct children (lazy loading +1)
+                   depth=None: All folders (eager loading)
+        """
         filter_user_id = None
         filter_org_id = None
         filter_parent_id = parent_folder_id
         if parent_folder_id is not None:
-            # Priority 1: Filter by parent folder only
             pass
         elif organization_id:
-            # Priority 2: Filter by organization only
             filter_org_id = organization_id
         elif user_id:
-            # Priority 3: Filter by user only
             filter_user_id = user_id
-        # Priority 4: No filters (RLS handles access)
 
         folders = FolderRepository.get_folders_titles(
             client,
             user_id=filter_user_id,
             organization_id=filter_org_id,
             parent_folder_id=filter_parent_id,
+            depth=depth,
             limit=limit,
             offset=offset,
         )
