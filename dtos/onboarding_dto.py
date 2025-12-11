@@ -209,6 +209,18 @@ class FetchCompanyLogoResponseDTO(BaseModel):
     logo_url: str | None = None
 
 
+class FetchProfilePictureRequestDTO(BaseModel):
+    """Request to fetch profile picture from LinkedIn"""
+
+    linkedin_url: str | None = None
+
+
+class FetchProfilePictureResponseDTO(BaseModel):
+    """Response with fetched profile picture URL"""
+
+    profile_picture_url: str | None = None
+
+
 class GenerateUserBlocksRequestDTO(BaseModel):
     """Request to generate user blocks (context, roles, goals)"""
 

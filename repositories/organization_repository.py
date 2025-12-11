@@ -239,6 +239,115 @@ class OrganizationRepository:
         )
 
     @staticmethod
+    def update_organization(
+        client: Client,
+        organization_id: str,
+        name: str | None = None,
+        description: str | None = None,
+        image_url: str | None = None,
+        website_url: str | None = None,
+    ) -> Organization | None:
+        """
+        Update an organization's details.
+
+        Returns the updated Organization entity or None if not found.
+        """
+        # Build update data - only include fields that are provided
+        update_data = {}
+        if name is not None:
+            update_data["name"] = name
+        if description is not None:
+            update_data["description"] = {"text": description} if description else None
+        if image_url is not None:
+            update_data["image_url"] = image_url if image_url else None
+        if website_url is not None:
+            update_data["website_url"] = website_url if website_url else None
+
+        if not update_data:
+            # Nothing to update, just return the current org
+            return OrganizationRepository._get_organization_simple(client, organization_id)
+
+        response = (
+            client.table("organizations")
+            .update(update_data)
+            .eq("id", organization_id)
+            .execute()
+        )
+
+        if not response.data or len(response.data) == 0:
+            return None
+
+        org_row = response.data[0]
+
+        # Get user's role
+        role_response = (
+            client.table("user_organization_roles")
+            .select("user_id, role")
+            .eq("organization_id", organization_id)
+            .limit(1)
+            .execute()
+        )
+
+        user_org_role = None
+        if role_response.data and len(role_response.data) > 0:
+            role_data = role_response.data[0]
+            user_org_role = UserOrganizationRole(
+                user_id=role_data["user_id"],
+                organization_id=organization_id,
+                role=role_data["role"],
+            )
+
+        return Organization(
+            id=org_row["id"],
+            name=org_row["name"],
+            type=org_row.get("type", "standard"),
+            image_url=org_row.get("image_url"),
+            banner_url=org_row.get("banner_url"),
+            created_at=org_row.get("created_at"),
+            website_url=org_row.get("website_url"),
+            user_organization_role=user_org_role,
+        )
+
+    @staticmethod
+    def _get_organization_simple(client: Client, organization_id: str) -> Organization | None:
+        """Get organization without member details."""
+        response = client.table("organizations").select("*").eq("id", organization_id).execute()
+
+        if not response.data or len(response.data) == 0:
+            return None
+
+        org_row = response.data[0]
+
+        # Get user's role
+        role_response = (
+            client.table("user_organization_roles")
+            .select("user_id, role")
+            .eq("organization_id", organization_id)
+            .limit(1)
+            .execute()
+        )
+
+        user_org_role = None
+        if role_response.data and len(role_response.data) > 0:
+            role_data = role_response.data[0]
+            user_org_role = UserOrganizationRole(
+                user_id=role_data["user_id"],
+                organization_id=organization_id,
+                role=role_data["role"],
+            )
+
+        return Organization(
+            id=org_row["id"],
+            name=org_row["name"],
+            type=org_row.get("type", "standard"),
+            image_url=org_row.get("image_url"),
+            banner_url=org_row.get("banner_url"),
+            created_at=org_row.get("created_at"),
+            website_url=org_row.get("website_url"),
+            user_organization_role=user_org_role,
+        )
+
+    @staticmethod
     def create_invitation(
         client: Client,
         organization_id: str,

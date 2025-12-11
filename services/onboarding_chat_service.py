@@ -594,6 +594,90 @@ Make each use case highly specific and actionable for a {job_title}. Consider th
         logger.info(f"[ONBOARDING] LinkedIn logo fetching not implemented: {linkedin_url}")
         return None
 
+    def fetch_profile_picture(self, linkedin_url: str | None = None) -> str | None:
+        """
+        Fetch profile picture from LinkedIn profile URL.
+
+        Args:
+            linkedin_url: User's LinkedIn profile URL
+
+        Returns:
+            URL of the profile picture or None if not found
+        """
+        if not linkedin_url:
+            return None
+
+        picture_url = self._fetch_picture_from_linkedin(linkedin_url)
+        return picture_url
+
+    def _fetch_picture_from_linkedin(self, linkedin_url: str) -> str | None:
+        """
+        Fetch profile picture from LinkedIn profile page.
+
+        LinkedIn blocks most scraping, but we can try to get the og:image
+        which sometimes contains the profile picture.
+        """
+        try:
+            # Ensure URL has scheme
+            if not linkedin_url.startswith(("http://", "https://")):
+                linkedin_url = f"https://{linkedin_url}"
+
+            # Normalize LinkedIn URL
+            if "linkedin.com/in/" not in linkedin_url.lower():
+                logger.warning(f"[ONBOARDING] Invalid LinkedIn profile URL: {linkedin_url}")
+                return None
+
+            with httpx.Client(
+                timeout=10.0,
+                follow_redirects=True,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    "Accept-Language": "en-US,en;q=0.5",
+                },
+            ) as client:
+                response = client.get(linkedin_url)
+                response.raise_for_status()
+                html = response.text
+
+                # Look for og:image which often contains profile picture
+                og_patterns = [
+                    r'<meta[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']+)["\']',
+                    r'<meta[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:image["\']',
+                ]
+
+                for pattern in og_patterns:
+                    og_match = re.search(pattern, html, re.IGNORECASE)
+                    if og_match:
+                        image_url = og_match.group(1)
+                        # LinkedIn profile pictures usually contain "profile-displayphoto" or similar
+                        # Filter out generic LinkedIn images
+                        if "profile" in image_url.lower() or "media" in image_url.lower():
+                            logger.info(f"[ONBOARDING] Found LinkedIn profile picture: {image_url[:100]}...")
+                            return image_url
+
+                # Try to find profile image in the HTML directly
+                # LinkedIn uses various patterns for profile images
+                img_patterns = [
+                    r'<img[^>]*class=["\'][^"\']*profile-photo[^"\']*["\'][^>]*src=["\']([^"\']+)["\']',
+                    r'<img[^>]*src=["\']([^"\']+)["\'][^>]*class=["\'][^"\']*profile-photo[^"\']*["\']',
+                    r'<img[^>]*class=["\'][^"\']*pv-top-card[^"\']*["\'][^>]*src=["\']([^"\']+)["\']',
+                ]
+
+                for pattern in img_patterns:
+                    img_match = re.search(pattern, html, re.IGNORECASE)
+                    if img_match:
+                        image_url = img_match.group(1)
+                        logger.info(f"[ONBOARDING] Found LinkedIn profile image: {image_url[:100]}...")
+                        return image_url
+
+        except httpx.HTTPStatusError as e:
+            logger.warning(f"[ONBOARDING] LinkedIn returned {e.response.status_code} for {linkedin_url}")
+        except Exception as e:
+            logger.warning(f"[ONBOARDING] Error fetching profile picture from LinkedIn: {e}")
+
+        return None
+
     def generate_user_blocks(
         self,
         job_title: str,

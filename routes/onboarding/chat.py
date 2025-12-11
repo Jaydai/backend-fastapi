@@ -21,6 +21,8 @@ from dtos.onboarding_dto import (
     CompleteOnboardingChatResponseDTO,
     FetchCompanyLogoRequestDTO,
     FetchCompanyLogoResponseDTO,
+    FetchProfilePictureRequestDTO,
+    FetchProfilePictureResponseDTO,
     GenerateUserBlocksRequestDTO,
     GenerateUserBlocksResponseDTO,
     BlockDTO,
@@ -239,6 +241,39 @@ async def fetch_company_logo(request: Request, data: FetchCompanyLogoRequestDTO)
         logger.error(f"[ONBOARDING] Error fetching company logo: {e}", exc_info=True)
         # Return None instead of error - logo fetching is not critical
         return FetchCompanyLogoResponseDTO(logo_url=None)
+
+
+@router.post("/chat/fetch-profile-picture", response_model=FetchProfilePictureResponseDTO)
+async def fetch_profile_picture(request: Request, data: FetchProfilePictureRequestDTO):
+    """
+    Fetch profile picture from LinkedIn profile URL.
+
+    Attempts to find the user's profile picture by scraping the LinkedIn profile page.
+    """
+    try:
+        user_id = request.state.user_id
+    except AttributeError:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    if not data.linkedin_url:
+        raise HTTPException(status_code=400, detail="LinkedIn URL is required")
+
+    try:
+        picture_url = onboarding_chat_service.fetch_profile_picture(
+            linkedin_url=data.linkedin_url,
+        )
+
+        logger.info(f"[ONBOARDING] Fetched profile picture for user {user_id}: {picture_url is not None}")
+
+        return FetchProfilePictureResponseDTO(profile_picture_url=picture_url)
+
+    except Exception as e:
+        logger.error(f"[ONBOARDING] Error fetching profile picture: {e}", exc_info=True)
+        # Return None instead of error - profile picture fetching is not critical
+        return FetchProfilePictureResponseDTO(profile_picture_url=None)
 
 
 @router.post("/chat/generate-user-blocks", response_model=GenerateUserBlocksResponseDTO)
