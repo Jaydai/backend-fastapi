@@ -54,3 +54,45 @@ class OnboardingRepository:
             raise ValueError("Failed to update user metadata")
 
         return response.data[0]
+
+    @staticmethod
+    def save_chat_data(
+        client: Client,
+        user_id: str,
+        chat_history: list[dict],
+        chat_summary: str | None,
+        extracted_data: dict | None,
+    ) -> dict:
+        """
+        Save onboarding chat data to users_metadata.
+
+        Args:
+            client: Supabase client
+            user_id: User's ID
+            chat_history: Full conversation history
+            chat_summary: AI-generated summary
+            extracted_data: Extracted structured data (job_type, interests, etc.)
+        """
+        import json
+
+        # Build the update payload
+        update_data: dict = {
+            "onboarding_chat_history": json.dumps(chat_history),
+        }
+
+        if chat_summary:
+            update_data["onboarding_chat_summary"] = chat_summary
+
+        # Also update extracted fields if present
+        if extracted_data:
+            field_mapping = {
+                "job_type": "job_type",
+                "job_industry": "job_industry",
+                "job_seniority": "job_seniority",
+                "interests": "interests",
+            }
+            for source_field, target_field in field_mapping.items():
+                if source_field in extracted_data and extracted_data[source_field]:
+                    update_data[target_field] = extracted_data[source_field]
+
+        return OnboardingRepository.update_user_metadata(client, user_id, update_data)
