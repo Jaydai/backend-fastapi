@@ -9,8 +9,12 @@ Supports multiple languages (en, fr).
 import json
 import logging
 import os
+import re
+import uuid
 from typing import Any
+from urllib.parse import urlparse
 
+import httpx
 from openai import OpenAI
 
 logger = logging.getLogger(__name__)
@@ -426,6 +430,401 @@ Make each use case highly specific and actionable for a {job_title}. Consider th
                     {"title": "Plan complex projects", "description": "Break down complex projects into manageable tasks with estimates and dependencies. Create realistic timelines.", "category": "Planning"},
                     {"title": "Translate documents", "description": "Quickly translate documents while preserving professional context and nuances of the original text.", "category": "Communication"},
                 ]
+
+    def fetch_company_logo(
+        self,
+        website_url: str | None = None,
+        linkedin_url: str | None = None,
+    ) -> str | None:
+        """
+        Fetch company logo from website or LinkedIn.
+
+        Args:
+            website_url: Company website URL
+            linkedin_url: Company LinkedIn URL
+
+        Returns:
+            Logo URL if found, None otherwise
+        """
+        logo_url = None
+
+        # Try website first
+        if website_url:
+            logo_url = self._fetch_logo_from_website(website_url)
+
+        # Try LinkedIn if no logo found
+        if not logo_url and linkedin_url:
+            logo_url = self._fetch_logo_from_linkedin(linkedin_url)
+
+        return logo_url
+
+    def _fetch_logo_from_website(self, website_url: str) -> str | None:
+        """
+        Fetch favicon/logo from website.
+
+        Priority order:
+        1. High-resolution favicon (icon with sizes attribute, prefer largest)
+        2. Apple touch icon (usually high quality square icon)
+        3. Standard favicon link
+        4. /favicon.ico fallback
+        5. og:image as last resort (often not a logo)
+        """
+        try:
+            # Ensure URL has scheme
+            if not website_url.startswith(("http://", "https://")):
+                website_url = f"https://{website_url}"
+
+            parsed = urlparse(website_url)
+            base_url = f"{parsed.scheme}://{parsed.netloc}"
+
+            with httpx.Client(timeout=10.0, follow_redirects=True) as client:
+                response = client.get(website_url)
+                response.raise_for_status()
+                html = response.text
+
+                def resolve_url(url: str) -> str:
+                    """Resolve relative URLs to absolute."""
+                    if url.startswith("//"):
+                        return f"https:{url}"
+                    elif url.startswith("/"):
+                        return base_url + url
+                    elif not url.startswith(("http://", "https://")):
+                        return f"{base_url}/{url}"
+                    return url
+
+                # 1. Look for high-res icons with sizes (prefer 192x192, 180x180, 152x152, etc.)
+                # Match: <link rel="icon" sizes="192x192" href="...">
+                icon_with_sizes = re.findall(
+                    r'<link[^>]*rel=["\'](?:icon|shortcut icon)["\'][^>]*(?:sizes=["\'](\d+)x\d+["\'][^>]*)?href=["\']([^"\']+)["\']',
+                    html,
+                    re.IGNORECASE
+                )
+                # Also match reversed attribute order
+                icon_with_sizes += re.findall(
+                    r'<link[^>]*href=["\']([^"\']+)["\'][^>]*rel=["\'](?:icon|shortcut icon)["\'][^>]*(?:sizes=["\'](\d+)x\d+["\'])?',
+                    html,
+                    re.IGNORECASE
+                )
+
+                # Parse and sort by size (largest first)
+                sized_icons = []
+                for match in icon_with_sizes:
+                    if isinstance(match, tuple) and len(match) == 2:
+                        size_str, href = match
+                        if href and not size_str:
+                            # Reversed order match
+                            href, size_str = match
+                        size = int(size_str) if size_str and size_str.isdigit() else 0
+                        if href:
+                            sized_icons.append((size, href))
+
+                # Sort by size descending, filter for reasonable sizes
+                sized_icons.sort(key=lambda x: x[0], reverse=True)
+                for size, href in sized_icons:
+                    if size >= 32:  # Prefer icons 32px or larger
+                        logo = resolve_url(href)
+                        logger.info(f"[ONBOARDING] Found icon with size {size}x{size}: {logo}")
+                        return logo
+
+                # 2. Look for apple-touch-icon (usually 180x180 or larger, good quality)
+                apple_patterns = [
+                    r'<link[^>]*rel=["\']apple-touch-icon(?:-precomposed)?["\'][^>]*href=["\']([^"\']+)["\']',
+                    r'<link[^>]*href=["\']([^"\']+)["\'][^>]*rel=["\']apple-touch-icon(?:-precomposed)?["\']',
+                ]
+                for pattern in apple_patterns:
+                    apple_match = re.search(pattern, html, re.IGNORECASE)
+                    if apple_match:
+                        logo = resolve_url(apple_match.group(1))
+                        logger.info(f"[ONBOARDING] Found apple-touch-icon: {logo}")
+                        return logo
+
+                # 3. Look for any favicon link (without size requirement)
+                favicon_patterns = [
+                    r'<link[^>]*rel=["\'](?:shortcut )?icon["\'][^>]*href=["\']([^"\']+)["\']',
+                    r'<link[^>]*href=["\']([^"\']+)["\'][^>]*rel=["\'](?:shortcut )?icon["\']',
+                ]
+                for pattern in favicon_patterns:
+                    favicon_match = re.search(pattern, html, re.IGNORECASE)
+                    if favicon_match:
+                        logo = resolve_url(favicon_match.group(1))
+                        logger.info(f"[ONBOARDING] Found favicon link: {logo}")
+                        return logo
+
+                # 4. Try common favicon paths
+                common_paths = [
+                    "/favicon.ico",
+                    "/favicon.png",
+                    "/favicon-32x32.png",
+                    "/favicon-16x16.png",
+                    "/apple-touch-icon.png",
+                ]
+                for path in common_paths:
+                    favicon_url = f"{base_url}{path}"
+                    try:
+                        favicon_response = client.head(favicon_url)
+                        if favicon_response.status_code == 200:
+                            content_type = favicon_response.headers.get("content-type", "")
+                            if "image" in content_type or path.endswith((".ico", ".png", ".svg")):
+                                logger.info(f"[ONBOARDING] Found favicon at common path: {favicon_url}")
+                                return favicon_url
+                    except Exception:
+                        pass
+
+                # 5. og:image as last resort (often a banner, not ideal but better than nothing)
+                og_patterns = [
+                    r'<meta[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']+)["\']',
+                    r'<meta[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:image["\']',
+                ]
+                for pattern in og_patterns:
+                    og_match = re.search(pattern, html, re.IGNORECASE)
+                    if og_match:
+                        logo = resolve_url(og_match.group(1))
+                        logger.info(f"[ONBOARDING] Found og:image (fallback): {logo}")
+                        return logo
+
+        except Exception as e:
+            logger.warning(f"[ONBOARDING] Error fetching logo from website: {e}")
+
+        return None
+
+    def _fetch_logo_from_linkedin(self, linkedin_url: str) -> str | None:
+        """Fetch logo from LinkedIn company page."""
+        # LinkedIn requires authentication for scraping, so we can't easily fetch logos
+        # For now, return None - in production, you'd use LinkedIn API
+        logger.info(f"[ONBOARDING] LinkedIn logo fetching not implemented: {linkedin_url}")
+        return None
+
+    def generate_user_blocks(
+        self,
+        job_title: str,
+        linkedin_url: str | None = None,
+        manual_description: str | None = None,
+        company_name: str | None = None,
+        company_description: str | None = None,
+        industry: str | None = None,
+        language: str = "en",
+    ) -> dict[str, Any]:
+        """
+        Generate user blocks: context block, role blocks, and goal blocks.
+
+        Args:
+            job_title: The user's job title
+            linkedin_url: User's LinkedIn profile URL (optional)
+            manual_description: Manual job description (optional)
+            company_name: Company name for context (optional)
+            company_description: Company description for context (optional)
+            industry: Industry for context (optional)
+            language: Language code ('en' or 'fr')
+
+        Returns:
+            Dict with context_block, role_blocks, goal_blocks, job_title, job_description, seniority_level
+        """
+        if self.mock_mode:
+            return self._mock_user_blocks(job_title, company_name, language)
+
+        lang_instruction = "Respond in French." if language == "fr" else "Respond in English."
+
+        context_parts = [f"Job title: {job_title}"]
+        if linkedin_url:
+            context_parts.append(f"LinkedIn: {linkedin_url}")
+        if manual_description:
+            context_parts.append(f"Job details: {manual_description}")
+        if company_name:
+            context_parts.append(f"Company: {company_name}")
+        if company_description:
+            context_parts.append(f"Company description: {company_description}")
+        if industry:
+            context_parts.append(f"Industry: {industry}")
+
+        context = "\n".join(context_parts)
+
+        prompt = f"""Based on this professional profile:
+{context}
+
+Generate personalized blocks for this user. These blocks will help them use AI more effectively.
+
+{lang_instruction}
+
+Respond in this exact JSON format:
+{{
+    "job_title": "The formatted job title",
+    "job_description": "A 2-3 sentence description of what this professional does, their key responsibilities, and their typical tasks",
+    "seniority_level": "junior/mid/senior/lead/executive",
+    "context_block": {{
+        "title": "I work as...",
+        "description": "A first-person narrative (2-3 sentences) describing who they are professionally, what they do, and their context. Start with 'I am a...' or 'Je suis...' depending on language."
+    }},
+    "role_blocks": [
+        {{
+            "title": "Short role name (e.g., 'SEO Specialist')",
+            "description": "What this expert does and how they can help (1-2 sentences)",
+            "icon": "A single relevant emoji",
+            "category": "A category like Marketing, Engineering, Design, Finance, Operations, Strategy, Analytics, Communication"
+        }}
+    ],
+    "goal_blocks": [
+        {{
+            "title": "Short goal name (e.g., 'Improve Conversion Rate')",
+            "description": "What achieving this goal means and why it matters (1-2 sentences)",
+            "icon": "A single relevant emoji",
+            "category": "A category like Growth, Efficiency, Quality, Innovation, Cost, Revenue, Team, Customer"
+        }}
+    ]
+}}
+
+Important:
+- Generate exactly 3 role_blocks (expert personas the user might want AI to act as)
+- Generate exactly 3 goal_blocks (professional objectives relevant to this role)
+- Make roles and goals highly specific to this job title and industry
+- Each block should be actionable and useful for AI interactions"""
+
+        try:
+            response = self.client.responses.create(
+                model=ONBOARDING_MODEL,
+                input=[{"role": "user", "content": prompt}],
+                temperature=GENERATION_TEMPERATURE,
+            )
+
+            response_text = response.output_text.strip()
+
+            # Handle markdown code blocks
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0]
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0]
+
+            parsed = json.loads(response_text)
+
+            # Add IDs and types to blocks
+            context_block = {
+                "id": str(uuid.uuid4()),
+                "type": "context",
+                "title": parsed["context_block"]["title"],
+                "description": parsed["context_block"]["description"],
+                "icon": "briefcase",
+            }
+
+            role_blocks = []
+            for rb in parsed.get("role_blocks", [])[:3]:
+                role_blocks.append({
+                    "id": str(uuid.uuid4()),
+                    "type": "role",
+                    "title": rb["title"],
+                    "description": rb["description"],
+                    "icon": rb.get("icon", "user"),
+                    "category": rb.get("category", "General"),
+                })
+
+            goal_blocks = []
+            for gb in parsed.get("goal_blocks", [])[:3]:
+                goal_blocks.append({
+                    "id": str(uuid.uuid4()),
+                    "type": "goal",
+                    "title": gb["title"],
+                    "description": gb["description"],
+                    "icon": gb.get("icon", "target"),
+                    "category": gb.get("category", "General"),
+                })
+
+            logger.info(f"[ONBOARDING] Generated user blocks for: {job_title}")
+
+            return {
+                "context_block": context_block,
+                "role_blocks": role_blocks,
+                "goal_blocks": goal_blocks,
+                "job_title": parsed.get("job_title", job_title),
+                "job_description": parsed.get("job_description", ""),
+                "seniority_level": parsed.get("seniority_level", "mid"),
+            }
+
+        except Exception as e:
+            logger.error(f"[ONBOARDING] Error generating user blocks: {e}")
+            return self._mock_user_blocks(job_title, company_name, language)
+
+    def _mock_user_blocks(self, job_title: str, company_name: str | None, language: str = "en") -> dict[str, Any]:
+        """Generate mock user blocks for testing."""
+        job_lower = job_title.lower()
+
+        if language == "fr":
+            company_part = f" chez {company_name}" if company_name else ""
+            context_desc = f"Je suis {job_title}{company_part}. Je suis responsable de la stratégie et de l'exécution des initiatives clés de mon domaine. Mon travail implique la coordination d'équipes et la livraison de résultats mesurables."
+
+            if "market" in job_lower or "marketing" in job_lower:
+                role_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Spécialiste SEO", "description": "Expert en optimisation pour les moteurs de recherche et stratégies de mots-clés.", "icon": "🔍", "category": "Marketing"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Copywriter", "description": "Rédige des textes marketing percutants et persuasifs.", "icon": "✍️", "category": "Contenu"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Analyste Data", "description": "Analyse les données marketing et identifie les tendances.", "icon": "📊", "category": "Analytics"},
+                ]
+                goal_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Améliorer le taux de conversion", "description": "Augmenter les conversions en optimisant le parcours utilisateur.", "icon": "📈", "category": "Croissance"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Stratégie de contenu", "description": "Développer un calendrier éditorial complet pour accroître la notoriété.", "icon": "📋", "category": "Stratégie"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "ROI des campagnes", "description": "Maximiser le retour sur investissement des campagnes marketing.", "icon": "💰", "category": "Revenue"},
+                ]
+            else:
+                role_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Consultant Stratégique", "description": "Conseille sur les décisions stratégiques et l'optimisation des processus.", "icon": "🎯", "category": "Stratégie"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Rédacteur Pro", "description": "Rédige des documents professionnels clairs et impactants.", "icon": "✍️", "category": "Communication"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Analyste", "description": "Analyse les données et génère des insights actionnables.", "icon": "📊", "category": "Analytics"},
+                ]
+                goal_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Productivité équipe", "description": "Améliorer l'efficacité et la collaboration de l'équipe.", "icon": "⚡", "category": "Efficacité"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Qualité livrables", "description": "Assurer la qualité et la cohérence des livrables.", "icon": "✅", "category": "Qualité"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Innovation", "description": "Identifier et implémenter des solutions innovantes.", "icon": "💡", "category": "Innovation"},
+                ]
+        else:
+            company_part = f" at {company_name}" if company_name else ""
+            context_desc = f"I am a {job_title}{company_part}. I am responsible for strategy and execution of key initiatives in my domain. My work involves coordinating teams and delivering measurable results."
+
+            if "market" in job_lower or "marketing" in job_lower:
+                role_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "SEO Specialist", "description": "Expert in search engine optimization and keyword strategies.", "icon": "🔍", "category": "Marketing"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Copywriter", "description": "Crafts compelling and persuasive marketing copy.", "icon": "✍️", "category": "Content"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Data Analyst", "description": "Analyzes marketing data and identifies trends.", "icon": "📊", "category": "Analytics"},
+                ]
+                goal_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Improve Conversion Rate", "description": "Increase conversions by optimizing the user journey.", "icon": "📈", "category": "Growth"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Content Strategy", "description": "Develop a comprehensive editorial calendar to increase brand awareness.", "icon": "📋", "category": "Strategy"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Campaign ROI", "description": "Maximize return on investment from marketing campaigns.", "icon": "💰", "category": "Revenue"},
+                ]
+            elif "engineer" in job_lower or "developer" in job_lower:
+                role_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Code Reviewer", "description": "Reviews code for quality, security, and best practices.", "icon": "🔍", "category": "Engineering"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Tech Writer", "description": "Creates clear technical documentation and guides.", "icon": "📝", "category": "Documentation"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "DevOps Expert", "description": "Optimizes deployment and infrastructure processes.", "icon": "🚀", "category": "Operations"},
+                ]
+                goal_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Code Quality", "description": "Improve codebase quality and reduce technical debt.", "icon": "✅", "category": "Quality"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Ship Faster", "description": "Reduce time-to-production for new features.", "icon": "⚡", "category": "Efficiency"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "System Reliability", "description": "Improve uptime and reduce incident response time.", "icon": "🛡️", "category": "Quality"},
+                ]
+            else:
+                role_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Strategic Consultant", "description": "Advises on strategic decisions and process optimization.", "icon": "🎯", "category": "Strategy"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Professional Writer", "description": "Writes clear and impactful professional documents.", "icon": "✍️", "category": "Communication"},
+                    {"id": str(uuid.uuid4()), "type": "role", "title": "Analyst", "description": "Analyzes data and generates actionable insights.", "icon": "📊", "category": "Analytics"},
+                ]
+                goal_blocks = [
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Team Productivity", "description": "Improve team efficiency and collaboration.", "icon": "⚡", "category": "Efficiency"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Deliverable Quality", "description": "Ensure quality and consistency of deliverables.", "icon": "✅", "category": "Quality"},
+                    {"id": str(uuid.uuid4()), "type": "goal", "title": "Innovation", "description": "Identify and implement innovative solutions.", "icon": "💡", "category": "Innovation"},
+                ]
+
+        context_block = {
+            "id": str(uuid.uuid4()),
+            "type": "context",
+            "title": "I work as..." if language == "en" else "Je travaille comme...",
+            "description": context_desc,
+            "icon": "briefcase",
+        }
+
+        return {
+            "context_block": context_block,
+            "role_blocks": role_blocks,
+            "goal_blocks": goal_blocks,
+            "job_title": job_title,
+            "job_description": f"Responsible for key initiatives and team coordination as a {job_title}." if language == "en" else f"Responsable des initiatives clés et de la coordination d'équipe en tant que {job_title}.",
+            "seniority_level": "mid",
+        }
 
 
 # Singleton instance

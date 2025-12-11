@@ -9,4 +9,5 @@ from . import (  # noqa: E402
     get_status,
     update_status,
     update_step,
+    upload,
 )
