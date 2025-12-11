@@ -47,14 +47,14 @@ async def get_all_templates(
                 folder_id_list = [fid.strip() for fid in folder_ids.split(",") if fid.strip()]
 
         templates = TemplateService.get_templates_titles(
-            client,
-            locale,
-            user_id,  # Pass user_id for personal templates
-            organization_id,  # Pass organization_id for org templates
-            folder_id_list,
-            published,
-            limit,
-            offset,
+            client=client,
+            user_id=user_id,
+            locale=locale,
+            organization_id=organization_id,
+            folder_id=folder_id_list[0] if isinstance(folder_id_list, list) and len(folder_id_list) == 1 else None,
+            published=published,
+            limit=limit,
+            offset=offset,
         )
 
         logger.info(f"Returning {len(templates)} template titles")

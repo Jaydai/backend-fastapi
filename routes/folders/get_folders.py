@@ -16,6 +16,7 @@ async def get_folders(
     workspace_type: str | None = Query(None, description="Workspace: user, organization, all"),
     organization_id: str | None = None,
     parent_folder_id: str | None = None,
+    depth: int | None = Query(None, ge=0, description="Folder depth: 0=root only, 1=root+children, null=all"),
     limit: int = Query(100, le=500),
     offset: int = Query(0, ge=0),
 ) -> list[FolderTitleResponseDTO]:
@@ -25,11 +26,11 @@ async def get_folders(
         user_id = request.state.user_id
 
         logger.info(
-            f"User {user_id} fetching folders with workspace={workspace_type}, org={organization_id}, parent={parent_folder_id}"
+            f"User {user_id} fetching folders with org={organization_id}, parent={parent_folder_id}, depth={depth}"
         )
 
         folders = FolderService.get_folders_titles(
-            client, user_id, locale, workspace_type, organization_id, parent_folder_id, limit, offset
+            client, user_id, locale, organization_id, parent_folder_id, depth, limit, offset
         )
 
         logger.info(f"Returning {len(folders)} folder titles")

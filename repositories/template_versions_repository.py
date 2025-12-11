@@ -30,30 +30,36 @@ class TemplateVersionRepository:
     def get_versions_summary(client: Client, template_id: str, published: bool | None = None) -> list[VersionSummary]:
         query = (
             client.table("prompt_templates_versions")
-            .select("id, name, is_default, status, published, optimized_for")
+            .select("id, name, status, is_published, optimized_for")
             .eq("template_id", template_id)
         )
         if published is not None:
-            query = query.eq("published", published)
+            query = query.eq("is_published", published)
         response = query.order("created_at", desc=True).execute()
 
         if not response.data:
             return []
 
-        return [VersionSummary(**item) for item in response.data]
+        return [VersionSummary(
+            id=item["id"],
+            name=item["name"],
+            status=item["status"],
+            published=item["is_published"],
+            optimized_for=item["optimized_for"],
+        ) for item in response.data]
 
     @staticmethod
     def get_version_by_id(client: Client, version_id: int) -> VersionDetails | None:
-        response = client.table("prompt_templates_versions").select("id, optimized_for, published, status, description, content").eq("id", version_id).execute()
+        response = client.table("prompt_templates_versions").select("id, optimized_for, is_published, status, change_notes, content").eq("id", version_id).execute()
         if not response.data:
             return None
         data = response.data[0]
         return VersionDetails(
             id=data["id"],
             optimized_for=data["optimized_for"],
-            published=data["published"],
+            published=data["is_published"],
             status=data["status"],
-            description=data["description"],
+            description=data["change_notes"],
             content=data["content"],
         )
 
@@ -77,7 +83,7 @@ class TemplateVersionRepository:
             "author_id": author_id,
             "content": content,
             "name": name,
-            "description": description,
+            "change_notes": description,
             "status": status,
             "optimized_for": optimized_for,
         }

@@ -1,6 +1,10 @@
+import logging
+
 from supabase import Client
 
 from domains.entities import UserOrganizationRole, UserProfile
+
+logger = logging.getLogger(__name__)
 
 
 class UserRepository:
@@ -81,7 +85,7 @@ class UserRepository:
             if not metadata_updates:
                 return UserRepository.get_user_profile(client, user_id)
 
-            existing = client.table("users_metadata").select("id").eq("user_id", user_id).execute()
+            existing = client.table("users_metadata").select("user_id").eq("user_id", user_id).execute()
 
             if existing.data:
                 client.table("users_metadata").update(metadata_updates).eq("user_id", user_id).execute()
@@ -96,7 +100,7 @@ class UserRepository:
     @staticmethod
     def update_data_collection(client: Client, user_id: str, data_collection: bool) -> bool:
         try:
-            existing = client.table("users_metadata").select("id").eq("user_id", user_id).execute()
+            existing = client.table("users_metadata").select("user_id").eq("user_id", user_id).execute()
 
             if existing.data:
                 client.table("users_metadata").update({"data_collection": data_collection}).eq(
@@ -108,5 +112,6 @@ class UserRepository:
                 ).execute()
 
             return True
-        except Exception:
+        except Exception as e:
+            logger.error(f"Failed to update data_collection for user {user_id}: {e}")
             return False

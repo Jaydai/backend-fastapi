@@ -27,6 +27,7 @@ class FolderRepository:
         user_id=None,
         organization_id=None,
         parent_folder_id=None,
+        depth=None,
         limit=100,
         offset=0,
     ):
@@ -36,6 +37,7 @@ class FolderRepository:
             user_id=user_id,
             organization_id=organization_id,
             parent_folder_id=parent_folder_id,
+            depth=depth,
             limit=limit,
             offset=offset,
         )

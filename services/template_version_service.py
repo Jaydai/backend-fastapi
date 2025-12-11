@@ -18,6 +18,7 @@ class TemplateVersionService:
             return None
         return TemplateMapper.version_entity_to_content_dto(version, locale)
 
+    @staticmethod
     def get_versions_summary(client: Client, template_id: str, published: bool | None = None) -> list[VersionSummary]:
         return TemplateVersionRepository.get_versions_summary(client, template_id, published)
 
