@@ -21,6 +21,8 @@ from routes import router as api_router
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+print("test")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
