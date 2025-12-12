@@ -1,9 +1,13 @@
 from dataclasses import dataclass
-from datetime import datetime
 
 
 @dataclass
 class OnboardingStatus:
+    """Legacy onboarding status for user preferences.
+
+    Note: Onboarding flow state (step, flow_type, completed_at) is now
+    stored in users_onboarding table and accessed via OnboardingRepository.
+    """
     job_type: str | None = None
     job_industry: str | None = None
     job_seniority: str | None = None
@@ -17,8 +21,4 @@ class OnboardingStatus:
     first_template_used: bool = False
     first_block_created: bool = False
     keyboard_shortcut_used: bool = False
-    # New fields for onboarding flow
-    onboarding_step: str = "not_started"
-    onboarding_flow_type: str | None = None
-    onboarding_completed_at: datetime | None = None
     extension_installed: bool = False

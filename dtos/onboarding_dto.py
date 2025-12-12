@@ -1,8 +1,15 @@
+"""
+Onboarding DTOs
+
+Data Transfer Objects for onboarding flow API endpoints.
+"""
+
 from typing import Literal
 
 from pydantic import BaseModel
 
 
+# Type definitions
 OnboardingFlowType = Literal["invited", "create_org", "personal"]
 OnboardingStep = Literal[
     "not_started",
@@ -16,7 +23,14 @@ OnboardingStep = Literal[
 ]
 
 
+# =============================================================================
+# Legacy Status DTOs (for backward compatibility)
+# =============================================================================
+
+
 class OnboardingStatusResponseDTO(BaseModel):
+    """Legacy onboarding status response."""
+
     has_completed_onboarding: bool
     job_type: str | None = None
     job_industry: str | None = None
@@ -34,6 +48,8 @@ class OnboardingStatusResponseDTO(BaseModel):
 
 
 class UpdateOnboardingDTO(BaseModel):
+    """Legacy update onboarding request."""
+
     job_type: str | None = None
     job_industry: str | None = None
     job_seniority: str | None = None
@@ -49,8 +65,13 @@ class UpdateOnboardingDTO(BaseModel):
     keyboard_shortcut_used: bool | None = None
 
 
+# =============================================================================
+# Flow DTOs
+# =============================================================================
+
+
 class PendingInvitationDTO(BaseModel):
-    """Simplified invitation info for onboarding flow"""
+    """Simplified invitation info for onboarding flow."""
 
     id: str
     organization_id: str
@@ -60,69 +81,65 @@ class PendingInvitationDTO(BaseModel):
 
 
 class OnboardingFlowResponseDTO(BaseModel):
-    """Current onboarding flow state"""
+    """Current onboarding flow state."""
 
     flow_type: OnboardingFlowType | None = None
     current_step: OnboardingStep = "not_started"
     pending_invitation: PendingInvitationDTO | None = None
     organization_id: str | None = None
     has_extension: bool = False
-    # Include status info for convenience
     has_completed_onboarding: bool = False
 
 
 class UpdateOnboardingStepDTO(BaseModel):
-    """Update onboarding step progress"""
+    """Update onboarding step progress."""
 
     step: OnboardingStep
     flow_type: OnboardingFlowType | None = None
 
 
-class OnboardingChatMessageDTO(BaseModel):
-    """User response in onboarding chat (legacy)"""
-
-    question_id: str
-    user_response: str
+# =============================================================================
+# Organization Generation DTOs
+# =============================================================================
 
 
-class OnboardingChatResponseDTO(BaseModel):
-    """AI-processed response for onboarding chat (legacy)"""
+class GenerateOrganizationDescriptionRequestDTO(BaseModel):
+    """Request to generate organization description."""
 
-    ai_summary: str | None = None
-    extracted_data: dict | None = None
-    next_question_id: str | None = None
-
-
-# New AI-powered onboarding DTOs
-
-
-class GenerateCompanyDescriptionRequestDTO(BaseModel):
-    """Request to generate company description"""
-
-    company_name: str
+    organization_name: str
     website_url: str | None = None
     linkedin_url: str | None = None
-    language: str = "en"  # Language code ('en' or 'fr')
+    language: str = "en"
 
 
-class GenerateCompanyDescriptionResponseDTO(BaseModel):
-    """Response with generated company description"""
+class GenerateOrganizationDescriptionResponseDTO(BaseModel):
+    """Response with generated organization description."""
 
-    company_description: str
+    organization_description: str
     industry: str
 
 
+# Legacy aliases for backward compatibility
+GenerateCompanyDescriptionRequestDTO = GenerateOrganizationDescriptionRequestDTO
+GenerateCompanyDescriptionResponseDTO = GenerateOrganizationDescriptionResponseDTO
+
+
+# =============================================================================
+# Job Generation DTOs
+# =============================================================================
+
+
 class GenerateJobDescriptionRequestDTO(BaseModel):
-    """Request to generate job description"""
+    """Request to generate job description."""
 
     linkedin_url: str | None = None
     manual_description: str | None = None
-    company_description: str | None = None
-    language: str = "en"  # Language code ('en' or 'fr')
+    organization_description: str | None = None
+    language: str = "en"
 
 
 class JobDescriptionDTO(BaseModel):
-    """A generated job description"""
+    """A generated job description."""
 
     job_title: str
     job_description: str
@@ -130,15 +147,20 @@ class JobDescriptionDTO(BaseModel):
 
 
 class GenerateJobDescriptionResponseDTO(BaseModel):
-    """Response with generated job description"""
+    """Response with generated job description."""
 
     job_title: str
     job_description: str
     seniority_level: str
 
 
+# =============================================================================
+# Use Case DTOs
+# =============================================================================
+
+
 class AIUseCaseDTO(BaseModel):
-    """A generated AI use case"""
+    """A generated AI use case."""
 
     title: str
     description: str
@@ -146,23 +168,117 @@ class AIUseCaseDTO(BaseModel):
 
 
 class GenerateUseCasesRequestDTO(BaseModel):
-    """Request to generate AI use cases based on job"""
+    """Request to generate AI use cases based on job."""
 
     job_title: str
     job_description: str
-    company_description: str | None = None
+    organization_description: str | None = None
     industry: str | None = None
-    language: str = "en"  # Language code ('en' or 'fr')
+    language: str = "en"
 
 
 class GenerateUseCasesResponseDTO(BaseModel):
-    """Response with generated AI use cases"""
+    """Response with generated AI use cases."""
 
     use_cases: list[AIUseCaseDTO]
 
 
+# =============================================================================
+# Block DTOs
+# =============================================================================
+
+
+class BlockDTO(BaseModel):
+    """A block that can be used with AI (role, goal, or context)."""
+
+    id: str
+    type: Literal["context", "role", "goal"]
+    title: str
+    description: str
+    icon: str | None = None
+    category: str | None = None
+
+
+class GenerateUserBlocksRequestDTO(BaseModel):
+    """Request to generate user blocks (context, roles, goals)."""
+
+    job_title: str
+    linkedin_url: str | None = None
+    manual_description: str | None = None
+    organization_name: str | None = None
+    organization_description: str | None = None
+    industry: str | None = None
+    language: str = "en"
+
+
+class GenerateUserBlocksResponseDTO(BaseModel):
+    """Response with generated user blocks."""
+
+    context_block: BlockDTO
+    role_blocks: list[BlockDTO]
+    goal_blocks: list[BlockDTO]
+    job_title: str
+    job_description: str
+    seniority_level: str
+
+
+# =============================================================================
+# Asset Fetching DTOs
+# =============================================================================
+
+
+class FetchOrganizationLogoRequestDTO(BaseModel):
+    """Request to fetch organization logo from website or LinkedIn."""
+
+    website_url: str | None = None
+    linkedin_url: str | None = None
+
+
+class FetchOrganizationLogoResponseDTO(BaseModel):
+    """Response with fetched organization logo URL."""
+
+    logo_url: str | None = None
+
+
+# Legacy aliases
+FetchCompanyLogoRequestDTO = FetchOrganizationLogoRequestDTO
+FetchCompanyLogoResponseDTO = FetchOrganizationLogoResponseDTO
+
+
+class FetchProfilePictureRequestDTO(BaseModel):
+    """Request to fetch profile picture from LinkedIn."""
+
+    linkedin_url: str | None = None
+
+
+class FetchProfilePictureResponseDTO(BaseModel):
+    """Response with fetched profile picture URL."""
+
+    profile_picture_url: str | None = None
+
+
+# =============================================================================
+# Chat Completion DTOs
+# =============================================================================
+
+
+class OnboardingChatMessageDTO(BaseModel):
+    """User response in onboarding chat (legacy)."""
+
+    question_id: str
+    user_response: str
+
+
+class OnboardingChatResponseDTO(BaseModel):
+    """AI-processed response for onboarding chat (legacy)."""
+
+    ai_summary: str | None = None
+    extracted_data: dict | None = None
+    next_question_id: str | None = None
+
+
 class CompleteOnboardingChatRequestDTO(BaseModel):
-    """Request to complete onboarding chat and save data"""
+    """Request to complete onboarding chat and save data (legacy v1)."""
 
     company_name: str | None = None
     company_description: str | None = None
@@ -176,81 +292,19 @@ class CompleteOnboardingChatRequestDTO(BaseModel):
 
 
 class CompleteOnboardingChatResponseDTO(BaseModel):
-    """Response after completing onboarding chat"""
+    """Response after completing onboarding chat."""
 
     summary: str
     extracted_data: dict
 
 
-# New Block DTOs for enhanced onboarding flow
-
-
-class BlockDTO(BaseModel):
-    """A block that can be used with AI (role, goal, or context)"""
-
-    id: str
-    type: Literal["company", "context", "role", "goal"]
-    title: str
-    description: str
-    icon: str | None = None  # emoji or lucide icon name
-    category: str | None = None  # for role/goal blocks
-
-
-class FetchCompanyLogoRequestDTO(BaseModel):
-    """Request to fetch company logo from website or LinkedIn"""
-
-    website_url: str | None = None
-    linkedin_url: str | None = None
-
-
-class FetchCompanyLogoResponseDTO(BaseModel):
-    """Response with fetched company logo URL"""
-
-    logo_url: str | None = None
-
-
-class FetchProfilePictureRequestDTO(BaseModel):
-    """Request to fetch profile picture from LinkedIn"""
-
-    linkedin_url: str | None = None
-
-
-class FetchProfilePictureResponseDTO(BaseModel):
-    """Response with fetched profile picture URL"""
-
-    profile_picture_url: str | None = None
-
-
-class GenerateUserBlocksRequestDTO(BaseModel):
-    """Request to generate user blocks (context, roles, goals)"""
-
-    job_title: str
-    linkedin_url: str | None = None
-    manual_description: str | None = None
-    company_name: str | None = None
-    company_description: str | None = None
-    industry: str | None = None
-    language: str = "en"
-
-
-class GenerateUserBlocksResponseDTO(BaseModel):
-    """Response with generated user blocks"""
-
-    context_block: BlockDTO
-    role_blocks: list[BlockDTO]
-    goal_blocks: list[BlockDTO]
-    job_title: str
-    job_description: str
-    seniority_level: str
-
-
 class CompleteOnboardingChatRequestDTOV2(BaseModel):
-    """Request to complete onboarding chat and save data (v2 with blocks)"""
+    """Request to complete onboarding chat and save data (v2 with blocks)."""
 
-    # Company info
-    company_name: str | None = None
-    company_logo_url: str | None = None
-    company_description: str | None = None
+    # Organization info
+    organization_name: str | None = None
+    organization_logo_url: str | None = None
+    organization_description: str | None = None
     industry: str | None = None
 
     # User info
@@ -274,3 +328,16 @@ class CompleteOnboardingChatRequestDTOV2(BaseModel):
     ai_dreams: str | None = None
     user_message: str | None = None
     signup_source: str
+
+    # Legacy field aliases for backward compatibility
+    @property
+    def company_name(self) -> str | None:
+        return self.organization_name
+
+    @property
+    def company_logo_url(self) -> str | None:
+        return self.organization_logo_url
+
+    @property
+    def company_description(self) -> str | None:
+        return self.organization_description

@@ -6,19 +6,26 @@ Updates the current onboarding step for the authenticated user.
 
 import logging
 
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, status
 
 from dtos.onboarding_dto import OnboardingFlowResponseDTO, UpdateOnboardingStepDTO
 from services.onboarding_flow_service import OnboardingFlowService
+from utils.dependencies import AuthenticatedUser, SupabaseClient
 
 from . import router
 
 logger = logging.getLogger(__name__)
 
 
-@router.patch("/step", response_model=OnboardingFlowResponseDTO, status_code=status.HTTP_200_OK)
+@router.patch(
+    "/step",
+    response_model=OnboardingFlowResponseDTO,
+    status_code=status.HTTP_200_OK,
+)
 async def update_onboarding_step(
-    request: Request, data: UpdateOnboardingStepDTO
+    user_id: AuthenticatedUser,
+    client: SupabaseClient,
+    data: UpdateOnboardingStepDTO,
 ) -> OnboardingFlowResponseDTO:
     """
     Update the current onboarding step.
@@ -30,12 +37,9 @@ async def update_onboarding_step(
     Returns the updated onboarding flow state.
     """
     try:
-        user_id = request.state.user_id
         logger.info(f"User {user_id} updating onboarding step to {data.step}")
 
-        result = OnboardingFlowService.update_step(
-            request.state.supabase_client, user_id, data
-        )
+        result = OnboardingFlowService.update_step(client, user_id, data)
 
         logger.info(f"User {user_id} onboarding step updated to {result.current_step}")
         return result

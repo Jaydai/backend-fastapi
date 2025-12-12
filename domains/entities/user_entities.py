@@ -1,17 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass
-class User:
-    user_id: str
-    name: str | None = None
-    data_collection: bool = True
-    profile_picture_url: str | None = None
-    email: str | None = None
-    created_at: str | None = None
-    onboarding_step: str | None = None
-    onboarding_flow_type: str | None = None
-    onboarding_completed_at: str | None = None
+# Note: User entity is defined in auth_entities.py
 
 
 @dataclass

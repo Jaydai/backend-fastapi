@@ -6,18 +6,26 @@ Returns the current onboarding flow state for the authenticated user.
 
 import logging
 
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, status
 
 from dtos.onboarding_dto import OnboardingFlowResponseDTO
 from services.onboarding_flow_service import OnboardingFlowService
+from utils.dependencies import AuthenticatedUser, SupabaseClient
 
 from . import router
 
 logger = logging.getLogger(__name__)
 
 
-@router.get("/flow", response_model=OnboardingFlowResponseDTO, status_code=status.HTTP_200_OK)
-async def get_onboarding_flow(request: Request) -> OnboardingFlowResponseDTO:
+@router.get(
+    "/flow",
+    response_model=OnboardingFlowResponseDTO,
+    status_code=status.HTTP_200_OK,
+)
+async def get_onboarding_flow(
+    user_id: AuthenticatedUser,
+    client: SupabaseClient,
+) -> OnboardingFlowResponseDTO:
     """
     Get the current onboarding flow state.
 
@@ -30,12 +38,9 @@ async def get_onboarding_flow(request: Request) -> OnboardingFlowResponseDTO:
     - has_completed_onboarding: Whether onboarding is complete
     """
     try:
-        user_id = request.state.user_id
         logger.info(f"User {user_id} getting onboarding flow")
 
-        result = OnboardingFlowService.get_onboarding_flow(
-            request.state.supabase_client, user_id
-        )
+        result = OnboardingFlowService.get_onboarding_flow(client, user_id)
 
         logger.info(
             f"User {user_id} onboarding flow: type={result.flow_type}, step={result.current_step}"

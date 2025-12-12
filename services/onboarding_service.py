@@ -1,13 +1,18 @@
 from supabase import Client
 
 from dtos.onboarding_dto import OnboardingStatusResponseDTO, UpdateOnboardingDTO
-from repositories.onboarding_repository import OnboardingRepository
+from repositories.onboarding_repository import OnboardingRepositoryLegacy
 
 
 class OnboardingService:
+    """Service for legacy onboarding status (user preferences).
+
+    Note: For the new onboarding flow state, use OnboardingFlowService.
+    """
+
     @staticmethod
     def get_onboarding_status(client: Client, user_id: str) -> OnboardingStatusResponseDTO:
-        entity = OnboardingRepository.get_user_metadata(client, user_id)
+        entity = OnboardingRepositoryLegacy.get_user_metadata(client, user_id)
 
         has_completed = (
             bool(
@@ -48,6 +53,6 @@ class OnboardingService:
         if not update_dict:
             raise ValueError("No fields to update")
 
-        OnboardingRepository.update_user_metadata(client, user_id, update_dict)
+        OnboardingRepositoryLegacy.update_user_metadata(client, user_id, update_dict)
 
         return OnboardingService.get_onboarding_status(client, user_id)

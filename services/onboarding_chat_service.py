@@ -1,9 +1,16 @@
 """
 Onboarding Chat Service
 
-Handles AI-powered onboarding conversations using OpenAI Responses API.
-Generates company descriptions, job descriptions, AI use cases, and personalizes the onboarding experience.
-Supports multiple languages (en, fr).
+DEPRECATED: This service has been split into focused services in services/onboarding/:
+- organization_generation_service.py: Organization description generation
+- job_generation_service.py: Job/blocks generation
+- use_case_generation_service.py: AI use case generation
+- asset_fetcher_service.py: Logo and profile picture fetching
+
+This file is kept for backward compatibility and reference only.
+Please use the new services from services/onboarding/ instead.
+
+Legacy file - do not use for new features.
 """
 
 import json

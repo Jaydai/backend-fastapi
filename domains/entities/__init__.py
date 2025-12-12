@@ -2,6 +2,14 @@ from .auth_entities import Session, User
 from .block_entities import Block, BlockTitle, BlockSummary
 from .folder_entities import Folder, FolderWithItems, FolderTitle
 from .message_entities import Chat, Message
+from .onboarding import (
+    OnboardingBlock,
+    OnboardingBlockType,
+    OnboardingFlowType,
+    OnboardingStep,
+    UseCase,
+    UserOnboarding,
+)
 from .organizations import (
     Organization,
     OrganizationDetail,
@@ -46,4 +54,11 @@ __all__ = [
     "Block",
     "BlockTitle",
     "BlockSummary",
+    # Onboarding entities
+    "UserOnboarding",
+    "OnboardingBlock",
+    "OnboardingBlockType",
+    "OnboardingFlowType",
+    "OnboardingStep",
+    "UseCase",
 ]

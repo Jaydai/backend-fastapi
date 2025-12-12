@@ -1,46 +1,43 @@
 """
 POST /onboarding/upload endpoints
 
-Handles file uploads for company logos and profile pictures during onboarding.
+Handles file uploads for organization logos and profile pictures during onboarding.
 """
 
 import logging
 
-from fastapi import File, HTTPException, Request, UploadFile
+from fastapi import File, HTTPException, UploadFile, status
 
 from services.file_upload_service import file_upload_service
+from utils.dependencies import AuthenticatedUser, SupabaseClient
 
 from . import router
 
 logger = logging.getLogger(__name__)
 
 
-@router.post("/upload-company-logo")
-async def upload_company_logo(request: Request, file: UploadFile = File(...)):
+@router.post("/upload-organization-logo")
+async def upload_organization_logo(
+    user_id: AuthenticatedUser,
+    client: SupabaseClient,
+    file: UploadFile = File(...),
+) -> dict:
     """
-    Upload a company logo image.
+    Upload an organization logo image.
 
     Accepts image files (JPEG, PNG, GIF, WebP, SVG) up to 5MB.
     Returns the public URL of the uploaded file.
     """
-    try:
-        user_id = request.state.user_id
-    except AttributeError:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
     if not file.content_type:
-        raise HTTPException(status_code=400, detail="Missing content type")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing content type",
+        )
 
     try:
-        # Read file content
         file_content = await file.read()
 
-        # Upload to storage
-        client = request.state.supabase_client
-        public_url = file_upload_service.upload_company_logo(
+        public_url = file_upload_service.upload_organization_logo(
             client=client,
             user_id=user_id,
             file_content=file_content,
@@ -48,43 +45,57 @@ async def upload_company_logo(request: Request, file: UploadFile = File(...)):
             original_filename=file.filename,
         )
 
-        logger.info(f"[ONBOARDING] Uploaded company logo for user {user_id}")
+        logger.info(f"Uploaded organization logo for user {user_id}")
 
         return {"logo_url": public_url}
 
     except ValueError as e:
-        logger.warning(f"[ONBOARDING] Invalid file upload: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.warning(f"Invalid file upload: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
-        logger.error(f"[ONBOARDING] Error uploading company logo: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to upload file")
+        logger.error(f"Error uploading organization logo: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload file",
+        )
+
+
+# Legacy endpoint for backward compatibility
+@router.post("/upload-company-logo", deprecated=True)
+async def upload_company_logo(
+    user_id: AuthenticatedUser,
+    client: SupabaseClient,
+    file: UploadFile = File(...),
+) -> dict:
+    """
+    Upload a company logo image.
+
+    DEPRECATED: Use /upload-organization-logo instead.
+    """
+    return await upload_organization_logo(user_id, client, file)
 
 
 @router.post("/upload-profile-picture")
-async def upload_profile_picture(request: Request, file: UploadFile = File(...)):
+async def upload_profile_picture(
+    user_id: AuthenticatedUser,
+    client: SupabaseClient,
+    file: UploadFile = File(...),
+) -> dict:
     """
     Upload a profile picture image.
 
     Accepts image files (JPEG, PNG, GIF, WebP, SVG) up to 5MB.
     Returns the public URL of the uploaded file.
     """
-    try:
-        user_id = request.state.user_id
-    except AttributeError:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
     if not file.content_type:
-        raise HTTPException(status_code=400, detail="Missing content type")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing content type",
+        )
 
     try:
-        # Read file content
         file_content = await file.read()
 
-        # Upload to storage
-        client = request.state.supabase_client
         public_url = file_upload_service.upload_profile_picture(
             client=client,
             user_id=user_id,
@@ -93,13 +104,16 @@ async def upload_profile_picture(request: Request, file: UploadFile = File(...))
             original_filename=file.filename,
         )
 
-        logger.info(f"[ONBOARDING] Uploaded profile picture for user {user_id}")
+        logger.info(f"Uploaded profile picture for user {user_id}")
 
         return {"profile_picture_url": public_url}
 
     except ValueError as e:
-        logger.warning(f"[ONBOARDING] Invalid file upload: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.warning(f"Invalid file upload: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
-        logger.error(f"[ONBOARDING] Error uploading profile picture: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to upload file")
+        logger.error(f"Error uploading profile picture: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload file",
+        )

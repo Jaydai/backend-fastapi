@@ -65,10 +65,14 @@ class AuthRepository:
 
     @staticmethod
     def get_user_metadata(client: Client, user_id: str) -> User:
-        """Get user metadata from users_metadata table"""
+        """Get user metadata from users_metadata table.
+
+        Note: Onboarding state is now stored in users_onboarding table
+        and accessed via OnboardingRepository.
+        """
         response = (
             client.table("users_metadata")
-            .select("user_id, name, data_collection, profile_picture_url, email, created_at, onboarding_step, onboarding_flow_type, onboarding_completed_at")
+            .select("user_id, name, data_collection, profile_picture_url, email, created_at")
             .eq("user_id", user_id)
             .execute()
         )
@@ -94,9 +98,6 @@ class AuthRepository:
                     profile_picture_url=data.get("profile_picture_url"),
                     email=data.get("email"),
                     created_at=data.get("created_at"),
-                    onboarding_step=data.get("onboarding_step"),
-                    onboarding_flow_type=data.get("onboarding_flow_type"),
-                    onboarding_completed_at=data.get("onboarding_completed_at"),
                 )
 
             # If insert failed, return default User
@@ -110,7 +111,4 @@ class AuthRepository:
             profile_picture_url=data.get("profile_picture_url"),
             email=data.get("email"),
             created_at=data.get("created_at"),
-            onboarding_step=data.get("onboarding_step"),
-            onboarding_flow_type=data.get("onboarding_flow_type"),
-            onboarding_completed_at=data.get("onboarding_completed_at"),
         )

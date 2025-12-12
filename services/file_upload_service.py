@@ -1,13 +1,11 @@
 """
 File Upload Service
 
-Handles file uploads to Supabase Storage for company logos and profile pictures.
+Handles file uploads to Supabase Storage for organization logos and profile pictures.
 """
 
 import logging
-import os
 import uuid
-from typing import BinaryIO
 
 from supabase import Client
 
@@ -15,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 STORAGE_BUCKET = "uploads"
-COMPANY_LOGOS_FOLDER = "company-logos"
+ORGANIZATION_LOGOS_FOLDER = "organization-logos"
 PROFILE_PICTURES_FOLDER = "profile-pictures"
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"]
@@ -26,7 +24,7 @@ class FileUploadService:
     Service for uploading files to Supabase Storage.
 
     Features:
-    - Upload company logos
+    - Upload organization logos
     - Upload profile pictures
     - File type validation
     - File size validation
@@ -52,7 +50,7 @@ class FileUploadService:
             raise ValueError(f"File too large: {file_size} bytes. Maximum: {MAX_FILE_SIZE} bytes")
 
     @staticmethod
-    def upload_company_logo(
+    def upload_organization_logo(
         client: Client,
         user_id: str,
         file_content: bytes,
@@ -60,7 +58,7 @@ class FileUploadService:
         original_filename: str | None = None,
     ) -> str:
         """
-        Upload a company logo to Supabase Storage.
+        Upload an organization logo to Supabase Storage.
 
         Args:
             client: Supabase client
@@ -72,31 +70,30 @@ class FileUploadService:
         Returns:
             Public URL of the uploaded file
         """
-        # Validate
         FileUploadService.validate_image(content_type, len(file_content))
 
-        # Generate unique filename
         extension = FileUploadService._get_extension(content_type, original_filename)
         filename = f"{uuid.uuid4()}{extension}"
-        file_path = f"{COMPANY_LOGOS_FOLDER}/{user_id}/{filename}"
+        file_path = f"{ORGANIZATION_LOGOS_FOLDER}/{user_id}/{filename}"
 
         try:
-            # Upload to Supabase Storage
             client.storage.from_(STORAGE_BUCKET).upload(
                 path=file_path,
                 file=file_content,
                 file_options={"content-type": content_type},
             )
 
-            # Get public URL
             public_url = client.storage.from_(STORAGE_BUCKET).get_public_url(file_path)
 
-            logger.info(f"[FILE_UPLOAD] Uploaded company logo for user {user_id}: {file_path}")
+            logger.info(f"Uploaded organization logo for user {user_id}: {file_path}")
             return public_url
 
         except Exception as e:
-            logger.error(f"[FILE_UPLOAD] Error uploading company logo: {e}", exc_info=True)
+            logger.error(f"Error uploading organization logo: {e}", exc_info=True)
             raise ValueError(f"Failed to upload file: {str(e)}")
+
+    # Legacy alias for backward compatibility
+    upload_company_logo = upload_organization_logo
 
     @staticmethod
     def upload_profile_picture(
@@ -119,30 +116,26 @@ class FileUploadService:
         Returns:
             Public URL of the uploaded file
         """
-        # Validate
         FileUploadService.validate_image(content_type, len(file_content))
 
-        # Generate unique filename
         extension = FileUploadService._get_extension(content_type, original_filename)
         filename = f"{uuid.uuid4()}{extension}"
         file_path = f"{PROFILE_PICTURES_FOLDER}/{user_id}/{filename}"
 
         try:
-            # Upload to Supabase Storage
             client.storage.from_(STORAGE_BUCKET).upload(
                 path=file_path,
                 file=file_content,
                 file_options={"content-type": content_type},
             )
 
-            # Get public URL
             public_url = client.storage.from_(STORAGE_BUCKET).get_public_url(file_path)
 
-            logger.info(f"[FILE_UPLOAD] Uploaded profile picture for user {user_id}: {file_path}")
+            logger.info(f"Uploaded profile picture for user {user_id}: {file_path}")
             return public_url
 
         except Exception as e:
-            logger.error(f"[FILE_UPLOAD] Error uploading profile picture: {e}", exc_info=True)
+            logger.error(f"Error uploading profile picture: {e}", exc_info=True)
             raise ValueError(f"Failed to upload file: {str(e)}")
 
     @staticmethod

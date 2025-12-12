@@ -5,6 +5,9 @@ Manages the user onboarding flow state, including:
 - Determining flow type (invited, create_org, personal)
 - Tracking current step
 - Advancing through steps
+- Completing onboarding
+
+Uses the new users_onboarding table via OnboardingRepository.
 """
 
 import logging
@@ -26,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 # Step order for each flow type
-FLOW_STEPS = {
+FLOW_STEPS: dict[str, list[str]] = {
     "invited": ["personal_questions", "extension_check", "completed"],
     "create_org": [
         "org_details",
@@ -41,6 +44,8 @@ FLOW_STEPS = {
 
 
 class OnboardingFlowService:
+    """Service for managing onboarding flow state."""
+
     @staticmethod
     def get_onboarding_flow(client: Client, user_id: str) -> OnboardingFlowResponseDTO:
         """
@@ -50,90 +55,57 @@ class OnboardingFlowService:
         1. If user has pending invitation -> flow_type = 'invited'
         2. If user already has organizations -> skip org creation
         3. Otherwise -> flow_type = None (user must choose)
+
+        Args:
+            client: Supabase client
+            user_id: User's UUID
+
+        Returns:
+            OnboardingFlowResponseDTO with current state
         """
-        # Get current onboarding metadata
-        metadata = OnboardingRepository.get_user_metadata(client, user_id)
+        # Get or create onboarding record
+        onboarding = OnboardingRepository.get_or_create(client, user_id)
 
         # Check if already completed
-        has_completed = (
-            bool(
-                metadata.job_type
-                and metadata.job_industry
-                and metadata.job_seniority
-                and metadata.interests
-                and metadata.signup_source
-            )
-            or metadata.onboarding_dismissed
-            or metadata.onboarding_step == "completed"
-        )
-
-        if has_completed:
+        if onboarding.is_completed or onboarding.is_dismissed:
             return OnboardingFlowResponseDTO(
-                flow_type=metadata.onboarding_flow_type,
+                flow_type=onboarding.flow_type,
                 current_step="completed",
                 has_completed_onboarding=True,
-                has_extension=metadata.extension_installed,
+                has_extension=onboarding.extension_installed,
             )
 
         # Check for pending invitations
-        pending_invitation = None
-        try:
-            invitations = InvitationService.get_pending_invitations(client, user_id)
-            if invitations:
-                first_inv = invitations[0]
-                pending_invitation = PendingInvitationDTO(
-                    id=first_inv.id,
-                    organization_id="",  # TODO: Get from invitation
-                    organization_name=first_inv.organization_name or "",
-                    inviter_name=first_inv.inviter_name,
-                    role=first_inv.role,
-                )
-        except Exception as e:
-            logger.warning(f"Error checking pending invitations: {e}")
+        pending_invitation = OnboardingFlowService._get_pending_invitation(
+            client, user_id
+        )
 
         # Determine flow type
-        flow_type = metadata.onboarding_flow_type
+        flow_type = onboarding.flow_type
 
         if pending_invitation and not flow_type:
             flow_type = "invited"
 
         # If no flow type and not invited, check if user has organizations
         if not flow_type and not pending_invitation:
-            try:
-                organizations = OrganizationService.get_organizations(client)
-                if organizations:
-                    # User already has organizations, skip org creation
-                    flow_type = "personal"
-            except Exception as e:
-                logger.warning(f"Error checking organizations: {e}")
+            flow_type = OnboardingFlowService._check_existing_organizations(client)
 
         # Determine current step
-        current_step = metadata.onboarding_step
-        if current_step == "not_started":
-            if pending_invitation:
-                current_step = "personal_questions"  # Skip to personal for invited users
-            elif not flow_type:
-                current_step = "flow_selection"
-            elif flow_type == "create_org":
-                current_step = "org_details"
-            else:
-                current_step = "personal_questions"
+        current_step = OnboardingFlowService._determine_current_step(
+            onboarding.current_step,
+            flow_type,
+            pending_invitation is not None,
+        )
 
         # Get organization ID if user has one
-        organization_id = None
-        try:
-            organizations = OrganizationService.get_organizations(client)
-            if organizations:
-                organization_id = organizations[0].id
-        except Exception:
-            pass
+        organization_id = OnboardingFlowService._get_user_organization_id(client)
 
         return OnboardingFlowResponseDTO(
             flow_type=flow_type,
             current_step=current_step,
             pending_invitation=pending_invitation,
             organization_id=organization_id,
-            has_extension=metadata.extension_installed,
+            has_extension=onboarding.extension_installed,
             has_completed_onboarding=False,
         )
 
@@ -143,16 +115,21 @@ class OnboardingFlowService:
     ) -> OnboardingFlowResponseDTO:
         """
         Update the current onboarding step.
+
+        Args:
+            client: Supabase client
+            user_id: User's UUID
+            update_data: Step and optional flow type to update
+
+        Returns:
+            Updated OnboardingFlowResponseDTO
         """
-        update_dict = {"onboarding_step": update_data.step}
-
-        if update_data.flow_type:
-            update_dict["onboarding_flow_type"] = update_data.flow_type
-
-        if update_data.step == "completed":
-            update_dict["onboarding_completed_at"] = datetime.utcnow().isoformat()
-
-        OnboardingRepository.update_user_metadata(client, user_id, update_dict)
+        OnboardingRepository.update_step(
+            client,
+            user_id,
+            step=update_data.step,
+            flow_type=update_data.flow_type,
+        )
 
         return OnboardingFlowService.get_onboarding_flow(client, user_id)
 
@@ -160,6 +137,16 @@ class OnboardingFlowService:
     def advance_step(client: Client, user_id: str) -> OnboardingFlowResponseDTO:
         """
         Advance to the next step in the current flow.
+
+        Args:
+            client: Supabase client
+            user_id: User's UUID
+
+        Returns:
+            Updated OnboardingFlowResponseDTO
+
+        Raises:
+            ValueError: If no flow type is set
         """
         current_flow = OnboardingFlowService.get_onboarding_flow(client, user_id)
 
@@ -169,15 +156,7 @@ class OnboardingFlowService:
         flow_steps = FLOW_STEPS.get(current_flow.flow_type, [])
         current_step = current_flow.current_step
 
-        try:
-            current_index = flow_steps.index(current_step)
-            if current_index < len(flow_steps) - 1:
-                next_step = flow_steps[current_index + 1]
-            else:
-                next_step = "completed"
-        except ValueError:
-            # Current step not in flow, start from beginning
-            next_step = flow_steps[0] if flow_steps else "completed"
+        next_step = OnboardingFlowService._get_next_step(flow_steps, current_step)
 
         return OnboardingFlowService.update_step(
             client,
@@ -189,21 +168,120 @@ class OnboardingFlowService:
     def complete_onboarding(client: Client, user_id: str) -> OnboardingFlowResponseDTO:
         """
         Mark onboarding as complete.
+
+        Args:
+            client: Supabase client
+            user_id: User's UUID
+
+        Returns:
+            Updated OnboardingFlowResponseDTO
         """
-        update_dict = {
-            "onboarding_step": "completed",
-            "onboarding_completed_at": datetime.utcnow().isoformat(),
-        }
-
-        OnboardingRepository.update_user_metadata(client, user_id, update_dict)
-
+        OnboardingRepository.complete(client, user_id)
         return OnboardingFlowService.get_onboarding_flow(client, user_id)
 
     @staticmethod
-    def set_extension_installed(client: Client, user_id: str, installed: bool) -> None:
+    def dismiss_onboarding(client: Client, user_id: str) -> OnboardingFlowResponseDTO:
+        """
+        Dismiss onboarding (user chose to skip).
+
+        Args:
+            client: Supabase client
+            user_id: User's UUID
+
+        Returns:
+            Updated OnboardingFlowResponseDTO
+        """
+        OnboardingRepository.dismiss(client, user_id)
+        return OnboardingFlowService.get_onboarding_flow(client, user_id)
+
+    @staticmethod
+    def set_extension_installed(
+        client: Client, user_id: str, installed: bool = True
+    ) -> None:
         """
         Update the extension installed status.
+
+        Args:
+            client: Supabase client
+            user_id: User's UUID
+            installed: Whether extension is installed
         """
-        OnboardingRepository.update_user_metadata(
-            client, user_id, {"extension_installed": installed}
-        )
+        OnboardingRepository.set_extension_installed(client, user_id, installed)
+
+    # =========================================================================
+    # Private helper methods
+    # =========================================================================
+
+    @staticmethod
+    def _get_pending_invitation(
+        client: Client, user_id: str
+    ) -> PendingInvitationDTO | None:
+        """Get the first pending invitation for the user."""
+        try:
+            invitations = InvitationService.get_pending_invitations(client, user_id)
+            if invitations:
+                first_inv = invitations[0]
+                return PendingInvitationDTO(
+                    id=first_inv.id,
+                    organization_id=getattr(first_inv, "organization_id", ""),
+                    organization_name=first_inv.organization_name or "",
+                    inviter_name=first_inv.inviter_name,
+                    role=first_inv.role,
+                )
+        except Exception as e:
+            logger.warning(f"Error checking pending invitations: {e}")
+        return None
+
+    @staticmethod
+    def _check_existing_organizations(client: Client) -> str | None:
+        """Check if user has existing organizations, return 'personal' if so."""
+        try:
+            organizations = OrganizationService.get_organizations(client)
+            if organizations:
+                return "personal"
+        except Exception as e:
+            logger.warning(f"Error checking organizations: {e}")
+        return None
+
+    @staticmethod
+    def _get_user_organization_id(client: Client) -> str | None:
+        """Get the user's first organization ID if any."""
+        try:
+            organizations = OrganizationService.get_organizations(client)
+            if organizations:
+                return organizations[0].id
+        except Exception:
+            pass
+        return None
+
+    @staticmethod
+    def _determine_current_step(
+        stored_step: str,
+        flow_type: str | None,
+        has_pending_invitation: bool,
+    ) -> OnboardingStep:
+        """Determine the appropriate current step based on state."""
+        if stored_step != "not_started":
+            return stored_step
+
+        if has_pending_invitation:
+            return "personal_questions"
+        elif not flow_type:
+            return "flow_selection"
+        elif flow_type == "create_org":
+            return "org_details"
+        else:
+            return "personal_questions"
+
+    @staticmethod
+    def _get_next_step(flow_steps: list[str], current_step: str) -> OnboardingStep:
+        """Get the next step in the flow."""
+        try:
+            current_index = flow_steps.index(current_step)
+            if current_index < len(flow_steps) - 1:
+                return flow_steps[current_index + 1]
+            else:
+                return "completed"
+        except ValueError:
+            # Current step not in flow, start from beginning
+            return flow_steps[0] if flow_steps else "completed"
