@@ -19,6 +19,7 @@ class BlockRepository:
         client: Client,
         user_id: str | None = None,
         organization_id: str | None = None,
+        team_id: str | None = None,
         include_org_info: bool = False,
         type: str | None = None,
         limit: int = 1000,
@@ -27,17 +28,19 @@ class BlockRepository:
         # If include_org_info, join with organizations to fetch image_url
         if include_org_info:
             query = client.table("prompt_blocks").select(
-                "id, title, description, usage_count, type, organization_id, organizations!inner(image_url)"
+                "id, title, description, usage_count, type, organization_id, team_id, workspace_type, organizations!inner(image_url)"
             )
         else:
             query = client.table("prompt_blocks").select(
-                "id, title, description, usage_count, type"
+                "id, title, description, usage_count, type, team_id, workspace_type"
             )
 
         if user_id is not None:
-            query = query.eq("user_id", user_id)
-        if organization_id is not None:
-            query = query.eq("organization_id", organization_id)
+            query = query.eq("user_id", user_id).eq("workspace_type", "user")
+        if organization_id is not None and team_id is None:
+            query = query.eq("organization_id", organization_id).eq("workspace_type", "organization")
+        if team_id is not None:
+            query = query.eq("team_id", team_id).eq("workspace_type", "team")
         if type is not None:
             query = query.eq("type", type)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
@@ -52,8 +55,10 @@ class BlockRepository:
                     title=data.get("title", {}),
                     description=data.get("description"),
                     usage_count=data.get("usage_count", 0),
-                    organization_image_url=data.get("organizations", {}).get("image_url"),
+                    organization_image_url=data.get("organizations", {}).get("image_url") if include_org_info else None,
                     organization_id=data.get("organization_id"),
+                    team_id=data.get("team_id"),
+                    workspace_type=data.get("workspace_type"),
                 )
             )
 
@@ -117,6 +122,7 @@ class BlockRepository:
             published=data.get("published", False),
             user_id=data["user_id"],
             organization_id=data.get("organization_id"),
+            team_id=data.get("team_id"),
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
@@ -133,6 +139,7 @@ class BlockRepository:
         content: dict[str, str],
         published: bool,
         organization_id: str | None,
+        team_id: str | None,
         workspace_type: str,
     ) -> Block:
         block_data = {
@@ -143,6 +150,7 @@ class BlockRepository:
             "content": content,
             "published": published,
             "organization_id": organization_id,
+            "team_id": team_id,
             "workspace_type": workspace_type,
         }
 
@@ -158,6 +166,7 @@ class BlockRepository:
             published=data.get("published", False),
             user_id=data["user_id"],
             organization_id=data.get("organization_id"),
+            team_id=data.get("team_id"),
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
@@ -201,6 +210,7 @@ class BlockRepository:
             published=data.get("published", False),
             user_id=data["user_id"],
             organization_id=data.get("organization_id"),
+            team_id=data.get("team_id"),
             workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),

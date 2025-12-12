@@ -237,6 +237,28 @@ class TeamService:
         )
 
     @staticmethod
+    def get_user_teams(
+        client: Client, user_id: str, organization_id: str | None = None
+    ) -> list[TeamDTO]:
+        """Get all teams the user belongs to, optionally filtered by organization"""
+        teams = TeamRepository.get_user_teams(client, user_id, organization_id)
+
+        return [
+            TeamDTO(
+                id=team.id,
+                organization_id=team.organization_id,
+                name=team.name,
+                description=team.description,
+                parent_team_id=team.parent_team_id,
+                color=team.color,
+                created_at=team.created_at,
+                updated_at=team.updated_at,
+                member_count=team.member_count,
+            )
+            for team in teams
+        ]
+
+    @staticmethod
     def _convert_tree_to_dtos(tree_nodes: list) -> list[TeamTreeNodeDTO]:
         """Convert tree nodes to DTOs recursively"""
         dtos = []

@@ -69,6 +69,49 @@ class FolderService:
         ]
 
     @staticmethod
+    def get_folders_by_scope(
+        client: Client,
+        user_id: str,
+        scope: str,
+        locale: str = LocaleService.DEFAULT_LOCALE,
+        organization_id: str | None = None,
+        team_id: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[FolderTitleResponseDTO]:
+        """Get folders filtered by content scope
+
+        Args:
+            scope: 'private' | 'organization' | 'team'
+            organization_id: Required for 'organization' and 'team' scopes
+            team_id: Required for 'team' scope
+        """
+        filter_user_id = None
+        filter_org_id = None
+        filter_team_id = None
+
+        if scope == "private":
+            filter_user_id = user_id
+        elif scope == "organization":
+            filter_org_id = organization_id
+        elif scope == "team":
+            filter_team_id = team_id
+
+        folders = FolderRepository.get_folders_titles(
+            client,
+            user_id=filter_user_id,
+            organization_id=filter_org_id,
+            team_id=filter_team_id,
+            limit=limit,
+            offset=offset,
+        )
+
+        return [
+            FolderTitleResponseDTO(**LocaleService.localize_object(folder.__dict__, locale, ["title"]))
+            for folder in folders
+        ]
+
+    @staticmethod
     def get_folder_by_id(
         client: Client, folder_id: str, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> FolderResponseDTO | None:

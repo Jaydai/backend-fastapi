@@ -5,6 +5,7 @@ router = APIRouter(prefix="/blocks", tags=["Blocks"])
 from . import (  # noqa: E402, I001
     get_block_types,
     get_available_blocks,
+    get_by_scope,  # /by-scope/{scope} must come before /{block_id}
     create_block,
     get_blocks_by_type,
     get_pinned_blocks,  # Must be before get_block to avoid path conflicts

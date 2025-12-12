@@ -8,7 +8,9 @@ class Template:
     description: dict[str, str] | None
     folder_id: str | None
     organization_id: str | None
+    team_id: str | None
     user_id: str | None
+    workspace_type: str
     created_at: str
     updated_at: str | None
     usage_count: int
@@ -41,6 +43,8 @@ class TemplateTitle:
     id: str
     title: dict[str, str]
     folder_id: str | None = None
+    team_id: str | None = None
+    workspace_type: str | None = None
 
 
 @dataclass

@@ -20,6 +20,7 @@ class BlockService:
         locale: str = LocaleService.DEFAULT_LOCALE,
         user_id: str | None = None,
         organization_id: str | None = None,
+        team_id: str | None = None,
         type: str | None = None,
         include_org_info: bool = False,
         limit: int = 1000,
@@ -29,8 +30,47 @@ class BlockService:
             client,
             user_id=user_id,
             organization_id=organization_id,
+            team_id=team_id,
             type=type,
             include_org_info=include_org_info,
+            limit=limit,
+            offset=offset,
+        )
+
+        return [BlockMapper.entity_to_summary_dto(b, locale) for b in blocks]
+
+    @staticmethod
+    def get_blocks_by_scope(
+        client: Client,
+        user_id: str,
+        scope: str,
+        locale: str = LocaleService.DEFAULT_LOCALE,
+        organization_id: str | None = None,
+        team_id: str | None = None,
+        type: str | None = None,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> list[BlockSummaryResponseDTO]:
+        """Get blocks filtered by scope (private, organization, or team)"""
+        filter_user_id = None
+        filter_org_id = None
+        filter_team_id = None
+
+        if scope == "private":
+            filter_user_id = user_id
+        elif scope == "organization" and organization_id:
+            filter_org_id = organization_id
+        elif scope == "team" and team_id:
+            filter_team_id = team_id
+        else:
+            return []
+
+        blocks = BlockRepository.get_blocks(
+            client,
+            user_id=filter_user_id,
+            organization_id=filter_org_id,
+            team_id=filter_team_id,
+            type=type,
             limit=limit,
             offset=offset,
         )
@@ -77,8 +117,11 @@ class BlockService:
     def create_block(
         client: Client, user_id: str, data: CreateBlockDTO, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> BlockResponseDTO:
+        # Determine workspace_type based on hierarchy: team > organization > user
         workspace_type = "user"
-        if data.organization_id:
+        if data.team_id:
+            workspace_type = "team"
+        elif data.organization_id:
             workspace_type = "organization"
 
         title_dict = LocaleService.ensure_localized_dict(data.title, locale)
@@ -94,6 +137,7 @@ class BlockService:
             content_dict,
             data.published,
             data.organization_id,
+            data.team_id,
             workspace_type,
         )
 

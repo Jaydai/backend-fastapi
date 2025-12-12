@@ -13,6 +13,7 @@ class Block:
     published: bool
     user_id: str
     organization_id: str | None
+    team_id: str | None
     workspace_type: str
     created_at: str
     updated_at: str | None
@@ -33,3 +34,5 @@ class BlockSummary:
     usage_count: int
     organization_image_url: str | None
     organization_id: str | None
+    team_id: str | None = None
+    workspace_type: str | None = None

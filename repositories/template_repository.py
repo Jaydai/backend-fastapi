@@ -16,15 +16,18 @@ class TemplateRepository:
         client: Client,
         user_id: str | None = None,
         organization_id: str | None = None,
+        team_id: str | None = None,
         published: bool | None = None,
         limit: int = 100,
         offset: int = 0,
     ) -> list[TemplateTitle]:
-        query = client.table("prompt_templates").select("id, title, folder_id")
+        query = client.table("prompt_templates").select("id, title, folder_id, team_id, workspace_type")
         if user_id:
-            query = query.eq("user_id", user_id)
-        if organization_id:
-            query = query.eq("organization_id", organization_id)
+            query = query.eq("user_id", user_id).eq("workspace_type", "user")
+        if organization_id and not team_id:
+            query = query.eq("organization_id", organization_id).eq("workspace_type", "organization")
+        if team_id:
+            query = query.eq("team_id", team_id).eq("workspace_type", "team")
         if published is not None:
             query = query.eq("published", published)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
@@ -79,7 +82,9 @@ class TemplateRepository:
             description=data.get("description"),
             folder_id=data.get("folder_id"),
             organization_id=data.get("organization_id"),
+            team_id=data.get("team_id"),
             user_id=data["user_id"],
+            workspace_type=data.get("workspace_type", "user"),
             created_at=data["created_at"],
             updated_at=data.get("updated_at"),
             usage_count=data.get("usage_count", 0),
@@ -96,6 +101,7 @@ class TemplateRepository:
         description: dict[str, str] | None,
         folder_id: str | None,
         organization_id: str | None,
+        team_id: str | None,
         tags: list[str] | None,
         workspace_type: str,
     ) -> Template:
@@ -105,6 +111,7 @@ class TemplateRepository:
             "description": description,
             "folder_id": folder_id,
             "organization_id": organization_id,
+            "team_id": team_id,
             "tags": tags or [],
             "workspace_type": workspace_type,
         }

@@ -22,6 +22,7 @@ class TemplateService:
         user_id: str,
         locale: str = LocaleService.DEFAULT_LOCALE,
         organization_id: str | None = None,
+        team_id: str | None = None,
         folder_id: str | None = None,
         published: bool | None = None,
         limit: int = 100,
@@ -31,23 +32,67 @@ class TemplateService:
         # Business logic: Determine which filters to apply based on priority
         filter_user_id = None
         filter_org_id = None
+        filter_team_id = None
 
         if folder_id is not None:
             # Priority 1: Filter by folder only
             pass
+        elif team_id:
+            # Priority 2: Filter by team
+            filter_team_id = team_id
         elif organization_id:
-            # Priority 2: Filter by organization only
+            # Priority 3: Filter by organization only
             filter_org_id = organization_id
         elif user_id:
-            # Priority 3: Filter by user only
+            # Priority 4: Filter by user only (private)
             filter_user_id = user_id
-        # Priority 4: No filters (RLS handles access)
+        # Priority 5: No filters (RLS handles access)
 
         templates = TemplateRepository.get_templates_titles(
             client,
             user_id=filter_user_id,
             organization_id=filter_org_id,
+            team_id=filter_team_id,
             published=published,
+            limit=limit,
+            offset=offset,
+        )
+
+        return [
+            TemplateTitleResponseDTO(**LocaleService.localize_object(template.__dict__, locale, ["title"]))
+            for template in templates
+        ]
+
+    @staticmethod
+    def get_templates_by_scope(
+        client: Client,
+        user_id: str,
+        scope: str,
+        locale: str = LocaleService.DEFAULT_LOCALE,
+        organization_id: str | None = None,
+        team_id: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[TemplateTitleResponseDTO]:
+        """Get templates filtered by scope (private, organization, or team)"""
+        filter_user_id = None
+        filter_org_id = None
+        filter_team_id = None
+
+        if scope == "private":
+            filter_user_id = user_id
+        elif scope == "organization" and organization_id:
+            filter_org_id = organization_id
+        elif scope == "team" and team_id:
+            filter_team_id = team_id
+        else:
+            return []
+
+        templates = TemplateRepository.get_templates_titles(
+            client,
+            user_id=filter_user_id,
+            organization_id=filter_org_id,
+            team_id=filter_team_id,
             limit=limit,
             offset=offset,
         )
@@ -79,8 +124,11 @@ class TemplateService:
     def create_template(
         client: Client, user_id: str, data: CreateTemplateDTO, locale: str = LocaleService.DEFAULT_LOCALE
     ) -> TemplateResponseDTO:
+        # Determine workspace_type based on hierarchy: team > organization > user
         workspace_type = "user"
-        if data.organization_id:
+        if data.team_id:
+            workspace_type = "team"
+        elif data.organization_id:
             workspace_type = "organization"
 
         title_dict = LocaleService.ensure_localized_dict(data.title, locale)
@@ -94,6 +142,7 @@ class TemplateService:
             description_dict,
             data.folder_id,
             data.organization_id,
+            data.team_id,
             data.tags,
             workspace_type,
         )

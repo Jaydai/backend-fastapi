@@ -9,6 +9,7 @@ def get_folders_titles(
     client: Client,
     user_id: str | None = None,
     organization_id: str | None = None,
+    team_id: str | None = None,
     published: bool | None = None,
     parent_folder_id: str | None = None,
     depth: int | None = None,
@@ -24,6 +25,7 @@ def get_folders_titles(
                depth=0: Only folders at parent_folder_id level
                depth=1: Folders at parent_folder_id level + their direct children
                depth=None: All folders (current behavior)
+        team_id: Filter by team_id for team-scoped folders
     """
     query = client.table("prompt_folders").select("id, title, parent_folder_id")
 
@@ -32,6 +34,9 @@ def get_folders_titles(
 
     if organization_id:
         query = query.eq("organization_id", organization_id)
+
+    if team_id:
+        query = query.eq("team_id", team_id)
 
     if published is not None:
         query = query.eq("published", published)

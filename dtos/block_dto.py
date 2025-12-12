@@ -11,6 +11,7 @@ class CreateBlockDTO(BaseModel):
     content: str
     published: bool = True
     organization_id: str | None = None
+    team_id: str | None = None
 
 
 class UpdateBlockDTO(BaseModel):
@@ -30,6 +31,7 @@ class BlockResponseDTO(BaseModel):
     published: bool
     user_id: str
     organization_id: str | None = None
+    team_id: str | None = None
     workspace_type: str
     created_at: str
     updated_at: str | None = None
@@ -49,3 +51,5 @@ class BlockSummaryResponseDTO(BaseModel):
     usage_count: int
     organization_image_url: str | None = None
     organization_id: str | None = None
+    team_id: str | None = None
+    workspace_type: str | None = None

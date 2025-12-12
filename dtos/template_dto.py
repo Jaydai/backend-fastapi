@@ -9,6 +9,7 @@ class CreateTemplateDTO(BaseModel):
     content: str
     folder_id: str | None = None
     organization_id: str | None = None
+    team_id: str | None = None
     tags: list[str] | None = None
     category: str | None = None
     is_public: bool | None = None
@@ -44,6 +45,7 @@ class TemplateListItemDTO(BaseModel):
     description: str | None = None
     folder_id: str | None = None
     organization_id: str | None = None
+    team_id: str | None = None
     user_id: str | None = None
     workspace_type: str
     created_at: str
@@ -78,7 +80,9 @@ class TemplateResponseDTO(BaseModel):
     description: str | None = None
     folder_id: str | None = None
     organization_id: str | None = None
+    team_id: str | None = None
     user_id: str | None = None
+    workspace_type: str | None = None
     created_at: str
     updated_at: str | None = None
     usage_count: int
