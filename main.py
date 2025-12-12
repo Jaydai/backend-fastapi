@@ -30,6 +30,7 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     logger.info("Starting up Jaydai API...")
+    print("helllllllllllllllooooo")
 
     try:
         # TODO faire un call à chaque composant utilisé dans le BE (définit dans core/ (ou core/startup.py))
